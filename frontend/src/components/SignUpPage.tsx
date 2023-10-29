@@ -27,6 +27,11 @@ const SignUpPage: React.FC = () => {
             </Header>
             <Content className="site-layout" style={{ padding: '0 50px' }}>
                 <Breadcrumb style={{ margin: '16px 0' }}>
+                    <Breadcrumb.Item>
+                        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+                            <h3>Home</h3>
+                        </Link>
+                    </Breadcrumb.Item>
                 </Breadcrumb>
                 <div style={{ padding: 24, background: colorBgContainer }}>
                     <div style={{ padding: 50, background: colorBgContainer }}>
@@ -35,9 +40,9 @@ const SignUpPage: React.FC = () => {
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
                         </Space>
                         <Row>
-                            <Col span={12}></Col>
-                            <Col span={12}>Form SignUp</Col>
-                            <Col span={12}></Col>
+                            <Col span={8}></Col>
+                            <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>Form SignUp</Col>
+                            <Col span={8}></Col>
                         </Row>
                     </div>
                 </div>
