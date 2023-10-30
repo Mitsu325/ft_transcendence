@@ -16,7 +16,7 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto) {
     try {
   
-      const validatedUserDto = await new ValidationPipe().transform(createUserDto, {
+      await new ValidationPipe().transform(createUserDto, {
         metatype: CreateUserDto,
         type: 'body',
       });
