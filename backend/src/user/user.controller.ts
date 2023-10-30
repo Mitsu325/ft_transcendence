@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 import { UsernameExistsValidationPipe } from './pipes/verifyUsername.validation.pipe';
 
 @ApiTags('user')
@@ -12,9 +13,27 @@ export class UserController {
 
   @ApiOperation({ description: 'Create a new user' })
   @Post()
-  @UsePipes(UsernameExistsValidationPipe)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+  
+      const validatedUserDto = await new ValidationPipe().transform(createUserDto, {
+        metatype: CreateUserDto,
+        type: 'body',
+      });
+      await new UsernameExistsValidationPipe(this.userService).transform(createUserDto, { metatype: String, type: 'body' });
+
+      const hashPass = await this.userService.hashPassword(createUserDto.password)
+      createUserDto.password = hashPass;
+
+      const user = await this.userService.create(createUserDto);
+      if (user) {
+       return { success: true, message: 'User created successfully' };
+      } else {
+        return { success: false, message: 'Failed to create user' };
+      }
+    } catch(error){
+      return { success: false, message: 'Validation failed', error: error.response.message  };
+    } 
   }
 
   @ApiOperation({ description: 'Lista todos os usuários da base' })
