@@ -1,6 +1,6 @@
 import React from 'react';
 import '../style.css'
-import { Link } from 'react-router-dom'; // Importe Link do React Router
+import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
 
 const { Header, Content, Footer } = Layout;
