@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { UsernameExistsValidationPipe } from './pipes/verifyUsername.validation.pipe';
+import { EmailExistsValidationPipe } from './pipes/verifyEmail.validation.pipe';
 import { hashPassword } from '../utils/hash.util'
 
 @ApiTags('user')
@@ -21,7 +21,7 @@ export class UserController {
         metatype: CreateUserDto,
         type: 'body',
       });
-      await new UsernameExistsValidationPipe(this.userService).transform(createUserDto, { metatype: String, type: 'body' });
+      await new EmailExistsValidationPipe(this.userService).transform(createUserDto, { metatype: String, type: 'body' });
 
       const hashPass = await hashPassword(createUserDto.password)
       createUserDto.password = hashPass;
