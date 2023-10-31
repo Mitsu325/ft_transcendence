@@ -1,12 +1,12 @@
 import React from 'react';
-import '../style.css'
+import './style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
 
-const HomePage: React.FC = () => {
+const SignUpPage: React.FC = () => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
                         </Space>
                         <Row>
                             <Col span={8}></Col>
-                            <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>Form Login</Col>
+                            <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>Form SignUp</Col>
                             <Col span={8}></Col>
                         </Row>
                     </div>
@@ -52,4 +52,4 @@ const HomePage: React.FC = () => {
     );
 };
 
-export default HomePage;
+export default SignUpPage;
