@@ -15,9 +15,9 @@ export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty()
-    @MinLength(3)
+    @IsEmail()
     @MaxLength(200)
-    username: string;
+    email: string;
 
     @IsNotEmpty()
     @MinLength(8, { message: 'The password must be at least 8 characters.' })
