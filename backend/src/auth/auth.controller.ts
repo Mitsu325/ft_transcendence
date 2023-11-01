@@ -10,11 +10,15 @@ import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ParamExistValidationPipe } from 'src/common/code-validation.pipe';
 import { Response } from 'express';
+import { UserService } from 'src/user/user.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly userService: UserService,
+    ) {}
 
     @ApiOperation({ description: 'Request 42 access token' })
     @Post('42')
@@ -43,14 +47,27 @@ export class AuthController {
                 );
             }
 
-            // TODO: Buscar o usuário no userService por meio do e-mail
-            // TODO: Se não tiver usuário criar
-            // TODO: Retornar dados do usuário
-            // TODO: No front precisa tratar as sessões quando estiver logado.
-
+            const emailExists = await this.userService.findEmail(
+                resourceOwner.email,
+            );
+            let user = emailExists;
+            if (!user) {
+                user = await this.userService.createFromOAuth({
+                    name: resourceOwner.usual_full_name,
+                    email: resourceOwner.email,
+                    avatar: resourceOwner?.image?.link ?? '',
+                });
+            }
+            const data = {
+                avatar: user.avatar,
+                email: user.email,
+                name: user.name,
+                twoFactorAuth: user.twoFactorAuth,
+                username: user.username,
+            };
             res.status(HttpStatus.OK).json({
                 message: 'Successfully exchanged code for access token',
-                data: resourceOwner,
+                data,
             });
         } catch (error) {
             if (error.response) {
