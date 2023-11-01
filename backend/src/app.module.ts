@@ -6,8 +6,8 @@ import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}
