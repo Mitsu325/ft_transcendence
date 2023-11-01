@@ -1,5 +1,5 @@
 import React from 'react';
-import './style.css'
+import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
 
@@ -13,20 +13,16 @@ const HomePage: React.FC = () => {
 
     return (
         <Layout>
-            <Header
-                style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                }}
-            >
+            <Header className="header">
                 <div className="demo-logo" />
             </Header>
             <Content className="site-layout" style={{ padding: '0 50px' }}>
                 <Breadcrumb style={{ margin: '16px 0' }}>
+                    <Breadcrumb.Item>
+                        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+                            <h3>Home</h3>
+                        </Link>
+                    </Breadcrumb.Item>
                 </Breadcrumb>
                 <div style={{ padding: 24, background: colorBgContainer }}>
                     <div style={{ padding: 50, background: colorBgContainer }}>
@@ -34,27 +30,16 @@ const HomePage: React.FC = () => {
                         <Space direction="vertical" align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
                         </Space>
-                        <Row style={{ padding: 80 }}>
-                            <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
-                                <Button type="primary" style={{ minWidth: 200 }} >
-                                    <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>
-                                        Login
-                                    </Link>
-                                </Button>
-                            </Col>
-                        </Row>
                         <Row>
-                            <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
-                                <Link to="/signup" style={{ color: '#1677FF', textDecoration: 'none' }}>
-                                    Ainda não sou cadastrado...
-                                </Link>
-                            </Col>
+                            <Col span={8}></Col>
+                            <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>Form Login</Col>
+                            <Col span={8}></Col>
                         </Row>
                     </div>
                 </div>
             </Content >
             <Footer style={{ textAlign: 'center' }}>Ant Design ©2023 Created by JMP Team</Footer>
-        </Layout >
+        </Layout>
     );
 };
 

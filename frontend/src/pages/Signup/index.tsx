@@ -1,5 +1,5 @@
 import React from 'react';
-import './style.css'
+import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
 
@@ -13,16 +13,7 @@ const SignUpPage: React.FC = () => {
 
     return (
         <Layout>
-            <Header
-                style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                }}
-            >
+            <Header className="header">
                 <div className="demo-logo" />
             </Header>
             <Content className="site-layout" style={{ padding: '0 50px' }}>
