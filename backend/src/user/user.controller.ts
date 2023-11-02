@@ -1,17 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import { EmailExistsValidationPipe } from './pipes/verifyEmail.validation.pipe';
+import { hashPassword } from '../utils/hash.util'
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ description: 'Create a new user' })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+  
+      await new ValidationPipe().transform(createUserDto, {
+        metatype: CreateUserDto,
+        type: 'body',
+      });
+      await new EmailExistsValidationPipe(this.userService).transform(createUserDto, { metatype: String, type: 'body' });
+
+      const hashPass = await hashPassword(createUserDto.password)
+      createUserDto.password = hashPass;
+
+      const user = await this.userService.create(createUserDto);
+      if (user) {
+       return { success: true, message: 'User created successfully' };
+      } else {
+        return { success: false, message: 'Failed to create user' };
+      }
+    } catch(error){
+      return { success: false, message: 'Validation failed', error: error.response.message  };
+    } 
   }
 
   @ApiOperation({ description: 'Lista todos os usuários da base' })

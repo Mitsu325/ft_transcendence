@@ -13,8 +13,15 @@ export class UserService {
     private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = this.usersRepository.create(createUserDto);
+      const savedUser = await this.usersRepository.save(user);
+      return savedUser;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 
   findAll(): Promise<User[]> {
@@ -23,6 +30,10 @@ export class UserService {
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
+  }
+
+  findEmail(email: string){
+    return this.usersRepository.findOne({ where: { email } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
