@@ -2,6 +2,7 @@ import React from 'react';
 import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
+import { FormSignup } from '../../components/Forms';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -16,11 +17,11 @@ const SignUpPage: React.FC = () => {
             <Header className="header">
                 <div className="demo-logo" />
             </Header>
-            <Content className="site-layout" style={{ padding: '0 50px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
+            <Content className="site-layout">
+                <Breadcrumb className="breadcrumb">
                     <Breadcrumb.Item>
                         <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
-                            <h3>Home</h3>
+                            Home
                         </Link>
                     </Breadcrumb.Item>
                 </Breadcrumb>
@@ -29,12 +30,15 @@ const SignUpPage: React.FC = () => {
                         <Divider></Divider>
                         <Space direction="vertical" align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
+                            <Row>
+                                <div className='divform'>
+                                    <FormSignup />
+                                    <Link to="/login" className='link'>
+                                        Login
+                                    </Link>
+                                </div>
+                            </Row>
                         </Space>
-                        <Row>
-                            <Col span={8}></Col>
-                            <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>Form SignUp</Col>
-                            <Col span={8}></Col>
-                        </Row>
                     </div>
                 </div>
             </Content >

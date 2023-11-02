@@ -2,7 +2,7 @@ import React from 'react';
 import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
-import ButtonLink from '../../components/ButtonLink';
+import ButtonLink from '../../components/Buttons';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -17,27 +17,28 @@ const HomePage: React.FC = () => {
             <Header className="header">
                 <div className="demo-logo" />
             </Header>
-            <Content className="site-layout" style={{ padding: '0 50px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
+            <Content className="site-layout">
+                <Breadcrumb className="breadcrumb">
+                    <Breadcrumb.Item>
+                        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+                            Portal JMP
+                        </Link>
+                    </Breadcrumb.Item>
                 </Breadcrumb>
                 <div style={{ padding: 24, background: colorBgContainer }}>
                     <div style={{ padding: 50, background: colorBgContainer }}>
                         <Divider></Divider>
                         <Space direction="vertical" align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
-                        </Space>
-                        <Row style={{ padding: 80 }}>
-                            <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
+                            <Row>
                                 <ButtonLink to="/login" text="Login" />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
-                                <Link to="/signup" style={{ color: '#1677FF', textDecoration: 'none' }}>
+                            </Row>
+                            <Row>
+                                <Link to="/signup" className='link'>
                                     Ainda não sou cadastrado...
                                 </Link>
-                            </Col>
-                        </Row>
+                            </Row>
+                        </Space>
                     </div>
                 </div>
             </Content >
