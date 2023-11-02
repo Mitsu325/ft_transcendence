@@ -21,7 +21,7 @@ const validationSignup = yup.object().shape({
 const handleSubmit = (values: any, endPoint: any, { resetForm }: { resetForm: () => void }) => {
     // const nav = useNavigate();
 
-    axios.post(`http://localhost:3001/${endPoint}`, values)
+    axios.post(`http://localhost:3003/${endPoint}`, values)
         .then((response) => {
             console.log(response);
             // nav('/home');
@@ -83,7 +83,7 @@ export function FormSignup() {
                     password: '',
                     confirmPassword: '',
                 }}
-                onSubmit={(values, { resetForm }) => handleSubmit(values, 'login', { resetForm })}
+                onSubmit={(values, { resetForm }) => handleSubmit(values, 'user', { resetForm })}
                 validationSchema={validationSignup}>
                 <Form className="login-form">
                     <div className="login-form-group">
