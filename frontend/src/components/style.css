@@ -1,5 +1,8 @@
 .primary-button {
     min-width: 200px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px 10px;
 }
 
 .login-link {
@@ -32,10 +35,4 @@
     display: block;
     color: rgb(237, 67, 55);
     font-size: 0.9em;
-}
-
-.primary-button {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 5px 10px;
 }
