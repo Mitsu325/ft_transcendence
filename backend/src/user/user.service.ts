@@ -41,9 +41,18 @@ export class UserService {
         return `This action returns a #${id} user`;
     }
 
-    findEmail(email: string) {
-        return this.usersRepository.findOne({ where: { email } });
-    }
+  findUsername(username: string) {
+    return this.usersRepository.findOne({
+      where: [
+        { username: username },
+        { email: username },
+      ],
+    });
+  }
+  
+  findEmail(email: string){
+    return this.usersRepository.findOne({ where: { email } });
+  }
 
     update(id: number) {
         return `This action updates a #${id} user`;
