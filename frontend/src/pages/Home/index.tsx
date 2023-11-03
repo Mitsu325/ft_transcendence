@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
             <Content className="site-layout">
                 <Breadcrumb className="breadcrumb">
                     <Breadcrumb.Item>
-                        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+                        <Link to="/home" style={{ color: 'black', textDecoration: 'none' }}>
                             Portal JMP
                         </Link>
                     </Breadcrumb.Item>
@@ -31,12 +31,7 @@ const HomePage: React.FC = () => {
                         <Space direction="vertical" align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
                             <Row>
-                                <LinkButton to="/login" text="Login" />
-                            </Row>
-                            <Row>
-                                <Link to="/signup" className='link'>
-                                    Ainda não sou cadastrado...
-                                </Link>
+                                PÁGINA PRINCIPAL DO PORTAL (TO DO)
                             </Row>
                         </Space>
                     </div>

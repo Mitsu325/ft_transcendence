@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
             <Content className="site-layout">
                 <Breadcrumb className="breadcrumb">
                     <Breadcrumb.Item>
-                        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+                        <Link to="/home" style={{ color: 'black', textDecoration: 'none' }}>
                             Home
                         </Link>
                     </Breadcrumb.Item>
