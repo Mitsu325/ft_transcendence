@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
+import AlertMessage from './AlertMessage';
 import './style.css'
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
@@ -14,7 +15,7 @@ const handleSubmit = (values: any, endPoint: any, { resetForm }: { resetForm: ()
 
     axios.post(`http://localhost:3003/${endPoint}`, values)
         .then((response) => {
-            console.log(response);
+            alert(response.data.message + " - " + response.data.error);
         });
     resetForm();
 };
