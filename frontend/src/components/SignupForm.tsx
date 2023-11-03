@@ -5,18 +5,12 @@ import './style.css'
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
-const validationLogin = yup.object().shape({
-    user: yup.string().required('Campo obrigatório'),
-    password: yup.string().min(8, "min 8 caracteres").required('Campo obrigatório'),
-});
-
 const validationSignup = yup.object().shape({
     name: yup.string().required('Campo obrigatório'),
     username: yup.string().email("Não é um email válido").required('Campo obrigatório'),
     password: yup.string().min(8, "min 8 caracteres").required('Campo obrigatório'),
     confirmPassword: yup.string().oneOf([yup.ref('password')], 'Senhas não conferem').required('Campo obrigatório'),
 });
-
 
 const handleSubmit = (values: any, endPoint: any, { resetForm }: { resetForm: () => void }) => {
     // const nav = useNavigate();
@@ -29,49 +23,7 @@ const handleSubmit = (values: any, endPoint: any, { resetForm }: { resetForm: ()
     resetForm();
 };
 
-export function FormSignin() {
-
-    return (
-        <div className="container" >
-            <h1>Login</h1>
-            <Formik
-                initialValues={{
-                    user: '',
-                    password: '',
-                }}
-                onSubmit={(values, { resetForm }) => handleSubmit(values, 'login', { resetForm })}
-                validationSchema={validationLogin}>
-                <Form className="login-form">
-                    <div className="login-form-group">
-                        <Field name="user"
-                            className="form-field"
-                            placeholder="Email ou Login" />
-                        <ErrorMessage
-                            component="span"
-                            name="user"
-                            className="form-error" />
-                    </div>
-                    <div className="login-form-group">
-                        <Field name="password"
-                            className="form-field"
-                            type="password"
-                            placeholder="Senha" />
-                        <ErrorMessage
-                            component="span"
-                            name="password"
-                            className="form-error" />
-                    </div>
-                    <Button type="primary"
-                        htmlType="submit"
-                        className="primary-button"
-                    >Login</Button>
-                </Form>
-            </Formik>
-        </div >
-    );
-}
-
-export function FormSignup() {
+export default function SignupForm() {
 
     return (
         <div className="container" >

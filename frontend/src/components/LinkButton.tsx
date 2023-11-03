@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import './style.css'
 
-export default function ButtonLink(props: any) {
+export default function LinkButton(props: any) {
     const {
         text,
         to,

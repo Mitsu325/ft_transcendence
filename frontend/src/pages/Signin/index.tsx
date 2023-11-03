@@ -2,7 +2,7 @@ import React from 'react';
 import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
-import { FormSignin } from '../../components/Forms';
+import SigninForm from '../../components/SigninForm';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
                             <Row>
                                 <div className='divform'>
-                                    <FormSignin />
+                                    <SigninForm />
                                     <Link to="/signup" className='link'>
                                         Ainda não sou cadastrado...
                                     </Link>

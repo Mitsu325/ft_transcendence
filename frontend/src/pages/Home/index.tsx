@@ -2,7 +2,7 @@ import React from 'react';
 import '../style.css'
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Col, Divider, Row, Button, Typography, Space } from 'antd';
-import ButtonLink from '../../components/Buttons';
+import LinkButton from '../../components/LinkButton';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
                         <Space direction="vertical" align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                             <Text><h1>Bem vindo ao Portal de Jogos do 42 JMP Team</h1></Text>
                             <Row>
-                                <ButtonLink to="/login" text="Login" />
+                                <LinkButton to="/login" text="Login" />
                             </Row>
                             <Row>
                                 <Link to="/signup" className='link'>
