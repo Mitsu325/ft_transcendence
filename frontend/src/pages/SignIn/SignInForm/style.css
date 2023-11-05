@@ -1,0 +1,22 @@
+.container {
+  width: 250px;
+  height: max-content;
+  margin: auto;
+  background-color: #ebebeb;
+  padding: 20px 15px;
+  margin-top: 5px;
+  border-radius: 7px;
+  box-shadow: 10px 11px rgba(0, 0, 0, 0.7);
+}
+
+.form-field {
+  display: inline-block;
+  padding: 5px;
+  margin-top: 20px;
+}
+
+.form-error {
+  display: block;
+  color: rgb(237, 67, 55);
+  font-size: 0.9em;
+}

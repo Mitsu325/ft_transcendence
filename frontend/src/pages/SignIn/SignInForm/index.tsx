@@ -1,7 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
 import { Button } from 'antd';
-import 'components/style.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
@@ -24,10 +23,10 @@ const handleSubmit = (
   resetForm();
 };
 
-export default function SigninForm() {
+export default function SignInForm() {
   return (
     <div className="container">
-      <h1>Login</h1>
+      <h2 className="page-title">Login</h2>
       <Formik
         initialValues={{
           user: '',
@@ -38,8 +37,8 @@ export default function SigninForm() {
         }
         validationSchema={validationLogin}
       >
-        <Form className="login-form">
-          <div className="login-form-group">
+        <Form className="p-10">
+          <div>
             <Field
               name="username"
               className="form-field"
@@ -51,7 +50,7 @@ export default function SigninForm() {
               className="form-error"
             />
           </div>
-          <div className="login-form-group">
+          <div>
             <Field
               name="password"
               className="form-field"

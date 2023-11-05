@@ -1,0 +1,12 @@
+.page-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+.content {
+  padding: 50px 50px 64px;
+}
+
+.page-title {
+  text-align: center;
+}

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import axios from 'axios';
 import { Button } from 'antd';
-import 'components/style.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import 'pages/SignUp/SignUpForm/style.css';
 
 const validationSignup = yup.object().shape({
   name: yup.string().required('Campo obrigatório'),
@@ -33,10 +33,10 @@ const handleSubmit = (
   resetForm();
 };
 
-export default function SignupForm() {
+export default function SignUpForm() {
   return (
     <div className="container">
-      <h1>Cadastro</h1>
+      <h2 className="page-title">Cadastro</h2>
       <Formik
         initialValues={{
           name: '',
@@ -50,12 +50,12 @@ export default function SignupForm() {
         }
         validationSchema={validationSignup}
       >
-        <Form className="login-form">
-          <div className="login-form-group">
+        <Form className="p-10">
+          <div>
             <Field name="name" className="form-field" placeholder="Nome" />
             <ErrorMessage component="span" name="name" className="form-error" />
           </div>
-          <div className="login-form-group">
+          <div>
             <Field name="username" className="form-field" placeholder="Login" />
             <ErrorMessage
               component="span"
@@ -63,7 +63,7 @@ export default function SignupForm() {
               className="form-error"
             />
           </div>
-          <div className="login-form-group">
+          <div>
             <Field
               name="email"
               className="form-field"
@@ -76,7 +76,7 @@ export default function SignupForm() {
               className="form-error"
             />
           </div>
-          <div className="login-form-group">
+          <div>
             <Field
               name="password"
               className="form-field"
@@ -89,7 +89,7 @@ export default function SignupForm() {
               className="form-error"
             />
           </div>
-          <div className="login-form-group">
+          <div>
             <Field
               name="confirmPassword"
               className="form-field"
