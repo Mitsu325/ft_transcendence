@@ -1,8 +1,8 @@
 import React from 'react';
-import 'components/style.css';
 import { Link } from 'react-router-dom';
-import { Layout, theme, Divider, Row, Typography, Space } from 'antd';
+import { Layout, theme, Row, Typography, Space } from 'antd';
 import SigninForm from 'components/SigninForm';
+import 'pages/style.css';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -20,7 +20,6 @@ const SignInPage: React.FC = () => {
       <Content className="site-layout">
         <div style={{ padding: 24, background: colorBgContainer }}>
           <div style={{ padding: 50, background: colorBgContainer }}>
-            <Divider></Divider>
             <Space
               direction="vertical"
               align="center"
