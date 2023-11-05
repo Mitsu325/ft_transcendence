@@ -1,6 +1,7 @@
+import * as React from 'react';
 import axios from 'axios';
 import { Button } from 'antd';
-import './style.css';
+import 'components/style.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 

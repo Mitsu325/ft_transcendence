@@ -1,8 +1,8 @@
 import React from 'react';
-import '../style.css';
+import 'components/style.css';
 import { Link } from 'react-router-dom';
 import { Layout, theme, Divider, Row, Typography, Space } from 'antd';
-import SignupForm from '../../components/SignupForm';
+import SignupForm from 'components/SignupForm';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
