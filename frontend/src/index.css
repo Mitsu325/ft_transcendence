@@ -23,6 +23,10 @@ body {
   padding: 5px 10px;
 }
 
+.w-60 {
+  width: 60%;
+}
+
 .p-10 {
   padding: 10px;
 }

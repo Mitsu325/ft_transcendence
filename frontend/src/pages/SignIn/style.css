@@ -10,3 +10,9 @@
 .page-title {
   text-align: center;
 }
+
+.oauth-group {
+  width: 60%;
+  text-align: center;
+  margin: 0 auto;
+}
