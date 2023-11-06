@@ -35,6 +35,7 @@
         }
       ],
       "import/prefer-default-export": "off",
-      "import/extensions": "off"
+      "import/extensions": "off",
+      "no-undef": "off"
     }
 }
