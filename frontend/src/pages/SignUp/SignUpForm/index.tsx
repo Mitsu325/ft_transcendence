@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import SuccessNotification from 'components/Notification/SuccessNotification';
+import FailureNotification from 'components/Notification/FailureNotification';
 import 'pages/SignUp/SignUpForm/style.css';
 
 const validationSignup = yup.object().shape({
@@ -28,7 +30,17 @@ const handleSubmit = (
   { resetForm }: { resetForm: () => void },
 ) => {
   axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
-    alert(response.data.message + ' - ' + response.data.error);
+    if (response.data.success === true) {
+      SuccessNotification({
+        message: 'Cadastro realizado com sucesso',
+        description: 'Siga para o login.',
+      });
+    } else {
+      FailureNotification({
+        message: 'Não foi possível criar sua conta',
+        description: 'Por favor, verifique: ' + response.data.error,
+      });
+    }
   });
   resetForm();
 };

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import SuccessNotification from 'components/Notification/SuccessNotification';
+import FailureNotification from 'components/Notification/FailureNotification';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -18,7 +20,17 @@ const handleSubmit = (
   { resetForm }: { resetForm: () => void },
 ) => {
   axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
-    alert(response.data.message + ' - ' + response.data.error);
+    if (response.data.success === true) {
+      SuccessNotification({
+        message: 'Login bem-sucedido',
+        description: 'Você foi autenticado com sucesso.',
+      });
+    } else {
+      FailureNotification({
+        message: 'Não foi possível logar na sua conta',
+        description: 'Por favor, verifique suas credenciais e tente novamente.',
+      });
+    }
   });
   resetForm();
 };
