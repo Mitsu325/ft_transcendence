@@ -1,0 +1,15 @@
+.header {
+  background: #001529;
+  top: 0;
+  left: 0;
+  right: 0;
+  position: fixed;
+}
+
+.content {
+  margin: 30px;
+}
+
+.breadcrumb {
+  margin: 16px 0;
+}
