@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Breadcrumb } from 'antd';
-import MyFooter from '../../components/Footer';
-import RenderContent from './content';
+import RenderContent from '../../components/RenderContent/RenderContent';
+import getMenuBreadcrumb from '../../components/GetMenu/GetMenu';
 import '../../pages/Home/style.css';
 import {
   TeamOutlined,
@@ -17,7 +17,7 @@ const { SubMenu } = Menu;
 
 const Dashboard: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedMenuKey, setSelectedMenuKey] = useState(['1']);
+  const [selectedMenuKey, setSelectedMenuKey] = useState(['0']);
 
   const items = [
     { key: '0', label: 'Home', icon: <HomeOutlined /> },
@@ -38,9 +38,9 @@ const Dashboard: React.FC = () => {
       label: 'Chat',
       icon: <MessageOutlined />,
       children: [
-        { key: '6', label: 'Enviar mensagem' },
-        { key: '7', label: 'Gerenciar usuários' },
-        { key: '8', label: 'Convidar para jogar' },
+        { key: '6', label: 'Criar chat' },
+        { key: '7', label: 'Enviar mensagem' },
+        { key: '8', label: 'Gerenciar usuários' },
         { key: '9', label: 'Perfil de jogadores' },
       ],
     },
@@ -50,40 +50,7 @@ const Dashboard: React.FC = () => {
     setSelectedMenuKey([key]);
   };
 
-  const getMenuBreadcrumb = (itemKey: string): string[] => {
-    const breadcrumbItems: string[] = [];
-    const findMenuItem = (items: any[], key: string): any | undefined => {
-      for (const item of items) {
-        if (item.key === key) {
-          return item;
-        } else if (item.children) {
-          const foundItem = findMenuItem(item.children, key);
-          if (foundItem) {
-            breadcrumbItems.push(item.label);
-            return foundItem;
-          }
-        }
-      }
-      return undefined;
-    };
-
-    let selectedItem = findMenuItem(items, itemKey);
-    if (selectedItem) {
-      breadcrumbItems.push(selectedItem.label);
-      while (selectedItem.key !== '1') {
-        const parentItem = findMenuItem(items, selectedItem.parentKey);
-        if (parentItem) {
-          breadcrumbItems.push(parentItem.label);
-          selectedItem = parentItem;
-        } else {
-          break;
-        }
-      }
-    }
-    return breadcrumbItems;
-  };
-
-  const breadcrumbItems = getMenuBreadcrumb(selectedMenuKey[0]);
+  const breadcrumbItems = getMenuBreadcrumb(selectedMenuKey[0], items);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -128,8 +95,6 @@ const Dashboard: React.FC = () => {
           </Breadcrumb>
           {RenderContent(items, selectedMenuKey[0])}
         </Content>
-
-        <MyFooter />
       </Layout>
     </Layout>
   );

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Home from './home';
-import GameOptions from '../GameOptions';
-import Register from '../Register';
+import Home from '../../pages/Home/home';
+import GameOptions from '../../pages/GameOptions';
+import Register from '../../pages/Register';
 
 type MenuItem = {
   key: string;
