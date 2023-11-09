@@ -5,10 +5,11 @@ import { AppService } from './app.service';
 import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { TwoFactorAuthController } from './two-factor-auth/two-factor-auth.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, AuthModule],
-    controllers: [AppController],
+    controllers: [AppController, TwoFactorAuthController],
     providers: [AppService],
 })
 export class AppModule {}

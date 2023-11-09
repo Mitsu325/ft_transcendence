@@ -3,8 +3,10 @@ import axios from 'axios';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import randomSixDigitNumber from 'components/RandomNumber';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import FailureNotification from 'components/Notification/FailureNotification';
+import TwoFact from 'components/TwoFact';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -25,6 +27,11 @@ const handleSubmit = (
         message: 'Login bem-sucedido',
         description: 'Você foi autenticado com sucesso.',
       });
+      if (response.data.twoFactorAuth === true) {
+        <TwoFact />;
+        const token = randomSixDigitNumber();
+        console.log(token);
+      }
     } else {
       FailureNotification({
         message: 'Não foi possível logar na sua conta',
