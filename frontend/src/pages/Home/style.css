@@ -25,7 +25,7 @@
   color: #001529;
   text-align: center;
   font-family: Roboto Condensed;
-  font-size: 3rem;
+  font-size: 2rem;
 }
 
 .pong-container {
@@ -34,12 +34,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  height: 500px;
-  max-width: 60%;
+  height: 300px;
+  max-width: 40%;
   border: 2px solid #001529;
   border-radius: 9px;
   box-shadow: 0 0 20px #001529;
   margin: 0 auto;
+  margin-bottom: 50px;
 }
 
 .middle-line {
@@ -55,7 +56,7 @@
 @keyframes moveUp {
   0%,
   100% {
-    top: 400px;
+    top: 200px;
   }
   50% {
     top: 0;
@@ -68,7 +69,7 @@
     top: 0;
   }
   50% {
-    top: 400px;
+    top: 200px;
   }
 }
 
@@ -91,4 +92,33 @@
 .paddle-right {
   right: 0;
   animation-name: moveUp;
+}
+
+.games-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 50px;
+}
+
+.game-card {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border: 2px solid #001529;
+  border-radius: 5px;
+  background-color: #d3d3d3;
+}
+
+.game-card img {
+  width: 100px;
+  height: 100px;
+  display: block;
+}
+
+.player-info p {
+  margin-top: 5px;
+  text-align: center;
 }
