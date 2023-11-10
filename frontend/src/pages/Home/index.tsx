@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Breadcrumb } from 'antd';
-import RenderContent from '../../components/RenderContent/RenderContent';
-import getMenuBreadcrumb from '../../components/GetMenu/GetMenu';
+import RenderContent from '../utils/RenderContent';
+import getMenuBreadcrumb from '../utils/GetMenu';
 import '../../pages/Home/style.css';
 import {
   TeamOutlined,
