@@ -97,15 +97,13 @@
 .games-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: center;
   margin-bottom: 50px;
+  gap: 9px;
 }
 
 .game-card {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 10px;
   border: 2px solid #001529;
   border-radius: 5px;

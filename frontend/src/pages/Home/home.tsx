@@ -21,12 +21,12 @@ export default function Home() {
       <div className="games-grid">
         <div className="game-card">
           <div className="player-info">
-            <img src={avatar} alt="Avatar Jogador 1" />
+            <img src={avatar} alt="Avatar player 1" />
             <p>Username</p>
           </div>
 
           <div className="player-info">
-            <img src={avatar} alt="Avatar Jogador 2" />
+            <img src={avatar} alt="Avatar player 2" />
             <p>Username </p>
           </div>
         </div>
