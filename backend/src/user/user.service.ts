@@ -18,8 +18,7 @@ export class UserService {
             const savedUser = await this.usersRepository.save(user);
             return savedUser;
         } catch (error) {
-            console.error(error);
-            return null;
+            throw error;
         }
     }
 
@@ -37,28 +36,13 @@ export class UserService {
         return this.usersRepository.find();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} user`;
+    findUsername(username: string) {
+        return this.usersRepository.findOne({
+            where: [{ username: username }, { email: username }],
+        });
     }
 
-  findUsername(username: string) {
-    return this.usersRepository.findOne({
-      where: [
-        { username: username },
-        { email: username },
-      ],
-    });
-  }
-  
-  findEmail(email: string){
-    return this.usersRepository.findOne({ where: { email } });
-  }
-
-    update(id: number) {
-        return `This action updates a #${id} user`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} user`;
+    findEmail(email: string) {
+        return this.usersRepository.findOne({ where: { email } });
     }
 }

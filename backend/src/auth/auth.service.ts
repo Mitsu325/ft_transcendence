@@ -1,9 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import authConfig from 'src/configs/auth.config';
+import { UserService } from 'src/user/user.service';
+import { comparePass, hashPassword } from 'src/utils/hash.util';
 
 @Injectable()
 export class AuthService {
+    constructor(
+        private readonly userService: UserService,
+        private jwtService: JwtService,
+    ) {}
+
+    async signIn(username, password) {
+        const user = await this.userService.findUsername(username);
+        if (!user) {
+            throw new UnauthorizedException();
+        }
+        const matchPass = await comparePass(password, user.password);
+        if (!matchPass) {
+            throw new UnauthorizedException();
+        }
+        const payload = { sub: user.id, username: user.username };
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+        };
+    }
+
+    async signUp(name, email, password) {
+        const hashPass = await hashPassword(password);
+        password = hashPass;
+
+        const user = await this.userService.create({ name, email, password });
+        const payload = { sub: user.id, username: user.username };
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+        };
+    }
+
     async requestAccessToken(code: string): Promise<any> {
         try {
             const data = new URLSearchParams();
@@ -30,6 +69,45 @@ export class AuthService {
             return response.data;
         } catch (error) {
             throw error;
+        }
+    }
+
+    async signInWith42(code: string) {
+        try {
+            const token = await this.requestAccessToken(code);
+            const resourceOwner = await this.requestResourceOwner(
+                token.access_token,
+            );
+
+            if (!resourceOwner.email || !token.access_token) {
+                throw new HttpException(
+                    'Login using oauth 42 was not allowed',
+                    HttpStatus.FORBIDDEN,
+                );
+            }
+
+            let user = await this.userService.findEmail(resourceOwner.email);
+
+            if (!user) {
+                user = await this.userService.createFromOAuth({
+                    name: resourceOwner.usual_full_name,
+                    email: resourceOwner.email,
+                    avatar: resourceOwner?.image?.link ?? '',
+                });
+            }
+            const payload = { sub: user.id, username: user.username };
+            return {
+                access_token: await this.jwtService.signAsync(payload),
+            };
+        } catch (error) {
+            const errorMessage = error.response?.status
+                ? `Error getting data: ${error.message}`
+                : error.request
+                ? 'Unable to get response from server'
+                : 'Error configuring the request';
+            const status =
+                error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+            throw new HttpException(errorMessage, status);
         }
     }
 }

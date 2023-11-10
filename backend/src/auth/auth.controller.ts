@@ -1,16 +1,28 @@
 import {
+    Body,
     Controller,
-    HttpException,
+    Get,
+    HttpCode,
     HttpStatus,
     Post,
     Query,
-    Res,
+    Request,
+    ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiOperation,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { ParamExistValidationPipe } from 'src/common/code-validation.pipe';
-import { Response } from 'express';
+import { LoginDto } from 'src/user/dto/login.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { EmailExistsValidationPipe } from 'src/user/pipes/verifyEmail.validation.pipe';
 import { UserService } from 'src/user/user.service';
+import { Public } from 'src/common/constants';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -21,72 +33,49 @@ export class AuthController {
     ) {}
 
     @ApiOperation({ description: 'Request 42 access token' })
+    @ApiQuery({ name: 'code', type: String, required: true })
+    @Public()
+    @HttpCode(HttpStatus.OK)
     @Post('42')
-    async handleToken(
-        @Query('code', ParamExistValidationPipe) code: string,
-        @Res() res: Response,
-    ) {
-        try {
-            const token = await this.authService.requestAccessToken(code);
+    async handleToken(@Query('code', ParamExistValidationPipe) code: string) {
+        return await this.authService.signInWith42(code);
+    }
 
-            if (!token.access_token) {
-                throw new HttpException(
-                    'Login using oauth 42 was not allowed',
-                    HttpStatus.FORBIDDEN,
-                );
-            }
+    @ApiOperation({ description: 'Login user' })
+    @ApiBody({ type: LoginDto, description: 'Login request body.' })
+    @Public()
+    @HttpCode(HttpStatus.OK)
+    @Post('login')
+    async signIn(@Body() loginDto: LoginDto) {
+        return await this.authService.signIn(
+            loginDto.username,
+            loginDto.password,
+        );
+    }
 
-            const resourceOwner = await this.authService.requestResourceOwner(
-                token.access_token,
-            );
+    @ApiOperation({ description: 'Create a new user' })
+    @ApiBody({ type: CreateUserDto, description: 'Request body.' })
+    @Public()
+    @HttpCode(HttpStatus.CREATED)
+    @Post('signup')
+    async signUp(@Body() createUserDto: CreateUserDto) {
+        await new ValidationPipe().transform(createUserDto, {
+            metatype: CreateUserDto,
+            type: 'body',
+        });
+        await new EmailExistsValidationPipe(this.userService).transform(
+            createUserDto,
+        );
+        return await this.authService.signUp(
+            createUserDto.name,
+            createUserDto.email,
+            createUserDto.password,
+        );
+    }
 
-            if (!resourceOwner.email) {
-                throw new HttpException(
-                    'Login using oauth 42 was not allowed',
-                    HttpStatus.FORBIDDEN,
-                );
-            }
-
-            const emailExists = await this.userService.findEmail(
-                resourceOwner.email,
-            );
-            let user = emailExists;
-            if (!user) {
-                user = await this.userService.createFromOAuth({
-                    name: resourceOwner.usual_full_name,
-                    email: resourceOwner.email,
-                    avatar: resourceOwner?.image?.link ?? '',
-                });
-            }
-            const data = {
-                avatar: user.avatar,
-                email: user.email,
-                name: user.name,
-                twoFactorAuth: user.twoFactorAuth,
-                username: user.username,
-            };
-            res.status(HttpStatus.OK).json({
-                message: 'Successfully exchanged code for access token',
-                data,
-            });
-        } catch (error) {
-            if (error.response) {
-                const status = error.response.status;
-                throw new HttpException(
-                    `Error getting data: ${error.message}`,
-                    status,
-                );
-            } else if (error.request) {
-                throw new HttpException(
-                    'Unable to get response from server',
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                );
-            } else {
-                throw new HttpException(
-                    'Error configuring the request',
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                );
-            }
-        }
+    @ApiBearerAuth('access-token')
+    @Get('profile')
+    getProfile(@Request() req) {
+        return req.user;
     }
 }
