@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto&family=Roboto+Condensed:wght@300&display=swap');
+
+.header {
+  background: #001529;
+  top: 0;
+  left: 0;
+  right: 0;
+  position: fixed;
+}
+
+.content {
+  margin: 30px;
+}
+
+.breadcrumb {
+  margin: 16px 0;
+}
+
+.divider {
+  border-color: #001529;
+  margin-bottom: 60px;
+}
+
+.text {
+  color: #001529;
+  text-align: center;
+  font-family: Roboto Condensed;
+  font-size: 2rem;
+}
+
+.pong-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 300px;
+  max-width: 40%;
+  border: 2px solid #001529;
+  border-radius: 9px;
+  box-shadow: 0 0 20px #001529;
+  margin: 0 auto;
+  margin-bottom: 50px;
+}
+
+.middle-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #001529;
+  transform: translateX(-50%);
+}
+
+@keyframes moveUp {
+  0%,
+  100% {
+    top: 200px;
+  }
+  50% {
+    top: 0;
+  }
+}
+
+@keyframes moveDown {
+  0%,
+  100% {
+    top: 0;
+  }
+  50% {
+    top: 200px;
+  }
+}
+
+.paddle {
+  width: 20px;
+  height: 100px;
+  background-color: #001529;
+  position: absolute;
+  top: 0;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.paddle-left {
+  left: 0;
+  animation-name: moveDown;
+}
+
+.paddle-right {
+  right: 0;
+  animation-name: moveUp;
+}
+
+.games-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 50px;
+  gap: 9px;
+}
+
+.game-card {
+  display: flex;
+  margin-bottom: 10px;
+  border: 2px solid #001529;
+  border-radius: 5px;
+  background-color: #d3d3d3;
+}
+
+.game-card img {
+  width: 100px;
+  height: 100px;
+  display: block;
+}
+
+.player-info p {
+  margin-top: 5px;
+  text-align: center;
+}
