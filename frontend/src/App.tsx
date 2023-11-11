@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
-import ProtectedPage from 'pages/Protected';
 
 const App = () => {
   return (
@@ -10,7 +9,6 @@ const App = () => {
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" Component={SignIn} />
       <Route path="/signup" Component={SignUp} />
-      <Route path="/protected" Component={ProtectedPage} />
     </Routes>
   );
 };
