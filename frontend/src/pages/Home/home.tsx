@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Divider } from 'antd';
-import avatar from './images.png';
-import '../../pages/Home/style.css';
+import avatar from 'assets/avatar.png';
+import 'pages/Home/style.css';
 
 export default function Home() {
   return (
