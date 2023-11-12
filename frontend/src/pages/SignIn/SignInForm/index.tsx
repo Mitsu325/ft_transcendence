@@ -3,10 +3,9 @@ import axios from 'axios';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
-import randomSixDigitNumber from 'components/RandomNumber';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import FailureNotification from 'components/Notification/FailureNotification';
-import TwoFact from 'components/TwoFact';
+import { useNavigate } from 'react-router-dom';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -16,33 +15,29 @@ const validationLogin = yup.object().shape({
     .required('Campo obrigatório'),
 });
 
-const handleSubmit = (
-  values: any,
-  endPoint: any,
-  { resetForm }: { resetForm: () => void },
-) => {
-  axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
-    if (response.data.success === true) {
-      SuccessNotification({
-        message: 'Login bem-sucedido',
-        description: 'Você foi autenticado com sucesso.',
-      });
-      if (response.data.twoFactorAuth === true) {
-        <TwoFact />;
-        const token = randomSixDigitNumber();
-        console.log(token);
-      }
-    } else {
-      FailureNotification({
-        message: 'Não foi possível logar na sua conta',
-        description: 'Por favor, verifique suas credenciais e tente novamente.',
-      });
-    }
-  });
-  resetForm();
-};
-
 export default function SignInForm() {
+  const navigate = useNavigate();
+
+  const handleSubmit = (values: any, endPoint: any) => {
+    axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
+      if (response.data.success === true) {
+        SuccessNotification({
+          message: 'Login bem-sucedido',
+          description: 'Você foi autenticado com sucesso.',
+        });
+        if (response.data.twoFactorAuth === false) {
+          navigate(`/two-factor-auth?userId=${response.data.userId}`);
+        }
+      } else {
+        FailureNotification({
+          message: 'Não foi possível logar na sua conta',
+          description:
+            'Por favor, verifique suas credenciais e tente novamente.',
+        });
+      }
+    });
+  };
+
   return (
     <div className="container">
       <h2 className="page-title">Login</h2>
@@ -51,9 +46,7 @@ export default function SignInForm() {
           user: '',
           password: '',
         }}
-        onSubmit={(values, { resetForm }) =>
-          handleSubmit(values, 'user/login', { resetForm })
-        }
+        onSubmit={values => handleSubmit(values, 'user/login')}
         validationSchema={validationLogin}
       >
         <Form className="p-10">

@@ -1,25 +1,19 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
 import * as speakeasy from 'speakeasy';
 
 @Controller('two-factor-auth')
 export class TwoFactorAuthController {
-  @Get('generateSecret')
-  generateSecret(): { secret: string; otpauth_url: string } | string {
-    if (speakeasy && speakeasy.generateSecret) {
-      const secret: speakeasy.GeneratedSecret = speakeasy.generateSecret({ length: 20 });
-      return {
-        secret: secret.base32,
-        otpauth_url: secret.otpauth_url,
-      };
-    } else {
-      return "speakeasy ou speakeasy.generateSecret not defined";
-    }
-  }
+
+  constructor(private readonly userService: UserService) { }
 
   @Post('verifyOTP')
-  verifyOTP(@Body() body: { secret: string; otp: string }): { verified: boolean } {
+  async verifyOTP(@Body() body: { userId: string; otp: string }): Promise<{ verified: boolean; }> {
+
+    const user = await this.userService.findUser(body.userId);
+
     const verified: boolean = speakeasy.totp.verify({
-      secret: body.secret,
+      secret: user.twoFactorSecret,
       encoding: 'base32',
       token: body.otp,
     });

@@ -6,6 +6,7 @@ import { ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { EmailExistsValidationPipe } from './pipes/verifyEmail.validation.pipe';
 import { hashPassword, comparePass } from '../utils/hash.util'
+import { TwoFactorGenerator } from 'src/utils/twoFactor.util';
 import { LoginDto } from './dto/login.dto';
 
 @ApiTags('user')
@@ -27,6 +28,9 @@ export class UserController {
 
       const hashPass = await hashPassword(createUserDto.password);
       createUserDto.password = hashPass;
+
+      const secret: string = await TwoFactorGenerator();
+      createUserDto.twoFactorSecret = secret;
 
       const user = await this.userService.create(createUserDto);
       if (user) {
@@ -52,7 +56,7 @@ export class UserController {
 
     const matchPass = await comparePass(password, user.password);
     if (matchPass) {
-      return { success: true, message: 'Login successful.', email: user.email, twoFactorAuth: user.twoFactorAuth };
+      return { success: true, userId: user.id, message: 'Login successful.', email: user.email, twoFactorAuth: user.twoFactorAuth };
     } else {
       return { success: false, message: 'Invalid credentials.' };
     }
