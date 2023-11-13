@@ -7,7 +7,6 @@ import {
     Post,
     Query,
     Request,
-    ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -59,16 +58,13 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @Post('sign-up')
     async signUp(@Body() createUserDto: CreateUserDto) {
-        await new ValidationPipe().transform(createUserDto, {
-            metatype: CreateUserDto,
-            type: 'body',
-        });
         await new EmailExistsValidationPipe(this.userService).transform(
             createUserDto,
         );
         return await this.authService.signUp(
             createUserDto.name,
             createUserDto.email,
+            createUserDto.username,
             createUserDto.password,
         );
     }

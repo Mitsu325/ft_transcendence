@@ -20,5 +20,8 @@ export class CreateFromOAuthDto {
     email: string;
 
     @IsString()
+    username: string;
+
+    @IsString()
     avatar: string;
 }

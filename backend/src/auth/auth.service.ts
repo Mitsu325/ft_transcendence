@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import authConfig from 'src/configs/auth.config';
 import { UserService } from 'src/user/user.service';
 import { comparePass, hashPassword } from 'src/utils/hash.util';
@@ -32,11 +33,21 @@ export class AuthService {
         };
     }
 
-    async signUp(name, email, password) {
+    async signUp(name, email, username, password) {
         const hashPass = await hashPassword(password);
         password = hashPass;
+        username = username.replace(/\s/g, '');
+        const userWithLogin = await this.userService.findByUsername(username);
+        if (userWithLogin) {
+            username = uuidv4();
+        }
 
-        const user = await this.userService.create({ name, email, password });
+        const user = await this.userService.create({
+            name,
+            email,
+            username,
+            password,
+        });
         const payload = { sub: user.id, username: user.username };
         return {
             access_token: await this.jwtService.signAsync(payload),
@@ -89,9 +100,18 @@ export class AuthService {
             let user = await this.userService.findEmail(resourceOwner.email);
 
             if (!user) {
+                let username = resourceOwner.login.replace(/\s/g, '');
+                const userWithLogin = await this.userService.findByUsername(
+                    resourceOwner.login,
+                );
+                if (userWithLogin) {
+                    username = uuidv4();
+                }
+
                 user = await this.userService.createFromOAuth({
                     name: resourceOwner.usual_full_name,
                     email: resourceOwner.email,
+                    username,
                     avatar: resourceOwner?.image?.link ?? '',
                 });
             }
