@@ -14,7 +14,6 @@ import {
 
 const { Header, Content, Sider } = Layout;
 
-// TODO: aplicar a sessão para login com 42 e criação de conta
 // TODO: pensar na ação quando expirar o token
 // TODO: inclui botão logout
 

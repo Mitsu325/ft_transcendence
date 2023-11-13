@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Divider, Layout, theme } from 'antd';
-import SignInForm from 'pages/SignIn/SignInForm';
 import MyFooter from 'components/Footer';
+import SignInForm from 'pages/SignIn/SignInForm';
+import OAuth42 from 'pages/SignIn/OAuth42';
 import 'pages/SignIn/style.css';
-import OAuth42 from './OAuth42';
 
 const { Header, Content } = Layout;
 
@@ -25,7 +25,7 @@ const SignInPage: React.FC = () => {
           <Divider plain>ou</Divider>
         </div>
         <SignInForm />
-        <Link to="/signup" className="link-pos-center mt-40 mb-24">
+        <Link to="/sign-up" className="link-pos-center mt-40 mb-24">
           Ainda não sou cadastrado...
         </Link>
       </Content>

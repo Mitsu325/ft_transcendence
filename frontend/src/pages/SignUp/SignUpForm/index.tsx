@@ -1,9 +1,16 @@
-import * as React from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import { SignUpBody } from 'interfaces/reqBody/signup.interface';
+import { useAuth } from 'hooks/useAuth';
+import { authService } from 'services/auth.api';
+import { setAuthorizationHeader } from 'services/auth.service';
+import { userService } from 'services/user.api';
+import SuccessNotification from 'components/Notification/SuccessNotification';
+import FailureNotification from 'components/Notification/FailureNotification';
 import 'pages/SignUp/SignUpForm/style.css';
+import { useNavigate } from 'react-router-dom';
 
 const validationSignup = yup.object().shape({
   name: yup.string().required('Campo obrigatório'),
@@ -22,18 +29,33 @@ const validationSignup = yup.object().shape({
     .required('Campo obrigatório'),
 });
 
-const handleSubmit = (
-  values: any,
-  endPoint: any,
-  { resetForm }: { resetForm: () => void },
-) => {
-  axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
-    alert(response.data.message + ' - ' + response.data.error);
-  });
-  resetForm();
-};
-
 export default function SignUpForm() {
+  const context = useAuth();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignUp = async (values: SignUpBody) => {
+    try {
+      setLoading(true);
+      const res = await authService.signUp(values);
+      setAuthorizationHeader(res.access_token);
+      const user = await userService.getUser();
+      navigate('/');
+      context.Login(res.access_token, user);
+      SuccessNotification({
+        message: 'Conta criada!',
+        description: 'Você foi autenticado com sucesso.',
+      });
+      setLoading(false);
+    } catch (error) {
+      FailureNotification({
+        message: 'Não foi possível logar',
+        description: 'Por favor, verifique suas credenciais e tente novamente.',
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container">
       <h2 className="page-title">Cadastro</h2>
@@ -45,9 +67,7 @@ export default function SignUpForm() {
           password: '',
           confirmPassword: '',
         }}
-        onSubmit={(values, { resetForm }) =>
-          handleSubmit(values, 'user', { resetForm })
-        }
+        onSubmit={values => handleSignUp(values)}
         validationSchema={validationSignup}
       >
         <Form className="p-10">
@@ -102,7 +122,12 @@ export default function SignUpForm() {
               className="form-error"
             />
           </div>
-          <Button type="primary" htmlType="submit" className="primary-button">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="primary-button"
+            loading={loading}
+          >
             Cadastrar
           </Button>
         </Form>

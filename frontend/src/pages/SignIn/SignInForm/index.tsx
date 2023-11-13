@@ -8,6 +8,7 @@ import FailureNotification from 'components/Notification/FailureNotification';
 import { userService } from 'services/user.api';
 import { setAuthorizationHeader } from 'services/auth.service';
 import { useAuth } from 'hooks/useAuth';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -28,6 +29,10 @@ export default function SignInForm() {
       setAuthorizationHeader(res.access_token);
       const user = await userService.getUser();
       context.Login(res.access_token, user);
+      SuccessNotification({
+        message: 'Login bem-sucedido',
+        description: 'Você foi autenticado com sucesso.',
+      });
       setLoading(false);
     } catch (error) {
       FailureNotification({
