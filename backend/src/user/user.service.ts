@@ -32,8 +32,21 @@ export class UserService {
         }
     }
 
+    async findUser(id: string) {
+        const user = await this.findById(id);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...data } = user;
+        return data;
+    }
+
     findAll(): Promise<User[]> {
         return this.usersRepository.find();
+    }
+
+    async findById(id: string) {
+        return await this.usersRepository.findOne({
+            where: { id },
+        });
     }
 
     findUsername(username: string) {

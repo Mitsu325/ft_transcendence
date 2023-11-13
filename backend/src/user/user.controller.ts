@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -7,10 +7,17 @@ import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @ApiOperation({ description: 'Lista todos os usuários da base' })
+    @ApiOperation({ description: 'Get all users' })
     @ApiBearerAuth('access-token')
     @Get()
     findAll() {
         return this.userService.findAll();
+    }
+
+    @ApiOperation({ description: 'Get a user' })
+    @ApiBearerAuth('access-token')
+    @Get('my')
+    find(@Request() req) {
+        return this.userService.findUser(req.user.id);
     }
 }

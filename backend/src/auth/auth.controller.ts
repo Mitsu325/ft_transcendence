@@ -57,7 +57,7 @@ export class AuthController {
     @ApiBody({ type: CreateUserDto, description: 'Request body.' })
     @Public()
     @HttpCode(HttpStatus.CREATED)
-    @Post('signup')
+    @Post('sign-up')
     async signUp(@Body() createUserDto: CreateUserDto) {
         await new ValidationPipe().transform(createUserDto, {
             metatype: CreateUserDto,
@@ -73,6 +73,7 @@ export class AuthController {
         );
     }
 
+    @ApiOperation({ description: 'Get req user' })
     @ApiBearerAuth('access-token')
     @Get('profile')
     getProfile(@Request() req) {
