@@ -1,8 +1,13 @@
-import * as React from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
+import { authService } from 'services/auth.api';
+import { LoginBody } from 'interfaces/reqBody/login.interface';
+import FailureNotification from 'components/Notification/FailureNotification';
+import { userService } from 'services/user.api';
+import { setAuthorizationHeader } from 'services/auth.service';
+import { useAuth } from 'hooks/useAuth';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -12,29 +17,36 @@ const validationLogin = yup.object().shape({
     .required('Campo obrigatório'),
 });
 
-const handleSubmit = (
-  values: any,
-  endPoint: any,
-  { resetForm }: { resetForm: () => void },
-) => {
-  axios.post(`http://localhost:3003/${endPoint}`, values).then(response => {
-    alert(response.data.message + ' - ' + response.data.error);
-  });
-  resetForm();
-};
-
 export default function SignInForm() {
+  const context = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (values: LoginBody) => {
+    try {
+      setLoading(true);
+      const res = await authService.login(values);
+      setAuthorizationHeader(res.access_token);
+      const user = await userService.getUser();
+      context.Login(res.access_token, user);
+      setLoading(false);
+    } catch (error) {
+      FailureNotification({
+        message: 'Não foi possível logar',
+        description: 'Por favor, verifique suas credenciais e tente novamente.',
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container">
       <h2 className="page-title">Login</h2>
       <Formik
         initialValues={{
-          user: '',
+          username: '',
           password: '',
         }}
-        onSubmit={(values, { resetForm }) =>
-          handleSubmit(values, 'user/login', { resetForm })
-        }
+        onSubmit={values => handleLogin(values)}
         validationSchema={validationLogin}
       >
         <Form className="p-10">
@@ -42,7 +54,7 @@ export default function SignInForm() {
             <Field
               name="username"
               className="form-field"
-              placeholder="Email ou Login"
+              placeholder="Email ou Username"
             />
             <ErrorMessage
               component="span"
@@ -63,7 +75,12 @@ export default function SignInForm() {
               className="form-error"
             />
           </div>
-          <Button type="primary" htmlType="submit" className="primary-button">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="primary-button"
+            loading={loading}
+          >
             Login
           </Button>
         </Form>
