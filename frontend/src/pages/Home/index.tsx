@@ -14,9 +14,6 @@ import {
 
 const { Header, Content, Sider } = Layout;
 
-// TODO: pensar na ação quando expirar o token
-// TODO: inclui botão logout
-
 const Dashboard: React.FC = () => {
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['0']);

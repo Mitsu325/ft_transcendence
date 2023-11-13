@@ -27,7 +27,7 @@ const findMenuItemByKey = (key: string, items: MenuItem[]): MenuItem | null => {
   return null;
 };
 
-const renderContent = (items: any, key: string) => {
+const renderContent = (items: MenuItem[], key: string) => {
   const selectedItem = findMenuItemByKey(key[0], items);
   if (selectedItem) {
     switch (selectedItem.key) {
