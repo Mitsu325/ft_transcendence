@@ -5,16 +5,27 @@ type MenuItem = {
   children?: MenuItem[];
 };
 
-const getMenuBreadcrumb = (itemKey: string, items: MenuItem[]): string[] => {
-  const breadcrumbItems: string[] = [];
-  const findMenuItem = (items: any[], key: string): any | undefined => {
+interface BreadcrumbItem {
+  title: React.ReactNode;
+}
+
+const getMenuBreadcrumb = (
+  itemKey: string,
+  items: MenuItem[],
+): BreadcrumbItem[] => {
+  const breadcrumbItems: BreadcrumbItem[] = [];
+
+  const findMenuItem = (
+    items: MenuItem[],
+    key: string,
+  ): MenuItem | undefined => {
     for (const item of items) {
       if (item.key === key) {
         return item;
       } else if (item.children) {
         const foundItem = findMenuItem(item.children, key);
         if (foundItem) {
-          breadcrumbItems.push(item.label);
+          breadcrumbItems.push({ title: item.label });
           return foundItem;
         }
       }
@@ -24,15 +35,11 @@ const getMenuBreadcrumb = (itemKey: string, items: MenuItem[]): string[] => {
 
   let selectedItem = findMenuItem(items, itemKey);
   if (selectedItem) {
-    breadcrumbItems.push(selectedItem.label);
-    while (selectedItem.key !== '1') {
-      const parentItem = findMenuItem(items, selectedItem.parentKey);
-      if (parentItem) {
-        breadcrumbItems.push(parentItem.label);
-        selectedItem = parentItem;
-      } else {
-        break;
-      }
+    breadcrumbItems.push({ title: selectedItem.label });
+    while (selectedItem?.children && selectedItem.children.length > 0) {
+      const nextParent: MenuItem = selectedItem.children[0];
+      breadcrumbItems.push({ title: nextParent.label });
+      selectedItem = nextParent;
     }
   }
   return breadcrumbItems;

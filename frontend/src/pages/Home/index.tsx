@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Breadcrumb } from 'antd';
-import RenderContent from '../utils/RenderContent';
-import getMenuBreadcrumb from '../utils/GetMenu';
-import '../../pages/Home/style.css';
+import RenderContent from 'pages/utils/RenderContent';
+import getMenuBreadcrumb from 'pages/utils/GetMenu';
+import 'pages/Home/style.css';
 import {
   TeamOutlined,
   UserOutlined,
@@ -13,10 +13,13 @@ import {
 } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
-const { SubMenu } = Menu;
+
+// TODO: aplicar a sessão para login com 42 e criação de conta
+// TODO: pensar na ação quando expirar o token
+// TODO: inclui botão logout
 
 const Dashboard: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['0']);
 
   const items = [
@@ -46,7 +49,7 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const handleMenuClick = ({ key }: any) => {
+  const handleMenuClick = ({ key }: { key: string }) => {
     setSelectedMenuKey([key]);
   };
 
@@ -65,34 +68,14 @@ const Dashboard: React.FC = () => {
           selectedKeys={selectedMenuKey}
           mode="inline"
           onClick={handleMenuClick}
-        >
-          {items.map(item => {
-            if (item.children) {
-              return (
-                <SubMenu key={item.key} icon={item.icon} title={item.label}>
-                  {item.children.map(child => (
-                    <Menu.Item key={child.key}>{child.label}</Menu.Item>
-                  ))}
-                </SubMenu>
-              );
-            }
-            return (
-              <Menu.Item key={item.key} icon={item.icon}>
-                {item.label}
-              </Menu.Item>
-            );
-          })}
-        </Menu>
+          items={items}
+        />
       </Sider>
 
       <Header className="header"></Header>
       <Layout>
         <Content className="content">
-          <Breadcrumb className="breadcrumb">
-            {breadcrumbItems.map((item, index) => (
-              <Breadcrumb.Item key={index}>{item}</Breadcrumb.Item>
-            ))}
-          </Breadcrumb>
+          <Breadcrumb className="breadcrumb" items={breadcrumbItems} />
           {RenderContent(items, selectedMenuKey[0])}
         </Content>
       </Layout>
