@@ -16,7 +16,7 @@ export class UserController {
 
     @ApiOperation({ description: 'Get a user' })
     @ApiBearerAuth('access-token')
-    @Get('my')
+    @Get('me')
     find(@Request() req) {
         return this.userService.findUser(req.user.id);
     }
