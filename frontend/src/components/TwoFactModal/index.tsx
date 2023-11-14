@@ -26,6 +26,7 @@ const TwoFactorModal: React.FC<TwoFactorModalProps> = ({ visible, onOk, onCancel
     } catch (err) {
       console.error(err);
     }
+    onOk();
   };
 
   const handleCancel = () => {
