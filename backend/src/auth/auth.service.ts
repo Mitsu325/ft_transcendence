@@ -47,6 +47,7 @@ export class AuthService {
             email,
             username,
             password,
+            twoFactorSecret: '',
         });
         const payload = { sub: user.id, username: user.username };
         return {

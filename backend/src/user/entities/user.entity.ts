@@ -36,6 +36,15 @@ export class User extends BaseEntity {
     @Column({ name: 'two_factor_auth', type: 'boolean', default: false })
     twoFactorAuth: boolean;
 
+    @Column({
+        name: 'two_factor_secret',
+        type: 'varchar',
+        length: 32,
+        default: null,
+        nullable: true,
+    })
+    twoFactorSecret: string;
+
     @CreateDateColumn({
         name: 'created_at',
         type: 'timestamp',
