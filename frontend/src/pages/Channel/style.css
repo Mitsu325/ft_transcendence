@@ -1,0 +1,71 @@
+.channel-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  height: 100%;
+  width: 100%;
+}
+
+.menu {
+  background-color: #f5f5f5;
+  font-color: #001529;
+  font-family: Roboto Condensed;
+  font-size: 1.2rem;
+  width: 200px;
+  height: 33px;
+  margin-top: 12px;
+}
+
+.divider {
+  border-color: #001529;
+}
+
+.channel {
+  width: 100%;
+  max-width: 450px;
+  border: 2px solid #001529;
+  text-align: center;
+  margin-bottom: 15px;
+  box-shadow: 5px 5px 10px #001529;
+}
+
+.chat {
+  width: 900px;
+  border: 2px solid #001529;
+  margin-bottom: 15px;
+  box-shadow: 5px 5px 10px #001529;
+  justify-items: center;
+}
+
+.icon-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.text-icon {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-family: Roboto Condensed;
+}
+
+.plus-icon {
+  font-size: 40px;
+  cursor: pointer;
+  color: #001529;
+}
+
+@media screen and (max-width: 768px) {
+  .channel-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .channel,
+  .chat {
+    max-width: 100%;
+  }
+}
