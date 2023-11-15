@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Input, Button } from 'antd';
 import axios from 'axios';
 
@@ -6,23 +6,37 @@ interface TwoFactorModalProps {
   visible: boolean;
   onOk: () => void;
   onCancel: () => void;
+  TFSecret: string;
 }
 
-const TwoFactorModal: React.FC<TwoFactorModalProps> = ({ visible, onOk, onCancel }) => {
+const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
+  visible,
+  onOk,
+  onCancel,
+  TFSecret,
+}) => {
   const [otp, setOtp] = useState('');
+  const [userSecret, setuserSecret] = useState('');
+
+  useEffect(() => {
+    setuserSecret(TFSecret);
+  }, [TFSecret]);
 
   const handleVerify = async () => {
     try {
+      console.log(userSecret, otp);
       const response = await axios.post(
         'http://localhost:3003/two-factor-auth/verifyOTP',
-        { userId, otp },
+        { userSecret, otp },
       );
 
-      if (response.data.verified) {
-        alert('Login success');
-      } else {
-        alert('Login failed');
-      }
+      // console.log(response.data);
+
+      // if (response.data.verified) {
+      //   alert('Login success');
+      // } else {
+      //   alert('Login failed');
+      // }
     } catch (err) {
       console.error(err);
     }
@@ -51,7 +65,7 @@ const TwoFactorModal: React.FC<TwoFactorModalProps> = ({ visible, onOk, onCancel
       <div style={{ marginBottom: '10px' }}>
         <Input
           value={otp}
-          onChange={(e) => setOtp(e.target.value)}
+          onChange={e => setOtp(e.target.value)}
           placeholder="Insira o código OTP"
         />
       </div>

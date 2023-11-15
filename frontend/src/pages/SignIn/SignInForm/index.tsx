@@ -9,6 +9,7 @@ import { userService } from 'services/user.api';
 import { setAuthorizationHeader } from 'services/auth.service';
 import { useAuth } from 'hooks/useAuth';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import TwoFactorModal from 'components/TwoFactModal';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -21,6 +22,8 @@ const validationLogin = yup.object().shape({
 export default function SignInForm() {
   const context = useAuth();
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [userSecret, setUserSecret] = useState('');
 
   const handleLogin = async (values: LoginBody) => {
     try {
@@ -28,11 +31,19 @@ export default function SignInForm() {
       const res = await authService.login(values);
       setAuthorizationHeader(res.access_token);
       const user = await userService.getUser();
-      context.Login(res.access_token, user);
-      SuccessNotification({
-        message: 'Login bem-sucedido',
-        description: 'Você foi autenticado com sucesso.',
-      });
+
+      // console.log(user);
+
+      if (user.twoFactorAuth === false) {
+        setUserSecret(user.twoFactorSecret);
+        setVisible(true);
+        // context.Login(res.access_token, user);
+        // SuccessNotification({
+        //   message: 'Login bem-sucedido',
+        //   description: 'Você foi autenticado com sucesso.',
+        // });
+      }
+
       setLoading(false);
     } catch (error) {
       FailureNotification({
@@ -90,6 +101,12 @@ export default function SignInForm() {
           </Button>
         </Form>
       </Formik>
+      <TwoFactorModal
+        visible={visible}
+        onOk={() => setVisible(false)}
+        onCancel={() => setVisible(false)}
+        TFSecret={userSecret}
+      />
     </div>
   );
 }

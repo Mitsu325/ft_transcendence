@@ -12,6 +12,9 @@ const router = createBrowserRouter([
     path: '/sign-up',
     element: <SignUp />,
   },
+  {
+    path: '/two-factor-auth',
+  },
 ]);
 
 const PublicRoutes: React.FC = () => {
