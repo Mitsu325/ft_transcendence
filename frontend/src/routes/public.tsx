@@ -2,6 +2,7 @@ import React from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import SignIn from 'pages/SignIn';
 import SignUp from 'pages/SignUp';
+import TwoFactorModal from 'components/TwoFactModal';
 
 const router = createBrowserRouter([
   {
@@ -11,9 +12,6 @@ const router = createBrowserRouter([
   {
     path: '/sign-up',
     element: <SignUp />,
-  },
-  {
-    path: '/two-factor-auth',
   },
 ]);
 

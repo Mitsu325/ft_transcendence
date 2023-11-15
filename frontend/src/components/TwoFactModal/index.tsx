@@ -4,43 +4,40 @@ import axios from 'axios';
 
 interface TwoFactorModalProps {
   visible: boolean;
-  onOk: () => void;
+  onVerify: (verified: boolean) => void;
   onCancel: () => void;
-  TFSecret: string;
+  id: string;
+  setVerified: (verified: boolean) => void;
 }
 
 const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
   visible,
-  onOk,
+  onVerify,
   onCancel,
-  TFSecret,
+  id,
+  setVerified,
 }) => {
   const [otp, setOtp] = useState('');
-  const [userSecret, setuserSecret] = useState('');
+  const [userId, setUserID] = useState('');
 
   useEffect(() => {
-    setuserSecret(TFSecret);
-  }, [TFSecret]);
+    setUserID(id);
+  }, [id]);
 
   const handleVerify = async () => {
     try {
-      console.log(userSecret, otp);
       const response = await axios.post(
-        'http://localhost:3003/two-factor-auth/verifyOTP',
-        { userSecret, otp },
+        'http://localhost:3003/auth/two-factor-auth',
+        { userId, otp },
       );
 
-      // console.log(response.data);
-
-      // if (response.data.verified) {
-      //   alert('Login success');
-      // } else {
-      //   alert('Login failed');
-      // }
+      if (response.data.verified) {
+        setVerified(true);
+        onVerify(true);
+      }
     } catch (err) {
       console.error(err);
     }
-    onOk();
   };
 
   const handleCancel = () => {
@@ -51,7 +48,6 @@ const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
     <Modal
       title="Insira o Código OTP"
       open={visible}
-      onOk={handleVerify}
       onCancel={handleCancel}
       footer={[
         <Button key="cancel" onClick={handleCancel}>
