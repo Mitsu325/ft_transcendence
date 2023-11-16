@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
@@ -8,8 +8,9 @@ import FailureNotification from 'components/Notification/FailureNotification';
 import { userService } from 'services/user.api';
 import { setAuthorizationHeader } from 'services/auth.service';
 import { useAuth } from 'hooks/useAuth';
-// import SuccessNotification from 'components/Notification/SuccessNotification';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 import TwoFactorModal from 'components/TwoFactModal';
+import handleVerify from 'pages/utils/VerifyTF';
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -24,7 +25,7 @@ export default function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [userId, setUserId] = useState('');
+  const [otp, setOtp] = useState('');
 
   const handleLogin = async (values: LoginBody) => {
     try {
@@ -33,20 +34,28 @@ export default function SignInForm() {
       setAuthorizationHeader(res.access_token);
       const user = await userService.getUser();
 
-      // console.log(user);
-
-      if (user.twoFactorAuth === true) {
-        setUserId(user.id);
+      if (user.twoFactorAuth) {
         setVisible(true);
-        setVerified(false);
-        if (verified) {
-          context.Login(res.access_token, user);
-        }
-        // context.Login(res.access_token, user);
-        // SuccessNotification({
-        //   message: 'Login bem-sucedido',
-        //   description: 'Você foi autenticado com sucesso.',
-        // });
+        handleVerify(user.id, otp)
+          .then(result => {
+            if (typeof result === 'boolean') {
+              setVerified(result);
+            } else {
+              console.error('Resultado inesperado de handleVerify:', result);
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao verificar:', error);
+          });
+      } else {
+        setVerified(true);
+      }
+      if (verified) {
+        context.Login(res.access_token, user);
+        SuccessNotification({
+          message: 'Login bem-sucedido',
+          description: 'Você foi autenticado com sucesso.',
+        });
       }
 
       setLoading(false);
@@ -57,7 +66,6 @@ export default function SignInForm() {
       });
       setLoading(false);
     }
-    console.log(verified);
   };
 
   return (
@@ -109,13 +117,9 @@ export default function SignInForm() {
       </Formik>
       <TwoFactorModal
         visible={visible}
-        onVerify={(verified: boolean) => {
-          setVerified(verified);
-          setVisible(false);
-        }}
+        onOk={() => setVisible(false)}
         onCancel={() => setVisible(false)}
-        id={userId}
-        setVerified={setVerified}
+        setOtp={setOtp}
       />
     </div>
   );

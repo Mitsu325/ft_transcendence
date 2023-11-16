@@ -1,43 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Modal, Input, Button } from 'antd';
-import axios from 'axios';
 
 interface TwoFactorModalProps {
   visible: boolean;
-  onVerify: (verified: boolean) => void;
+  onOk: () => void;
   onCancel: () => void;
-  id: string;
-  setVerified: (verified: boolean) => void;
+  setOtp: (otp: string) => void;
 }
 
 const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
   visible,
-  onVerify,
+  onOk,
   onCancel,
-  id,
-  setVerified,
+  setOtp,
 }) => {
-  const [otp, setOtp] = useState('');
-  const [userId, setUserID] = useState('');
-
-  useEffect(() => {
-    setUserID(id);
-  }, [id]);
-
-  const handleVerify = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:3003/auth/two-factor-auth',
-        { userId, otp },
-      );
-
-      if (response.data.verified) {
-        setVerified(true);
-        onVerify(true);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleOk = () => {
+    onOk();
   };
 
   const handleCancel = () => {
@@ -53,14 +31,13 @@ const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
         <Button key="cancel" onClick={handleCancel}>
           Cancelar
         </Button>,
-        <Button key="verify" type="primary" onClick={handleVerify}>
-          Verificar
+        <Button key="verify" type="primary" onClick={handleOk}>
+          OK
         </Button>,
       ]}
     >
       <div style={{ marginBottom: '10px' }}>
         <Input
-          value={otp}
           onChange={e => setOtp(e.target.value)}
           placeholder="Insira o código OTP"
         />
