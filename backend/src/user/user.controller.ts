@@ -18,6 +18,6 @@ export class UserController {
     @ApiBearerAuth('access-token')
     @Get('me')
     find(@Request() req) {
-        return this.userService.findUser(req.user.id);
+        return this.userService.findUser(req.user.sub);
     }
 }
