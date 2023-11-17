@@ -9,7 +9,7 @@
 
 .menu {
   background-color: #f5f5f5;
-  font-color: #001529;
+  color: #001529;
   font-family: Roboto Condensed;
   font-size: 1.2rem;
   width: 200px;
@@ -18,24 +18,23 @@
 }
 
 .divider {
-  border-color: #001529;
+  margin-bottom: 10px;
 }
 
 .channel {
-  width: 100%;
+  flex: 1;
   max-width: 450px;
   border: 2px solid #001529;
   text-align: center;
-  margin-bottom: 15px;
   box-shadow: 5px 5px 10px #001529;
 }
 
 .chat {
-  width: 900px;
+  flex: 1;
+  max-width: 900px;
+  min-width: 300px;
   border: 2px solid #001529;
-  margin-bottom: 15px;
   box-shadow: 5px 5px 10px #001529;
-  justify-items: center;
 }
 
 .icon-container {
@@ -50,6 +49,28 @@
   margin-bottom: 20px;
   font-size: 2rem;
   font-family: Roboto Condensed;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #001529;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.icon-channel {
+  margin: 14px;
+}
+
+.channel-name {
+  margin-left: 10px;
+}
+
+.chat-icon {
+  font-size: 40px;
+  cursor: pointer;
+  color: #001529;
 }
 
 .plus-icon {

@@ -5,8 +5,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
-  controllers: [TwoFactorAuthController],
-  providers: [UserService],
+    imports: [TypeOrmModule.forFeature([User])],
+    controllers: [TwoFactorAuthController],
+    providers: [UserService],
 })
-export class TwoFactorAuthModule { }
+export class TwoFactorAuthModule {}
