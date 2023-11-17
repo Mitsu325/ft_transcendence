@@ -7,6 +7,8 @@ const handleVerify = async (userId: string, otp: string) => {
       { userId, otp },
     );
 
+    console.log(response.data);
+
     if (response.data.verified) {
       return true;
     } else {

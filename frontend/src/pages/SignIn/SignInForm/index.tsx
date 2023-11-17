@@ -10,7 +10,10 @@ import { setAuthorizationHeader } from 'services/auth.service';
 import { useAuth } from 'hooks/useAuth';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import TwoFactorModal from 'components/TwoFactModal';
-import handleVerify from 'pages/utils/VerifyTF';
+
+interface AuthResponse {
+  access_token: string;
+}
 
 const validationLogin = yup.object().shape({
   username: yup.string().required('Campo obrigatório'),
@@ -25,7 +28,11 @@ export default function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [userId, setuserId] = useState('');
+  const [loginResult, setLoginResult] = useState<{
+    res: AuthResponse | null;
+    user: any | null;
+  }>({ res: null, user: null });
 
   const handleLogin = async (values: LoginBody) => {
     try {
@@ -34,31 +41,14 @@ export default function SignInForm() {
       setAuthorizationHeader(res.access_token);
       const user = await userService.getUser();
 
+      setuserId(user.id);
+      setLoginResult({ res, user });
+
       if (user.twoFactorAuth) {
         setVisible(true);
-        handleVerify(user.id, otp)
-          .then(result => {
-            if (typeof result === 'boolean') {
-              setVerified(result);
-            } else {
-              console.error('Resultado inesperado de handleVerify:', result);
-            }
-          })
-          .catch(error => {
-            console.error('Erro ao verificar:', error);
-          });
       } else {
         setVerified(true);
       }
-      if (verified) {
-        context.Login(res.access_token, user);
-        SuccessNotification({
-          message: 'Login bem-sucedido',
-          description: 'Você foi autenticado com sucesso.',
-        });
-      }
-
-      setLoading(false);
     } catch (error) {
       FailureNotification({
         message: 'Não foi possível logar',
@@ -67,6 +57,22 @@ export default function SignInForm() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (verified && loginResult.res && loginResult.user) {
+      context.Login(loginResult.res.access_token, loginResult.user);
+      SuccessNotification({
+        message: 'Login bem-sucedido',
+        description: 'Você foi autenticado com sucesso.',
+      });
+    } else {
+      FailureNotification({
+        message: 'Não foi possível logar',
+        description: 'Por favor, verifique suas credenciais e tente novamente.',
+      });
+    }
+    setLoading(false);
+  }, [verified]);
 
   return (
     <div className="container">
@@ -119,7 +125,8 @@ export default function SignInForm() {
         visible={visible}
         onOk={() => setVisible(false)}
         onCancel={() => setVisible(false)}
-        setOtp={setOtp}
+        setVerified={setVerified}
+        id={userId}
       />
     </div>
   );

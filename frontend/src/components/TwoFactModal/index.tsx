@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Input, Button } from 'antd';
+import handleVerify from 'pages/utils/VerifyTF';
 
 interface TwoFactorModalProps {
   visible: boolean;
   onOk: () => void;
   onCancel: () => void;
-  setOtp: (otp: string) => void;
+  setVerified: (verified: boolean) => void;
+  id: string;
 }
 
 const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
   visible,
   onOk,
   onCancel,
-  setOtp,
+  setVerified,
+  id,
 }) => {
+  const [otp, setOtp] = useState('');
+
   const handleOk = () => {
+    handleVerify(id, otp)
+      .then(result => {
+        if (typeof result === 'boolean') {
+          setVerified(result);
+        } else {
+          console.error('Resultado inesperado de handleVerify:', result);
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao verificar:', error);
+      });
     onOk();
   };
 
