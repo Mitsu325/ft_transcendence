@@ -31,7 +31,7 @@ export default function SignInForm() {
   const [userId, setuserId] = useState('');
   const [loginResult, setLoginResult] = useState<{
     res: AuthResponse | null;
-    user: any | null;
+    user: null;
   }>({ res: null, user: null });
 
   const handleLogin = async (values: LoginBody) => {
@@ -65,14 +65,18 @@ export default function SignInForm() {
         message: 'Login bem-sucedido',
         description: 'Você foi autenticado com sucesso.',
       });
-    } else {
-      FailureNotification({
-        message: 'Não foi possível logar',
-        description: 'Por favor, verifique suas credenciais e tente novamente.',
-      });
+      setLoading(false);
+      if (!loading) {
+        if (!verified) {
+          FailureNotification({
+            message: 'Não foi possível logar',
+            description:
+              'Por favor, verifique suas credenciais e tente novamente.',
+          });
+        }
+      }
     }
-    setLoading(false);
-  }, [verified]);
+  }, [verified, loginResult.res, loginResult.user, loading, context]);
 
   return (
     <div className="container">
