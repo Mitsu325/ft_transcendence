@@ -56,6 +56,7 @@ export default function SignInForm() {
       });
       setLoading(false);
     }
+    setLoading(false);
   };
 
   useEffect(() => {

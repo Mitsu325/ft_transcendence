@@ -1,14 +1,8 @@
-import axios from 'axios';
+import api from 'services/api';
 
 const handleVerify = async (userId: string, otp: string) => {
   try {
-    const response = await axios.post(
-      'http://localhost:3003/auth/two-factor-auth',
-      { userId, otp },
-    );
-
-    console.log(response.data);
-
+    const response = await api.post('/auth/two-factor-auth', { userId, otp });
     if (response.data.verified) {
       return true;
     } else {

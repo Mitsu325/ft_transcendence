@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Input, Button } from 'antd';
-import handleVerify from 'pages/utils/VerifyTF';
+import FailureNotification from 'components/Notification/FailureNotification';
+import handleVerify from 'services/verifyTF.api';
 
 interface TwoFactorModalProps {
   visible: boolean;
@@ -24,6 +25,13 @@ const TwoFactorModal: React.FC<TwoFactorModalProps> = ({
       .then(result => {
         if (typeof result === 'boolean') {
           setVerified(result);
+          if (!result) {
+            FailureNotification({
+              message: 'Não foi possível logar',
+              description:
+                'Por favor, verifique suas credenciais e tente novamente.',
+            });
+          }
         } else {
           console.error('Resultado inesperado de handleVerify:', result);
         }
