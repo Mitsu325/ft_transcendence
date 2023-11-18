@@ -6,4 +6,12 @@ async function createChannel(params: ChannelInterface) {
   return result.data || null;
 }
 
-export default createChannel;
+async function getChannel() {
+  const result = await api.get('/channel');
+  return result.data || null;
+}
+
+export const channelService = {
+  createChannel,
+  getChannel,
+};

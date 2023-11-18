@@ -1,48 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Divider } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
-import { WechatOutlined } from '@ant-design/icons';
 import { MenuInfo } from 'rc-menu/lib/interface';
+import { WechatOutlined } from '@ant-design/icons';
 import 'pages/Channel/style.css';
-import { useAuth } from 'hooks/useAuth';
+import Modal from '../../components/Modal';
+import Conversation from '../../components/Conversation';
+import { channelService } from '../../services/channel.api';
 
-// interface ChannelItemProps {
-//   name: string;
-//   type: 'public' | 'private' | 'protected';
-//   owner: string;
-// }
-
-// const ChannelItem: React.FC<ChannelItemProps> = ({ name, type }) => {
-//   return (
-//     <div className="channel-item">
-//       <div className="icon-channel">
-//         <WechatOutlined className="chat-icon" />
-//       </div>
-//       <div className="channel-name">
-//         <p>{name}</p>
-//         <small>{type}</small>
-//       </div>
-//     </div>
-//   );
-// };
+interface ChannelItemProps {
+  id: string;
+  name_channel: string;
+  type: string;
+  owner: string;
+}
 
 const Channels: React.FC = () => {
-  // const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [current, setCurrent] = useState('channel');
+  const [channels, setChannels] = useState<ChannelItemProps[]>([]);
+  const [component, setComponent] = useState('modal');
+
+  useEffect(() => {
+    const getChannels = async () => {
+      const channelsData = await channelService.getChannel();
+      setChannels(channelsData);
+    };
+
+    getChannels();
+  }, []);
 
   const handleMenuClick = (e: MenuInfo) => {
     setCurrent(e.key as string);
+    setComponent('modal');
   };
-  const { user } = useAuth();
 
-  const handleIconClick = () => {
-    const userId = user?.id ?? ' ';
-    // const newChannel: ChannelItemProps = {
-    //   name: 'Novo Canal',
-    //   type: 'public',
-    //   owner: { userId },
-    // };
-    // setChannels([...channels, newChannel]);
+  const handleChatClick = (component: string): void => {
+    setComponent(component);
   };
 
   const menuItems = [
@@ -71,9 +63,20 @@ const Channels: React.FC = () => {
 
           {current === 'channel' && (
             <div>
-              {/* {channels.map(channel => (
-                <ChannelItem key={channel.name} {...channel} />
-              ))} */}
+              {channels.map(item => (
+                <div className="channel-item" key={item.id}>
+                  <div className="icon-channel">
+                    <WechatOutlined
+                      className="chat-icon"
+                      onClick={() => handleChatClick('conversation')}
+                    />
+                  </div>
+                  <div className="channel-name">
+                    <p>{item.name_channel}</p>
+                    <small>{item.type}</small>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -85,10 +88,8 @@ const Channels: React.FC = () => {
         </div>
 
         <div className="chat">
-          <div className="icon-container" onClick={handleIconClick}>
-            <p className="text-icon">Criar canal</p>
-            <PlusCircleOutlined className="plus-icon" />
-          </div>
+          {component === 'modal' && <Modal />}
+          {component === 'conversation' && <Conversation />}
         </div>
       </div>
     </>

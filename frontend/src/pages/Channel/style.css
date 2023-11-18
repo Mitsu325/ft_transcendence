@@ -18,7 +18,7 @@
 }
 
 .divider {
-  margin-bottom: 10px;
+  margin-bottom: 1px;
 }
 
 .channel {
@@ -37,34 +37,18 @@
   box-shadow: 5px 5px 10px #001529;
 }
 
-.icon-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.text-icon {
-  margin-bottom: 20px;
-  font-size: 2rem;
-  font-family: Roboto Condensed;
-}
-
 .channel-item {
   display: flex;
   align-items: center;
-  border: 1px solid #001529;
-  border-radius: 8px;
-  margin: 10px;
+  color: #001529;
+  border-bottom: 1px solid #001529;
+  /* border: 1px solid #001529; */
+  /* border-radius: 8px; */
+  /* margin: 9px; */
 }
 
 .icon-channel {
-  margin: 14px;
-}
-
-.channel-name {
-  margin-left: 10px;
+  margin: 10px;
 }
 
 .chat-icon {
@@ -73,10 +57,8 @@
   color: #001529;
 }
 
-.plus-icon {
-  font-size: 40px;
-  cursor: pointer;
-  color: #001529;
+.channel-name {
+  margin-left: 10px;
 }
 
 @media screen and (max-width: 768px) {

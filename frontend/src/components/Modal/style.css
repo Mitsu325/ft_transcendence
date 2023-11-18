@@ -1,0 +1,23 @@
+.icon-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.text-icon {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-family: Roboto Condensed;
+}
+
+.plus-icon {
+  font-size: 40px;
+  cursor: pointer;
+  color: #001529;
+}
+
+.input {
+  margin: 10px 10px 0 0;
+}

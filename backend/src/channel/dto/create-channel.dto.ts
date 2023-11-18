@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { User } from '../../user/entities/user.entity';
 
 export class CreateChannelDto {
     @IsString()
@@ -15,5 +16,5 @@ export class CreateChannelDto {
 
     @IsString()
     @IsNotEmpty()
-    owner: string;
+    owner: User;
 }
