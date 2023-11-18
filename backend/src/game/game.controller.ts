@@ -1,3 +1,5 @@
+import { Controller } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -6,26 +8,26 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
-  OnGatewayInit
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+@ApiTags('pong')
+@Controller('pong')
+@WebSocketGateway({ cors: { origin: 'http://localhost:3000', } })
+export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    console.log(client);
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(client.id + ' connected !!!');
   }
 
   handleDisconnect(client: Socket) {
-    // A new client has connected
+    console.log(client.id + ' disconnected ...');
   }
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    // Broadcast the message to all connected clients
     this.server.emit('message', data);
   }
 }

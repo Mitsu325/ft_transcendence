@@ -5,11 +5,11 @@ import { AppService } from './app.service';
 import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { GameGateway } from './game/game.gateway';
+import { GameModule } from './game/game.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, AuthModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, AuthModule, GameModule],
   controllers: [AppController],
-  providers: [AppService, GameGateway],
+  providers: [AppService],
 })
 export class AppModule { }
