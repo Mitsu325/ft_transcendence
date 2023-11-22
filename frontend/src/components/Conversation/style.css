@@ -8,6 +8,11 @@
   flex: 1;
   overflow-y: auto;
   padding: 10px;
+  color: #001529;
+}
+
+.chat-p {
+  color: #001529;
 }
 
 .chat-input {

@@ -89,7 +89,12 @@ const Channels: React.FC = () => {
 
         <div className="chat">
           {component === 'modal' && <Modal />}
-          {component === 'conversation' && <Conversation />}
+          {component === 'conversation' && (
+            <>
+              {/* <PlayerList players={players} /> */}
+              <Conversation />
+            </>
+          )}
         </div>
       </div>
     </>

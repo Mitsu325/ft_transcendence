@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from 'hooks/useAuth';
 import { channelService } from '../../services/channel.api';
-import { Modal as AntModal, Input, Button } from 'antd';
+import { Modal, Input, Button } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import './style.css';
 
@@ -19,12 +19,7 @@ const CustomModal: React.FC = () => {
   const showChannelNameModal = (selectedType: string) => {
     setChannelType(selectedType);
     setTypeModalVisible(false);
-
-    // if (selectedType === 'protegido') {
-    //   setIsModalOpen(true);
-    // } else {
     setIsModalOpen(true);
-    // }
   };
 
   const { user } = useAuth();
@@ -55,7 +50,7 @@ const CustomModal: React.FC = () => {
         <p className="text-icon">Criar canal</p>
         <PlusCircleOutlined className="plus-icon" />
       </div>
-      <AntModal
+      <Modal
         title="Selecione o Tipo de Canal"
         open={typeModalVisible}
         onCancel={handleCancel}
@@ -75,7 +70,7 @@ const CustomModal: React.FC = () => {
         ]}
       />
 
-      <AntModal
+      <Modal
         title={`Insira o Nome do Canal ${channelType}`}
         open={isModalOpen}
         onOk={sendForm}
@@ -98,7 +93,7 @@ const CustomModal: React.FC = () => {
             onChange={e => setChannelPassword(e.target.value)}
           />
         )}
-      </AntModal>
+      </Modal>
     </>
   );
 };
