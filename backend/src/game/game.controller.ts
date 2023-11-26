@@ -11,7 +11,26 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-const players = [];
+interface Player {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+interface Room {
+  player1: Player;
+  player2: Player;
+}
+
+interface Game {
+  players: { [key: string]: Player };
+  rooms: { [key: string]: Room };
+}
+
+const game: Game = {
+  players: {},
+  rooms: {},
+};
 
 @ApiTags('pong')
 @Controller('pong')
@@ -20,31 +39,51 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  players: any[] = [];
-
   handleConnection(client: Socket, ...args: any[]) {
     console.log(client.id + ' connected !!!');
   }
 
   handleDisconnect(client: Socket) {
-    const index = players.findIndex((p) => p.sid === client.id);
-    if (index !== -1) {
-      players.splice(index, 1);
+    const playerId = game.players[client.id]?.id;
+
+    if (playerId) {
+      delete game.players[client.id];
+      this.server.emit('players', Object.values(game.players));
     }
-    this.server.emit('players', players);
-    console.log(players);
+    console.log('players em disconnect: ' + Object.values(game.players));
+
+    const roomId = game.rooms[client.id]?.player1.id;
+
+    if (roomId) {
+      delete game.rooms[client.id];
+      this.server.emit('rooms', Object.values(game.rooms));
+    }
+    console.log('rooms em disconnect: ' + Object.values(game.rooms));
+    console.log(client.id + ' disconnected !!!');
+  }
+
+  @SubscribeMessage('CreateRoom')
+  handleCreateRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
+    const existingRoom = game.rooms[client.id];
+
+    if (!existingRoom) {
+      client.join(client.id);
+      game.rooms[client.id] = { player1: { ...user }, player2: null };
+    } else {
+      console.log('The Player is already in the room:', client.id);
+    }
+    this.server.emit('rooms', Object.values(game.rooms));
   }
 
   @SubscribeMessage('PlayerConnected')
   handlePlayerConnected(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
-    const existingPlayerIndex = players.findIndex((p) => p.id === player.id);
+    const existingPlayer = game.players[client.id];
 
-    if (existingPlayerIndex === -1) {
-      players.push({ id: player.id, sid: client.id, ...player });
+    if (!existingPlayer) {
+      game.players[client.id] = { ...player };
+      this.server.emit('players', Object.values(game.players));
     } else {
       console.log('Player with the same ID already exists:', player.id);
     }
-    this.server.emit('players', players);
-    console.log(players);
   }
 }

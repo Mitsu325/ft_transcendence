@@ -1,37 +1,22 @@
 import * as React from 'react';
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
-import { Avatar } from 'antd';
+import PlayerCard from 'components/PlayerCard';
+import { Button } from 'antd';
 import './style.css';
 
-interface Player {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
-interface PlayerCardProps {
-  player: Player;
-}
-
-const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => (
-  <div key={player.id} className="player-card">
-    <Avatar src={player.avatar} style={{ backgroundColor: '#f56a00' }}>
-      {player.name.substring(0, 1).toUpperCase()}
-    </Avatar>
-    <div className="player-info">
-      <p className="player-name">{player.name}</p>
-    </div>
-  </div>
-);
+let socket: Socket;
 
 export const Game = () => {
-  const user = useAuth();
+  const user = useAuth()?.user;
   const [players, setPlayers] = React.useState<
     Array<{ id: string; name: string; avatar: string }>
   >([]);
+  const [rooms, setRooms] = React.useState<
+    Array<{ id: string; name: string; avatar: string }>
+  >([]);
 
-  const socket = React.useMemo(() => {
+  socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
       reconnectionDelay: 10000,
     });
@@ -40,9 +25,9 @@ export const Game = () => {
 
   React.useEffect(() => {
     const player = {
-      id: user?.user?.id,
-      name: user?.user?.username,
-      avatar: user?.user?.avatar,
+      id: user?.id,
+      name: user?.username,
+      avatar: user?.avatar,
     };
 
     socket.on('connect', () => {
@@ -53,18 +38,30 @@ export const Game = () => {
       setPlayers(players);
     });
 
+    socket.on('rooms', rooms => {
+      setRooms(rooms);
+      console.log(rooms);
+    });
+
     return () => {
       socket.disconnect();
     };
-  }, [socket, user?.user?.id, user?.user?.username, user?.user?.avatar]);
+  }, [user?.id, user?.username, user?.avatar]);
+
+  const createRoom = () => {
+    socket.emit('CreateRoom', user);
+  };
 
   return (
     <div>
-      <h1>*** JOGADORES ***</h1>
+      <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
       <div className="players-container">
         {players.map(player => (
           <PlayerCard key={player.id} player={player} />
         ))}
+      </div>
+      <div>
+        <Button onClick={createRoom}>Criar sala</Button>
       </div>
     </div>
   );
