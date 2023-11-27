@@ -11,6 +11,7 @@ interface Room {
 
 interface RoomCardProps {
   room: Room;
+  getInRoom: (room: Room) => void;
 }
 
 function getRandomColor() {
@@ -22,15 +23,16 @@ function getRandomColor() {
   return color;
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ room }) => (
+const RoomCard: React.FC<RoomCardProps> = ({ room, getInRoom }) => (
   <div key={room.room_id} className="room-card">
-    <Avatar
-      src={room.player_avatar}
-      style={{ backgroundColor: getRandomColor() }}
-    >
-      Sala
-      {/* {room.player_name.substring(0, 1).toUpperCase()} */}
-    </Avatar>
+    <a href="#" onClick={() => getInRoom(room)}>
+      <Avatar
+        src={room.player_avatar}
+        style={{ backgroundColor: getRandomColor() }}
+      >
+        Sala
+      </Avatar>
+    </a>
     <div className="room-info">
       <p className="room-name">{room.player_name}</p>
     </div>

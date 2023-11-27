@@ -14,10 +14,17 @@ interface Player {
   avatar: string;
 }
 
-interface Room {
+interface RoomGame {
   room_id: string;
   player1: Player;
   player2: Player;
+}
+
+interface Room {
+  room_id: string;
+  player_id: string;
+  player_name: string;
+  player_avatar: string;
 }
 
 export const Game = () => {
@@ -57,7 +64,7 @@ export const Game = () => {
     });
 
     socket.on('rooms', rooms => {
-      const formattedRooms = rooms.map((room: Room) => {
+      const formattedRooms = rooms.map((room: RoomGame) => {
         return {
           room_id: room.player1.id,
           player_id: room.player1.id,
@@ -77,6 +84,10 @@ export const Game = () => {
     socket.emit('CreateRoom', user);
   };
 
+  const getInRoom = (room: Room) => {
+    console.log(`Entrando na sala ${room.room_id}`);
+  };
+
   return (
     <div>
       <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
@@ -91,7 +102,7 @@ export const Game = () => {
       </div>
       <div className="rooms-container">
         {rooms.map(room => (
-          <RoomCard key={room.room_id} room={room} />
+          <RoomCard key={room.room_id} room={room} getInRoom={getInRoom} />
         ))}
       </div>
     </div>
