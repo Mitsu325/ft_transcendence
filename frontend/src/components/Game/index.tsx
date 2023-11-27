@@ -2,10 +2,23 @@ import * as React from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
+import RoomCard from 'components/RoomCard';
 import { Button } from 'antd';
 import './style.css';
 
 let socket: Socket;
+
+interface Player {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+interface Room {
+  room_id: string;
+  player1: Player;
+  player2: Player;
+}
 
 export const Game = () => {
   const user = useAuth()?.user;
@@ -13,7 +26,12 @@ export const Game = () => {
     Array<{ id: string; name: string; avatar: string }>
   >([]);
   const [rooms, setRooms] = React.useState<
-    Array<{ id: string; name: string; avatar: string }>
+    Array<{
+      room_id: string;
+      player_id: string;
+      player_name: string;
+      player_avatar: string;
+    }>
   >([]);
 
   socket = React.useMemo(() => {
@@ -39,8 +57,15 @@ export const Game = () => {
     });
 
     socket.on('rooms', rooms => {
-      setRooms(rooms);
-      console.log(rooms);
+      const formattedRooms = rooms.map((room: Room) => {
+        return {
+          room_id: room.player1.id,
+          player_id: room.player1.id,
+          player_name: room.player1.name,
+          player_avatar: room.player1.avatar,
+        };
+      });
+      setRooms(formattedRooms);
     });
 
     return () => {
@@ -60,8 +85,14 @@ export const Game = () => {
           <PlayerCard key={player.id} player={player} />
         ))}
       </div>
+      <h1 style={{ padding: '20px' }}>*** SALAS ***</h1>
       <div>
         <Button onClick={createRoom}>Criar sala</Button>
+      </div>
+      <div className="rooms-container">
+        {rooms.map(room => (
+          <RoomCard key={room.room_id} room={room} />
+        ))}
       </div>
     </div>
   );

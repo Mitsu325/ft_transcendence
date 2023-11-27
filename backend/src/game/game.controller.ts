@@ -18,6 +18,7 @@ interface Player {
 }
 
 interface Room {
+  room_id: string;
   player1: Player;
   player2: Player;
 }
@@ -49,17 +50,16 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     if (playerId) {
       delete game.players[client.id];
       this.server.emit('players', Object.values(game.players));
+      // console.log('player disconnect:', JSON.stringify(game.players, null, 2));
     }
-    console.log('players em disconnect: ' + Object.values(game.players));
 
     const roomId = game.rooms[client.id]?.player1.id;
 
     if (roomId) {
       delete game.rooms[client.id];
       this.server.emit('rooms', Object.values(game.rooms));
+      // console.log('room disconnect:', JSON.stringify(game.rooms, null, 2));
     }
-    console.log('rooms em disconnect: ' + Object.values(game.rooms));
-    console.log(client.id + ' disconnected !!!');
   }
 
   @SubscribeMessage('CreateRoom')
@@ -68,11 +68,12 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!existingRoom) {
       client.join(client.id);
-      game.rooms[client.id] = { player1: { ...user }, player2: null };
+      game.rooms[client.id] = { room_id: client.id, player1: { ...user }, player2: null };
     } else {
       console.log('The Player is already in the room:', client.id);
     }
     this.server.emit('rooms', Object.values(game.rooms));
+    // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
   }
 
   @SubscribeMessage('PlayerConnected')
@@ -85,5 +86,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.log('Player with the same ID already exists:', player.id);
     }
+    // console.log('players em connect:', JSON.stringify(game.players, null, 2));
   }
 }

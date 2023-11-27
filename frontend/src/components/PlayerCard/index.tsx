@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Avatar } from 'antd';
 import './style.css';
+import { UserOutlined } from '@ant-design/icons';
 
 interface Player {
   id: string;
@@ -14,7 +15,11 @@ interface PlayerCardProps {
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => (
   <div key={player.id} className="player-card">
-    <Avatar src={player.avatar} style={{ backgroundColor: '#f56a00' }}>
+    <Avatar
+      src={player.avatar}
+      style={{ backgroundColor: '#87d068' }}
+      icon={<UserOutlined />}
+    >
       {player.name.substring(0, 1).toUpperCase()}
     </Avatar>
     <div className="player-info">
