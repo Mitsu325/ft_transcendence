@@ -18,6 +18,7 @@ const Channels: React.FC = () => {
   const [current, setCurrent] = useState('channel');
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [component, setComponent] = useState('modal');
+  const [currentRoom, setCurrentRoom] = useState<string | null>(null);
 
   useEffect(() => {
     const getChannels = async () => {
@@ -33,8 +34,9 @@ const Channels: React.FC = () => {
     setComponent('modal');
   };
 
-  const handleChatClick = (component: string): void => {
-    setComponent(component);
+  const handleChatClick = (roomId: string): void => {
+    setCurrentRoom(roomId);
+    setComponent('conversation');
   };
 
   const menuItems = [
@@ -68,7 +70,7 @@ const Channels: React.FC = () => {
                   <div className="icon-channel">
                     <WechatOutlined
                       className="chat-icon"
-                      onClick={() => handleChatClick('conversation')}
+                      onClick={() => handleChatClick(item.id)}
                     />
                   </div>
                   <div className="channel-name">
@@ -91,8 +93,7 @@ const Channels: React.FC = () => {
           {component === 'modal' && <Modal />}
           {component === 'conversation' && (
             <>
-              {/* <PlayerList players={players} /> */}
-              <Conversation />
+              <Conversation roomId={currentRoom} />
             </>
           )}
         </div>

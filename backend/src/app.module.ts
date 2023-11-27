@@ -7,7 +7,6 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
 import { ChannelModule } from './channel/channel.module';
-import { SocketModule } from './socket/socket.module';
 
 @Module({
     imports: [
@@ -16,7 +15,6 @@ import { SocketModule } from './socket/socket.module';
         AuthModule,
         TwoFactorAuthModule,
         ChannelModule,
-        SocketModule,
     ],
     controllers: [AppController],
     providers: [AppService],

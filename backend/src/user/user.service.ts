@@ -43,7 +43,7 @@ export class UserService {
         return this.usersRepository.find();
     }
 
-    async findById(id: string) {
+    private async findById(id: string) {
         return await this.usersRepository.findOne({
             where: { id },
         });
