@@ -17,29 +17,20 @@ interface Player {
 interface RoomGame {
   room_id: string;
   player1: Player;
-  player2: Player;
+  player2: Player | null;
 }
 
-interface Room {
-  room_id: string;
-  player_id: string;
-  player_name: string;
-  player_avatar: string;
-}
+// interface RoomOwner {
+//   room_id: string;
+//   player_id: string;
+//   player_name: string;
+//   player_avatar: string;
+// }
 
 export const Game = () => {
   const user = useAuth()?.user;
-  const [players, setPlayers] = React.useState<
-    Array<{ id: string; name: string; avatar: string }>
-  >([]);
-  const [rooms, setRooms] = React.useState<
-    Array<{
-      room_id: string;
-      player_id: string;
-      player_name: string;
-      player_avatar: string;
-    }>
-  >([]);
+  const [players, setPlayers] = React.useState<Player[]>([]);
+  const [rooms, setRooms] = React.useState<RoomGame[]>([]);
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -57,13 +48,16 @@ export const Game = () => {
       setPlayers(players);
     });
 
-    socket.on('rooms', rooms => {
+    socket.on('rooms', (rooms: RoomGame[]) => {
       const formattedRooms = rooms.map((room: RoomGame) => {
         return {
           room_id: room.room_id,
-          player_id: room.player1.id,
-          player_name: room.player1.name,
-          player_avatar: room.player1.avatar,
+          player1: {
+            id: room.player1.id,
+            name: room.player1.name,
+            avatar: room.player1.avatar,
+          },
+          player2: null,
         };
       });
       setRooms(formattedRooms);
@@ -78,7 +72,14 @@ export const Game = () => {
     socket.emit('CreateRoom', user);
   };
 
-  const getInRoom = (room: Room) => {
+  const getInRoom = (room: RoomGame) => {
+    room.player2 = {
+      id: user?.id ?? '',
+      name: user?.name ?? '',
+      avatar: user?.avatar ?? '',
+    };
+
+    socket.emit('GetInRoom', room);
     // console.log(`Entrando na sala ${room}`);
     console.log('room:', JSON.stringify(room, null, 2));
   };

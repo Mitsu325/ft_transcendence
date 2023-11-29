@@ -2,16 +2,28 @@ import * as React from 'react';
 import { Avatar } from 'antd';
 import './style.css';
 
-interface Room {
-  room_id: string;
-  player_id: string;
-  player_name: string;
-  player_avatar: string;
+interface Player {
+  id: string;
+  name: string;
+  avatar: string;
 }
 
+interface RoomGame {
+  room_id: string;
+  player1: Player;
+  player2: Player | null;
+}
+
+// interface RoomOwner {
+//   room_id: string;
+//   player_id: string;
+//   player_name: string;
+//   player_avatar: string;
+// }
+
 interface RoomCardProps {
-  room: Room;
-  getInRoom: (room: Room) => void;
+  room: RoomGame;
+  getInRoom: (room: RoomGame) => void;
 }
 
 function getRandomColor() {
@@ -27,14 +39,14 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, getInRoom }) => (
   <div key={room.room_id} className="room-card">
     <a href="#" onClick={() => getInRoom(room)}>
       <Avatar
-        src={room.player_avatar}
+        src={room.player1.avatar}
         style={{ backgroundColor: getRandomColor() }}
       >
         Sala
       </Avatar>
     </a>
     <div className="room-info">
-      <p className="room-name">{room.player_name}</p>
+      <p className="room-name">{room.player1.name}</p>
     </div>
   </div>
 );

@@ -77,6 +77,21 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
   }
 
+  @SubscribeMessage('GetInRoom')
+  handleGetInRoom(@MessageBody() room: Room, @ConnectedSocket() client: Socket) {
+    const existingRoom = game.rooms[room.room_id];
+
+    if (existingRoom) {
+      client.join(room.room_id);
+      game.rooms[room.room_id].player2 = { ...room.player2 };
+    } else {
+      console.log('Can`t find the room:', client.id);
+    }
+    this.server.emit('rooms', Object.values(game.rooms));
+    this.server.emit('players', Object.values(game.players));
+    console.log('rooms:', JSON.stringify(game.rooms, null, 2));
+  }
+
   @SubscribeMessage('PlayerConnected')
   handlePlayerConnected(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
     const existingPlayer = game.players[client.id];
