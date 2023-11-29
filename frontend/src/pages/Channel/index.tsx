@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Divider } from 'antd';
+import { Menu, Divider, Modal, Button } from 'antd';
 import { MenuInfo } from 'rc-menu/lib/interface';
-import { WechatOutlined } from '@ant-design/icons';
+import { WechatOutlined, EllipsisOutlined } from '@ant-design/icons';
 import 'pages/Channel/style.css';
-import Modal from '../../components/Modal';
+import CreateChannel from '../../components/CreateChannel';
 import Conversation from '../../components/Conversation';
 import { channelService } from '../../services/channel.api';
-
+import { joinRoom } from 'Socket/utilsSocket';
+import { useAuth } from 'hooks/useAuth';
 interface ChannelItemProps {
   id: string;
   name_channel: string;
@@ -19,6 +20,8 @@ const Channels: React.FC = () => {
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [component, setComponent] = useState('modal');
   const [currentRoom, setCurrentRoom] = useState<string | null>(null);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
 
   useEffect(() => {
     const getChannels = async () => {
@@ -31,12 +34,33 @@ const Channels: React.FC = () => {
 
   const handleMenuClick = (e: MenuInfo) => {
     setCurrent(e.key as string);
-    setComponent('modal');
+    setComponent('create');
   };
 
-  const handleChatClick = (roomId: string): void => {
+  const { user } = useAuth();
+  const handleChatClick = (roomId: string) => {
+    const userName = user?.name ?? '';
+    joinRoom(roomId, userName);
+
+    console.log(roomId);
     setCurrentRoom(roomId);
     setComponent('conversation');
+    setIsOpen(false);
+  };
+
+  const openModal = (channelId: string) => {
+    setSelectedChannel(channelId);
+    setIsOpen(true);
+  };
+
+  function closeModal() {
+    setSelectedChannel(null);
+    setIsOpen(false);
+  }
+
+  const onLeave = () => {
+    setIsOpen(false);
+    console.log('teste');
   };
 
   const menuItems = [
@@ -68,14 +92,37 @@ const Channels: React.FC = () => {
               {channels.map(item => (
                 <div className="channel-item" key={item.id}>
                   <div className="icon-channel">
-                    <WechatOutlined
-                      className="chat-icon"
-                      onClick={() => handleChatClick(item.id)}
-                    />
+                    <WechatOutlined className="chat-icon" />
                   </div>
                   <div className="channel-name">
                     <p>{item.name_channel}</p>
                     <small>{item.type}</small>
+                  </div>
+                  <div className="options-icon">
+                    <EllipsisOutlined
+                      className="ellipsis-icon"
+                      onClick={() => openModal(item.id)}
+                    />
+                    <Modal
+                      open={modalIsOpen}
+                      onCancel={closeModal}
+                      footer={null}
+                    >
+                      <div className="button-container">
+                        <Button
+                          type="primary"
+                          onClick={() =>
+                            selectedChannel !== null &&
+                            handleChatClick(selectedChannel)
+                          }
+                        >
+                          Entrar no canal
+                        </Button>
+                        <Button type="primary" onClick={onLeave}>
+                          Sair do canal
+                        </Button>
+                      </div>
+                    </Modal>
                   </div>
                 </div>
               ))}
@@ -90,7 +137,7 @@ const Channels: React.FC = () => {
         </div>
 
         <div className="chat">
-          {component === 'modal' && <Modal />}
+          {component === 'create' && <CreateChannel />}
           {component === 'conversation' && (
             <>
               <Conversation roomId={currentRoom} />

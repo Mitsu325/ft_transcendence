@@ -4,12 +4,12 @@ import {
     WebSocketServer,
     OnGatewayConnection,
     OnGatewayDisconnect,
-    // ConnectedSocket,
+    ConnectedSocket,
     MessageBody,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Socket, Server } from 'socket.io';
 
+const usersInRooms = {};
 @WebSocketGateway({
     cors: {
         origin: 'http://localhost:3000',
@@ -19,8 +19,7 @@ export class ChannelGateway
     implements OnGatewayConnection, OnGatewayDisconnect
 {
     @WebSocketServer()
-    socket: Socket;
-    private logger: Logger = new Logger('ChannelGateway');
+    server: Server;
 
     private rooms: Map<string, Set<string>> = new Map();
 
@@ -29,19 +28,25 @@ export class ChannelGateway
     }
 
     handleDisconnect(client: Socket) {
-        this.logger.log(`Usuário desconectado: ${client.id}`);
+        console.log(`Usuário desconectado: ${client.id}`);
         this.leaveAllRooms(client);
     }
 
     @SubscribeMessage('joinRoom')
-    handleJoinRoom(@MessageBody() data: { userName: string; roomId: string }) {
-        // const { roomId, userName } = data;
-        console.log('aqui:', data.roomId);
-        this.socket.join(data.roomId);
-        this.socket
+    handleJoinRoom(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { userName: string; roomId: string },
+    ) {
+        console.log('Room ID:', data.roomId);
+        client.join(data.roomId);
+
+        if (!usersInRooms[client.id]) {
+            usersInRooms[client.id] = [];
+        }
+        usersInRooms[client.id].push(data.roomId);
+        this.server
             .to(data.roomId)
             .emit('joinedRoom', data.roomId, data.userName);
-        // this.joinRoom(data.roomId, data.userName);
     }
 
     @SubscribeMessage('sendMessage')
@@ -65,15 +70,19 @@ export class ChannelGateway
     //     return true;
     // }
 
-    private joinRoom(roomId: string, Username: string) {
-        this.socket.join(roomId);
-        // if (!this.rooms.has(roomId)) {
-        //     this.rooms.set(roomId, new Set());
-        // }
-        // this.rooms.get(roomId).add(this.socket.id);
-        console.log(Username, roomId);
-        this.socket.to(roomId).emit('joinedRoom', roomId, Username);
-    }
+    // private joinRoom(
+    //     @ConnectedSocket() client: Socket,
+    //     roomId: string,
+    //     Username: string,
+    // ) {
+    //     client.join(roomId);
+    //     // if (!this.rooms.has(roomId)) {
+    //     //     this.rooms.set(roomId, new Set());
+    //     // }
+    //     // this.rooms.get(roomId).add(this.socket.id);
+    //     console.log(Username, roomId);
+    //     client.to(roomId).emit('joinedRoom', roomId, Username);
+    // }
 
     private leaveAllRooms(client: Socket) {
         this.rooms.forEach((clients, roomId) => {
@@ -91,10 +100,8 @@ export class ChannelGateway
     ) {
         console.log(`Recebida mensagem na sala ${roomId}: ${message}`);
         console.log(userName, roomId);
-        this.socket.emit('message', {
-            message: message,
-            userName: userName,
-        });
-        // client.to(roomId).emit('message', { userName, message });
+        this.server
+            .to(roomId)
+            .emit('message', { message: message, userName: userName });
     }
 }

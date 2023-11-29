@@ -5,7 +5,7 @@ import { Modal, Input, Button } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import './style.css';
 
-const CustomModal: React.FC = () => {
+const CreateChannel: React.FC = () => {
   const [typeModalVisible, setTypeModalVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelName, setChannelName] = useState('');
@@ -98,4 +98,4 @@ const CustomModal: React.FC = () => {
   );
 };
 
-export default CustomModal;
+export default CreateChannel;
