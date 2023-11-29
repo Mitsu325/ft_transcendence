@@ -14,7 +14,7 @@ import { Server, Socket } from 'socket.io';
 interface Player {
   id: string;
   name: string;
-  avatar: string;
+  avatar: null | string;
 }
 
 interface Room {
@@ -73,6 +73,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       console.log('The Player is already in the room:', client.id);
     }
     this.server.emit('rooms', Object.values(game.rooms));
+    this.server.emit('players', Object.values(game.players));
     // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
   }
 
@@ -81,11 +82,12 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const existingPlayer = game.players[client.id];
 
     if (!existingPlayer) {
-      game.players[client.id] = { ...player };
-      this.server.emit('players', Object.values(game.players));
+      game.players[client.id] = { id: player.id, name: player.username, avatar: player.avatar };
     } else {
       console.log('Player with the same ID already exists:', player.id);
     }
     // console.log('players em connect:', JSON.stringify(game.players, null, 2));
+    this.server.emit('rooms', Object.values(game.rooms));
+    this.server.emit('players', Object.values(game.players));
   }
 }

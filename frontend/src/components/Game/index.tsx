@@ -49,14 +49,8 @@ export const Game = () => {
   }, []);
 
   React.useEffect(() => {
-    const player = {
-      id: user?.id,
-      name: user?.username,
-      avatar: user?.avatar,
-    };
-
     socket.on('connect', () => {
-      socket.emit('PlayerConnected', player);
+      socket.emit('PlayerConnected', user);
     });
 
     socket.on('players', players => {
@@ -66,7 +60,7 @@ export const Game = () => {
     socket.on('rooms', rooms => {
       const formattedRooms = rooms.map((room: RoomGame) => {
         return {
-          room_id: room.player1.id,
+          room_id: room.room_id,
           player_id: room.player1.id,
           player_name: room.player1.name,
           player_avatar: room.player1.avatar,
@@ -78,14 +72,15 @@ export const Game = () => {
     return () => {
       socket.disconnect();
     };
-  }, [user?.id, user?.username, user?.avatar]);
+  }, [user]);
 
   const createRoom = () => {
     socket.emit('CreateRoom', user);
   };
 
   const getInRoom = (room: Room) => {
-    console.log(`Entrando na sala ${room.room_id}`);
+    // console.log(`Entrando na sala ${room}`);
+    console.log('room:', JSON.stringify(room, null, 2));
   };
 
   return (
