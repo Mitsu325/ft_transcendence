@@ -1,4 +1,5 @@
 import { Channel } from '../entities/channel.entity';
+import { User } from '../../user/entities/user.entity';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateMessageDto {
@@ -8,7 +9,7 @@ export class CreateMessageDto {
 
     @IsNotEmpty()
     @IsString()
-    sender_id: string;
+    sender_id: User;
 
     @IsNotEmpty()
     @IsString()

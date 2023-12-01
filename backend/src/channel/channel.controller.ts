@@ -4,6 +4,7 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel.dto';
 import { hashPassword } from 'src/utils/hash.util';
+import { CreateMessageDto } from './dto/create-message.dto';
 
 @ApiTags('channel')
 @Controller('channel')
@@ -39,5 +40,19 @@ export class ChannelController {
         } catch (error) {
             return { success: false, error: error };
         }
+    }
+
+    @ApiOperation({ description: 'Create a new message' })
+    @ApiBearerAuth('access-token')
+    @Post()
+    async createMessage(@Body() createMessageDto: CreateMessageDto) {
+        return this.channelService.addMessage(createMessageDto);
+    }
+
+    @ApiOperation({ description: 'Get all messages' })
+    @ApiBearerAuth('access-token')
+    @Get()
+    getAllMessages() {
+        return this.channelService.getAllMessages();
     }
 }
