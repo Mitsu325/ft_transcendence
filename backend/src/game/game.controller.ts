@@ -41,7 +41,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(client.id + ' connected !!!');
+    // console.log(client.id + ' connected !!!');
   }
 
   handleDisconnect(client: Socket) {
@@ -81,6 +81,13 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   handleGetInRoom(@MessageBody() room: Room, @ConnectedSocket() client: Socket) {
     const existingRoom = game.rooms[room.room_id];
 
+    console.log('@@@@@@@@@@@@@@@@ ROOM @@@@@@@@@@@@@@@@');
+    console.log('//////////////// P1 ////////////////');
+    console.log(existingRoom.player1);
+    console.log('//////////////// P2 ////////////////');
+    console.log(existingRoom.player2);
+    console.log('@@@@@@@@@@@@@@@@ ROOM @@@@@@@@@@@@@@@@');
+
     if (existingRoom) {
       client.join(room.room_id);
       game.rooms[room.room_id].player2 = { ...room.player2 };
@@ -89,7 +96,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     }
     this.server.emit('rooms', Object.values(game.rooms));
     this.server.emit('players', Object.values(game.players));
-    console.log('rooms:', JSON.stringify(game.rooms, null, 2));
+    // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
   }
 
   @SubscribeMessage('PlayerConnected')

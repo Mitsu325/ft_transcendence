@@ -6,7 +6,7 @@ import { UserOutlined } from '@ant-design/icons';
 interface Player {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 interface PlayerCardProps {

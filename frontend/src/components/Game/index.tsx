@@ -11,7 +11,7 @@ let socket: Socket;
 interface Player {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 interface RoomGame {
@@ -20,15 +20,18 @@ interface RoomGame {
   player2: Player | null;
 }
 
-// interface RoomOwner {
-//   room_id: string;
-//   player_id: string;
-//   player_name: string;
-//   player_avatar: string;
-// }
-
 export const Game = () => {
   const user = useAuth()?.user;
+
+  const userPlayer = React.useMemo(() => {
+    const newPlayer = {
+      id: user?.id ?? '',
+      name: user?.name ?? '',
+      avatar: user?.avatar ?? null,
+    };
+    return newPlayer;
+  }, [user]);
+
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [rooms, setRooms] = React.useState<RoomGame[]>([]);
 
@@ -41,7 +44,7 @@ export const Game = () => {
 
   React.useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('PlayerConnected', user);
+      socket.emit('PlayerConnected', userPlayer);
     });
 
     socket.on('players', players => {
@@ -49,39 +52,25 @@ export const Game = () => {
     });
 
     socket.on('rooms', (rooms: RoomGame[]) => {
-      const formattedRooms = rooms.map((room: RoomGame) => {
-        return {
-          room_id: room.room_id,
-          player1: {
-            id: room.player1.id,
-            name: room.player1.name,
-            avatar: room.player1.avatar,
-          },
-          player2: null,
-        };
-      });
-      setRooms(formattedRooms);
+      setRooms(rooms);
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [user]);
+  }, [userPlayer]);
 
   const createRoom = () => {
-    socket.emit('CreateRoom', user);
+    socket.emit('CreateRoom', userPlayer);
+
+    console.log(rooms);
   };
 
   const getInRoom = (room: RoomGame) => {
-    room.player2 = {
-      id: user?.id ?? '',
-      name: user?.name ?? '',
-      avatar: user?.avatar ?? '',
-    };
-
+    room.player2 = userPlayer;
     socket.emit('GetInRoom', room);
-    // console.log(`Entrando na sala ${room}`);
-    console.log('room:', JSON.stringify(room, null, 2));
+
+    console.log(rooms);
   };
 
   return (

@@ -5,7 +5,7 @@ import './style.css';
 interface Player {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 interface RoomGame {
@@ -13,13 +13,6 @@ interface RoomGame {
   player1: Player;
   player2: Player | null;
 }
-
-// interface RoomOwner {
-//   room_id: string;
-//   player_id: string;
-//   player_name: string;
-//   player_avatar: string;
-// }
 
 interface RoomCardProps {
   room: RoomGame;
