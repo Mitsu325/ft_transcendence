@@ -23,6 +23,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => (
       {player.name.substring(0, 1).toUpperCase()}
     </Avatar>
     <div className="player-info">
+      <p>{player.avatar}</p>
       <p className="player-name">{player.name}</p>
     </div>
   </div>

@@ -60,13 +60,15 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.emit('rooms', Object.values(game.rooms));
       // console.log('room disconnect:', JSON.stringify(game.rooms, null, 2));
     }
+    console.log(game.rooms);
   }
 
   @SubscribeMessage('CreateRoom')
   handleCreateRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
-    const existingRoom = game.rooms[client.id];
+    // const existingRoom = game.rooms[client.id];
+    const playerAlreadyInRoom = Object.values(game.rooms).find(room => room.player1.id === user.id || (room.player2 && room.player2.id === user.id));
 
-    if (!existingRoom) {
+    if (!playerAlreadyInRoom) {
       client.join(client.id);
       game.rooms[client.id] = { room_id: client.id, player1: { ...user }, player2: null };
     } else {
@@ -75,28 +77,28 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('rooms', Object.values(game.rooms));
     this.server.emit('players', Object.values(game.players));
     // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
+    console.log('----------------------------');
+    console.log(game.rooms);
+    console.log('----------------------------');
   }
 
   @SubscribeMessage('GetInRoom')
   handleGetInRoom(@MessageBody() room: Room, @ConnectedSocket() client: Socket) {
-    const existingRoom = game.rooms[room.room_id];
+    // const existingRoom = game.rooms[room.room_id];
+    const playerAlreadyInRoom = Object.values(game.rooms).find(existingRoom => existingRoom.player1.id === room.player2.id || (existingRoom.player2 && existingRoom.player2.id === room.player2.id));
 
-    console.log('@@@@@@@@@@@@@@@@ ROOM @@@@@@@@@@@@@@@@');
-    console.log('//////////////// P1 ////////////////');
-    console.log(existingRoom.player1);
-    console.log('//////////////// P2 ////////////////');
-    console.log(existingRoom.player2);
-    console.log('@@@@@@@@@@@@@@@@ ROOM @@@@@@@@@@@@@@@@');
-
-    if (existingRoom) {
+    if (!playerAlreadyInRoom) {
       client.join(room.room_id);
       game.rooms[room.room_id].player2 = { ...room.player2 };
     } else {
-      console.log('Can`t find the room:', client.id);
+      console.log('The Player is already in the room:', client.id);
     }
     this.server.emit('rooms', Object.values(game.rooms));
     this.server.emit('players', Object.values(game.players));
     // console.log('rooms:', JSON.stringify(game.rooms, null, 2));
+    console.log('----------------------------');
+    console.log(game.rooms);
+    console.log('----------------------------');
   }
 
   @SubscribeMessage('PlayerConnected')

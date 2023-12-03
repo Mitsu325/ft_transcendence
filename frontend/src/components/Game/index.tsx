@@ -44,7 +44,7 @@ export const Game = () => {
 
   React.useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('PlayerConnected', userPlayer);
+      socket.emit('PlayerConnected', user);
     });
 
     socket.on('players', players => {
@@ -58,18 +58,22 @@ export const Game = () => {
     return () => {
       socket.disconnect();
     };
-  }, [userPlayer]);
+  }, [user]);
 
   const createRoom = () => {
     socket.emit('CreateRoom', userPlayer);
 
+    console.log(rooms.length);
     console.log(rooms);
   };
 
   const getInRoom = (room: RoomGame) => {
-    room.player2 = userPlayer;
-    socket.emit('GetInRoom', room);
-
+    if (userPlayer.id != room.player1.id) {
+      room.player2 = userPlayer;
+      socket.emit('GetInRoom', room);
+    } else {
+      console.log('Você não pode entrar na sua própria sala!');
+    }
     console.log(rooms);
   };
 
