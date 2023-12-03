@@ -32,13 +32,11 @@ export const Game = () => {
     return newPlayer;
   }, [user]);
 
-  const [gameData, setGameData] = React.useState({
-    players: [] as Player[],
-    rooms: [] as RoomGame[],
-    status: '',
-    match: false,
-    connected: false,
-  });
+  const [players, setPlayers] = React.useState<Player[]>([]);
+  const [rooms, setRooms] = React.useState<RoomGame[]>([]);
+  const [status, setStatus] = React.useState<string>();
+  const [match, setMatch] = React.useState(false);
+  const [connected, setConnected] = React.useState(false);
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -50,64 +48,44 @@ export const Game = () => {
   React.useEffect(() => {
     socket.on('connect', () => {
       socket.emit('PlayerConnected', user);
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        connected: true,
-      }));
+      setConnected(true);
     });
 
-    socket.on('players', receivedPlayers => {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        players: receivedPlayers,
-      }));
+    socket.on('players', players => {
+      setPlayers(players);
     });
 
-    socket.on('rooms', (receivedRooms: RoomGame[]) => {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        rooms: receivedRooms,
-      }));
+    socket.on('rooms', (rooms: RoomGame[]) => {
+      setRooms(rooms);
     });
-
     return () => {
       socket.disconnect();
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        connected: false,
-      }));
+      setConnected(false);
     };
   }, [user]);
 
   const createRoom = () => {
     socket.emit('CreateRoom', userPlayer);
-    setGameData(prevGameData => ({
-      ...prevGameData,
-      match: true,
-    }));
-    console.log(gameData.rooms);
+    setStatus(
+      `Você criou a sala ( ${userPlayer.name} ), agora é só esperar alguém entrar para jogar!`,
+    );
   };
 
   const getInRoom = (room: RoomGame) => {
-    if (userPlayer.id !== room.player1.id) {
+    if (userPlayer.id != room.player1.id) {
       room.player2 = userPlayer;
       socket.emit('GetInRoom', room);
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        match: true,
-      }));
+      setMatch(true);
     } else {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
-      }));
+      setStatus(
+        `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
+      );
     }
-    console.log(gameData.rooms);
   };
 
   return (
     <>
-      {gameData.match && gameData.connected ? (
+      {match && connected ? (
         <div style={{ display: 'flex', width: '100%' }}>
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
         </div>
@@ -116,7 +94,7 @@ export const Game = () => {
           <div style={{ flex: '70%', marginRight: '30px' }}>
             <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
             <div className="players-container">
-              {gameData.players.map(player => (
+              {players.map(player => (
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>
@@ -125,7 +103,7 @@ export const Game = () => {
               <Button onClick={createRoom}>Criar sala</Button>
             </div>
             <div className="rooms-container">
-              {gameData.rooms.map(room => (
+              {rooms.map(room => (
                 <RoomCard
                   key={room.room_id}
                   room={room}
@@ -135,7 +113,7 @@ export const Game = () => {
             </div>
           </div>
           <div style={{ flex: '30%' }}>
-            <h2 style={{ padding: '20px' }}>{gameData.status}</h2>
+            <h2 style={{ padding: '20px' }}>{status}</h2>
           </div>
         </div>
       )}

@@ -47,6 +47,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   handleDisconnect(client: Socket) {
     const playerId = game.players[client.id]?.id;
 
+    console.log(playerId);
+
     if (playerId) {
       delete game.players[client.id];
       this.server.emit('players', Object.values(game.players));
@@ -59,6 +61,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       delete game.rooms[client.id];
       this.server.emit('rooms', Object.values(game.rooms));
       // console.log('room disconnect:', JSON.stringify(game.rooms, null, 2));
+      // console.log(game.rooms);
     }
     console.log(game.rooms);
   }
