@@ -34,6 +34,7 @@ export const Game = () => {
 
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [rooms, setRooms] = React.useState<RoomGame[]>([]);
+  const [status, setStatus] = React.useState<string>();
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -62,6 +63,9 @@ export const Game = () => {
 
   const createRoom = () => {
     socket.emit('CreateRoom', userPlayer);
+    setStatus(
+      `Você criou a sala ( ${userPlayer.name} ), agora é só esperar alguém entrar para jogar!`,
+    );
 
     console.log(rooms.length);
     console.log(rooms);
@@ -72,27 +76,37 @@ export const Game = () => {
       room.player2 = userPlayer;
       socket.emit('GetInRoom', room);
     } else {
-      console.log('Você não pode entrar na sua própria sala!');
+      setStatus(
+        `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
+      );
     }
     console.log(rooms);
   };
 
   return (
-    <div>
-      <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
-      <div className="players-container">
-        {players.map(player => (
-          <PlayerCard key={player.id} player={player} />
-        ))}
+    <div style={{ display: 'flex', width: '100%' }}>
+      <div style={{ flex: '70%', marginRight: '30px' }}>
+        <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
+        <div className="players-container">
+          {players.map(player => (
+            <PlayerCard key={player.id} player={player} />
+          ))}
+        </div>
+        <h1 style={{ padding: '20px' }}>*** SALAS ***</h1>
+        <div>
+          <Button onClick={createRoom}>Criar sala</Button>
+        </div>
+        <div className="rooms-container">
+          {rooms.map(room => (
+            <RoomCard key={room.room_id} room={room} getInRoom={getInRoom} />
+          ))}
+        </div>
       </div>
-      <h1 style={{ padding: '20px' }}>*** SALAS ***</h1>
-      <div>
-        <Button onClick={createRoom}>Criar sala</Button>
-      </div>
-      <div className="rooms-container">
-        {rooms.map(room => (
-          <RoomCard key={room.room_id} room={room} getInRoom={getInRoom} />
-        ))}
+
+      <div style={{ flex: '30%' }}>
+        <h2 style={{ padding: '20px' }}>{status}</h2>
+        {/* Conteúdo da nova div à direita */}
+        {/* Adicione aqui o conteúdo que deseja renderizar na nova div */}
       </div>
     </div>
   );
