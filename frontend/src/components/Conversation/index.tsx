@@ -4,6 +4,7 @@ import { SendOutlined } from '@ant-design/icons';
 import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
 import { sendMessage, connect } from '../../Socket/utilsSocket';
+import { channelService } from '../../services/channel.api';
 import './style.css';
 
 interface Message {
@@ -22,15 +23,36 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
 
     socket.on('message', (data: { userName: string; message: string }) => {
       console.log(data.message);
+      console.log(data.userName);
       setMessages(prevMessages => [
         ...prevMessages,
         { userName: data.userName, message: data.message },
       ]);
     });
+    const getMessages = async () => {
+      const msgData = await channelService.getMessages(roomId);
+      if (msgData) {
+        setMessages(msgData);
+      }
+    };
+
+    getMessages();
   }, [roomId, userName]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
+    const userName = user?.name ?? '';
     sendMessage(roomId, newMessage, userName);
+
+    await channelService.createMessage({
+      channel_id: String(roomId),
+      sender_id: user?.id ?? '',
+      message: newMessage,
+    });
+
+    const updatedMessages = await channelService.getMessages(roomId);
+    if (updatedMessages) {
+      setMessages(updatedMessages);
+    }
     setNewMessage('');
   };
 

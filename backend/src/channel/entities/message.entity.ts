@@ -4,6 +4,7 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     ManyToOne,
+    JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Channel } from './channel.entity';
@@ -14,9 +15,11 @@ export class Messages {
     id: string;
 
     @ManyToOne(() => Channel, channel => channel.id)
+    @JoinColumn({ name: 'channel_id', referencedColumnName: 'id' })
     channel_id: Channel;
 
     @ManyToOne(() => User, user => user.id)
+    @JoinColumn({ name: 'sender_id', referencedColumnName: 'id' })
     sender_id: User;
 
     @Column()

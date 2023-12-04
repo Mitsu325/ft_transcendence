@@ -5,7 +5,7 @@ import {
     ManyToOne,
     UpdateDateColumn,
     CreateDateColumn,
-    // JoinColumn,
+    JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
@@ -24,7 +24,7 @@ export class Channel {
     password?: string;
 
     @ManyToOne(() => User, user => user.id)
-    // @JoinColumn({ name: 'owner', referencedColumnName: 'id' })
+    @JoinColumn({ name: 'owner', referencedColumnName: 'id' })
     owner: User;
 
     @CreateDateColumn({

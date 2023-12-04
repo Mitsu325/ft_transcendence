@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
@@ -44,15 +44,15 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Create a new message' })
     @ApiBearerAuth('access-token')
-    @Post()
+    @Post('message')
     async createMessage(@Body() createMessageDto: CreateMessageDto) {
         return this.channelService.addMessage(createMessageDto);
     }
 
     @ApiOperation({ description: 'Get all messages' })
     @ApiBearerAuth('access-token')
-    @Get()
-    getAllMessages() {
-        return this.channelService.getAllMessages();
+    @Get('message')
+    getAllMessages(@Param('roomId') roomId: string | null) {
+        return this.channelService.getAllMessages(roomId);
     }
 }

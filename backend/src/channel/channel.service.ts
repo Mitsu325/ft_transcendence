@@ -44,7 +44,7 @@ export class ChannelService {
         return message;
     }
 
-    async getAllMessages(): Promise<Messages[]> {
-        return this.MessageRepository.find();
+    async getAllMessages(channel_id): Promise<Messages[]> {
+        return this.MessageRepository.find({ where: { channel_id } });
     }
 }
