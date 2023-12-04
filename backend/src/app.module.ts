@@ -6,10 +6,17 @@ import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, AuthModule, TwoFactorAuthModule],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        TypeOrmModule.forRoot(typeOrmConfig),
+        UserModule,
+        AuthModule,
+        TwoFactorAuthModule,
+        ChatModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

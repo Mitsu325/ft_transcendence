@@ -13,6 +13,7 @@ async function bootstrap() {
         .setVersion('1.0')
         .addTag('auth')
         .addTag('user')
+        .addTag('chat')
         .addBearerAuth(
             {
                 description: `Please enter token in following format: Bearer <JWT>`,

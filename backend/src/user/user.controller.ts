@@ -9,7 +9,7 @@ export class UserController {
 
     @ApiOperation({ description: 'Get all users' })
     @ApiBearerAuth('access-token')
-    @Get()
+    @Get('all')
     findAll() {
         return this.userService.findAll();
     }
