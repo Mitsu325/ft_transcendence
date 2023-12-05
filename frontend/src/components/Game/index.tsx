@@ -102,7 +102,6 @@ export const Game = () => {
         status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
       }));
     }
-    console.log(gameData.rooms);
   };
 
   return (
