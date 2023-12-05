@@ -19,8 +19,15 @@ export class ChatController {
     @ApiOperation({ description: 'Get all messages' })
     @ApiBearerAuth('access-token')
     @Get('messages')
-    findAllMessages() {
-        return this.chatService.findAllMessages();
+    async findAllMessages() {
+        return await this.chatService.findAllMessages();
+    }
+
+    @ApiOperation({ description: 'Get all recipients' })
+    @ApiBearerAuth('access-token')
+    @Get('recipients')
+    async findAllInteractedUsers(@Request() req) {
+        return await this.chatService.findAllInteractedUsers(req.user.sub);
     }
 
     @ApiOperation({ description: 'Send message' })

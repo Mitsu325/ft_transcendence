@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { DirectMessage } from './entities/direct-message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ChatService {
@@ -13,8 +14,25 @@ export class ChatService {
         private readonly userService: UserService,
     ) {}
 
-    findAllMessages(): Promise<DirectMessage[]> {
-        return this.directMessageRepository.find();
+    async findAllMessages(): Promise<DirectMessage[]> {
+        return await this.directMessageRepository.find();
+    }
+
+    async findAllInteractedUsers(user_id: string): Promise<User[]> {
+        const sentMessages = await this.directMessageRepository.find({
+            where: { sender: { id: user_id } },
+        });
+        const receivedMessages = await this.directMessageRepository.find({
+            where: { recipient: { id: user_id } },
+        });
+
+        const interactedUsersIds = [
+            ...new Set([
+                ...sentMessages.map(message => message.recipient.id),
+                ...receivedMessages.map(message => message.sender.id),
+            ]),
+        ];
+        return await this.userService.findByIds(interactedUsersIds);
     }
 
     async saveMessage(sendMessageDto: SendMessageDto, user_id: string) {

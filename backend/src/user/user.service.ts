@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
+
+// TODO: Não retornar dados sensíveis!!
 
 @Injectable()
 export class UserService {
@@ -63,5 +65,17 @@ export class UserService {
 
     findEmail(email: string) {
         return this.usersRepository.findOne({ where: { email } });
+    }
+
+    async findByIds(ids: string[]) {
+        return await this.usersRepository.find({
+            where: { id: In(ids) },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+            },
+        });
     }
 }
