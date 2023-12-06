@@ -70,6 +70,14 @@ export const Game = () => {
       }));
     });
 
+    socket.on('leave_room', (receivedRooms: RoomGame[]) => {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        rooms: receivedRooms,
+        match: false,
+      }));
+    });
+
     return () => {
       socket.disconnect();
       setGameData(prevGameData => ({
@@ -104,11 +112,22 @@ export const Game = () => {
     }
   };
 
+  const leaveRoom = () => {
+    socket.emit('leaveRoom', userPlayer);
+    setGameData(prevGameData => ({
+      ...prevGameData,
+      match: false,
+    }));
+  };
+
   return (
     <>
       {gameData.match && gameData.connected ? (
         <div style={{ display: 'flex', width: '100%' }}>
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
+          <div>
+            <Button onClick={leaveRoom}>Sair da sala</Button>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', width: '100%' }}>

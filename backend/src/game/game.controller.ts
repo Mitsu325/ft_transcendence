@@ -42,9 +42,9 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     if (roomId) {
       delete game.rooms[client.id];
       client.leave(roomId);
-      this.server.emit('rooms', Object.values(game.rooms));
+      // this.server.to(roomId).emit('leave_room', Object.values(game.rooms));
+      this.server.emit('leave_room', Object.values(game.rooms));
     }
-    console.log(game.rooms);
   }
 
   @SubscribeMessage('CreateRoom')
@@ -70,6 +70,21 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       game.rooms[room.room_id].player2 = { ...room.player2 };
     } else {
       console.log('The Player is already in the room:', client.id);
+    }
+    this.server.emit('rooms', Object.values(game.rooms));
+    this.server.emit('players', Object.values(game.players));
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
+    const roomId = this.gameService.findRoomByPlayerId(user.id, game);
+
+    if (roomId) {
+      delete game.rooms[client.id];
+      client.leave(roomId);
+      // this.server.to(roomId).emit('leave_room', Object.values(game.rooms));
+      this.server.emit('leave_room', Object.values(game.rooms));
+      console.log(game.rooms);
     }
     this.server.emit('rooms', Object.values(game.rooms));
     this.server.emit('players', Object.values(game.players));
