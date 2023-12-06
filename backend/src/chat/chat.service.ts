@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { DirectMessage } from './entities/direct-message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UserService } from 'src/user/user.service';
-import { User } from 'src/user/entities/user.entity';
+import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 
 @Injectable()
 export class ChatService {
@@ -18,21 +18,50 @@ export class ChatService {
         return await this.directMessageRepository.find();
     }
 
-    async findAllInteractedUsers(user_id: string): Promise<User[]> {
-        const sentMessages = await this.directMessageRepository.find({
-            where: { sender: { id: user_id } },
-        });
-        const receivedMessages = await this.directMessageRepository.find({
-            where: { recipient: { id: user_id } },
+    async findAllInteractedUsers(userId: string) {
+        const messages = await this.directMessageRepository.find({
+            where: [{ sender: { id: userId } }, { recipient: { id: userId } }],
+            order: { createdAt: 'DESC' },
+            relations: ['sender', 'recipient'],
         });
 
-        const interactedUsersIds = [
-            ...new Set([
-                ...sentMessages.map(message => message.recipient.id),
-                ...receivedMessages.map(message => message.sender.id),
-            ]),
-        ];
-        return await this.userService.findByIds(interactedUsersIds);
+        const interactedUserIds = new Set<string>();
+        messages.forEach(message => {
+            if (message.sender.id !== userId) {
+                interactedUserIds.add(message.sender.id);
+            } else {
+                interactedUserIds.add(message.recipient.id);
+            }
+        });
+
+        const interactedUsers = [];
+        for (const id of interactedUserIds) {
+            let lastMessage;
+            if (id === userId) {
+                lastMessage = messages.find(
+                    message =>
+                        message.sender.id === id && message.recipient.id === id,
+                );
+            } else {
+                lastMessage = messages.find(
+                    message =>
+                        message.sender.id === id || message.recipient.id === id,
+                );
+            }
+            if (!lastMessage) continue;
+
+            const sender = getNonSensitiveUserInfo(lastMessage.sender);
+            const recipient = getNonSensitiveUserInfo(lastMessage.recipient);
+            interactedUsers.push({
+                id: lastMessage.id,
+                message: lastMessage.message,
+                createdAt: lastMessage.createdAt,
+                sender: { ...sender },
+                recipient: { ...recipient },
+            });
+        }
+
+        return interactedUsers;
     }
 
     async saveMessage(sendMessageDto: SendMessageDto, user_id: string) {

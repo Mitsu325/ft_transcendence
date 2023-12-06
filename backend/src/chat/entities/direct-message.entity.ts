@@ -16,14 +16,12 @@ export class DirectMessage extends BaseEntity {
 
     @ManyToOne(() => User, sender => sender.id, {
         nullable: false,
-        eager: true,
     })
     @JoinColumn({ name: 'sender_id' })
     sender: User;
 
     @ManyToOne(() => User, recipient => recipient.id, {
         nullable: false,
-        eager: true,
     })
     @JoinColumn({ name: 'recipient_id' })
     recipient: User;
