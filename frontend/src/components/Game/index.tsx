@@ -75,6 +75,13 @@ export const Game = () => {
       }));
     });
 
+    socket.on('playerLeftRoom', (data: { message: string }) => {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        status: data.message,
+      }));
+    });
+
     return () => {
       socket.disconnect();
       setGameData(prevGameData => ({
@@ -117,8 +124,11 @@ export const Game = () => {
   };
 
   React.useEffect(() => {
+    console.log('PLAYERS');
     console.log(gameData.players);
-  }, [gameData.players]);
+    console.log('ROOMS');
+    console.log(gameData.rooms);
+  }, [gameData.players, gameData.rooms]);
 
   return (
     <>
@@ -127,6 +137,9 @@ export const Game = () => {
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
             <Button onClick={leaveRoom}>Sair da sala</Button>
+          </div>
+          <div>
+            <h2 style={{ padding: '20px' }}>{gameData.status}</h2>
           </div>
         </div>
       ) : (

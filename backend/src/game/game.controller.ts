@@ -31,19 +31,19 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     const playerId = game.players[client.id]?.id;
-
-    if (playerId) {
-      delete game.players[client.id];
-      this.server.emit('game', game);
-    }
-
     const roomId = this.gameService.findRoomByPlayerId(playerId, game);
 
-    if (roomId) {
-      delete game.rooms[client.id];
-      client.leave(roomId);
-      this.server.emit('game', game);
+    if (playerId) {
+      if (playerId === game.rooms[roomId]?.player1.id) {
+        delete game.rooms[roomId];
+        client.leave(roomId);
+      } else {
+        delete game.rooms[roomId]?.player2;
+        client.leave(roomId);
+      }
+      delete game.players[client.id];
     }
+    this.server.emit('game', game);
   }
 
   @SubscribeMessage('CreateRoom')
@@ -56,7 +56,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.log('The Player is already in the room:', client.id);
     }
-
     this.server.emit('game', game);
   }
 
@@ -70,7 +69,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.log('The Player is already in the room:', client.id);
     }
-
     this.server.emit('game', game);
   }
 
@@ -78,11 +76,23 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   handleLeaveRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
     const roomId = this.gameService.findRoomByPlayerId(user.id, game);
 
-    if (roomId) {
-      delete game.rooms[client.id];
+    if (game.rooms[roomId]) {
+      if (user.id === game.rooms[roomId].player1.id) {
+        delete game.rooms[roomId];
+      } else {
+        const otherPlayerSocketId = game.rooms[roomId].player2.id;
+        console.log(otherPlayerSocketId);
+        console.log(game.rooms[roomId].room_id);
+        delete game.rooms[roomId].player2;
+
+        // Emitir mensagem para o outro jogador na sala
+        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.players[client.id].name} saiu da sala.` });
+      }
+
       client.leave(roomId);
       this.server.emit('game', game);
-      console.log(game.rooms);
+    } else {
+      console.error(`Room not found for user ${user.id}`);
     }
   }
 
