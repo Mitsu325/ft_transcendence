@@ -20,6 +20,14 @@ interface RoomGame {
   player2: Player | null;
 }
 
+interface GameData {
+  players: Player[];
+  rooms: RoomGame[];
+  status: string;
+  match: boolean;
+  connected: boolean;
+}
+
 export const Game = () => {
   const user = useAuth()?.user;
 
@@ -32,9 +40,9 @@ export const Game = () => {
     return newPlayer;
   }, [user]);
 
-  const [gameData, setGameData] = React.useState({
-    players: [] as Player[],
-    rooms: [] as RoomGame[],
+  const [gameData, setGameData] = React.useState<GameData>({
+    players: [],
+    rooms: [],
     status: '',
     match: false,
     connected: false,
@@ -56,25 +64,14 @@ export const Game = () => {
       }));
     });
 
-    socket.on('players', receivedPlayers => {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        players: receivedPlayers,
-      }));
-    });
+    socket.on('game', (receivedGame: GameData) => {
+      const playersArray = Object.values(receivedGame.players);
+      const roomsArray = Object.values(receivedGame.rooms);
 
-    socket.on('rooms', (receivedRooms: RoomGame[]) => {
       setGameData(prevGameData => ({
         ...prevGameData,
-        rooms: receivedRooms,
-      }));
-    });
-
-    socket.on('leave_room', (receivedRooms: RoomGame[]) => {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        rooms: receivedRooms,
-        match: false,
+        players: playersArray,
+        rooms: roomsArray,
       }));
     });
 
@@ -93,7 +90,6 @@ export const Game = () => {
       ...prevGameData,
       match: true,
     }));
-    console.log(gameData.rooms);
   };
 
   const getInRoom = (room: RoomGame) => {
@@ -119,6 +115,10 @@ export const Game = () => {
       match: false,
     }));
   };
+
+  React.useEffect(() => {
+    console.log(gameData.players);
+  }, [gameData.players]);
 
   return (
     <>
