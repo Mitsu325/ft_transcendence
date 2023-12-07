@@ -18,16 +18,19 @@ export class ChatService {
         return await this.directMessageRepository.find();
     }
 
-    async findAllInteractedUsers(userId: string) {
+    async findAllInteractedUsers(loggedUserId: string) {
         const messages = await this.directMessageRepository.find({
-            where: [{ sender: { id: userId } }, { recipient: { id: userId } }],
+            where: [
+                { sender: { id: loggedUserId } },
+                { recipient: { id: loggedUserId } },
+            ],
             order: { createdAt: 'DESC' },
             relations: ['sender', 'recipient'],
         });
 
         const interactedUserIds = new Set<string>();
         messages.forEach(message => {
-            if (message.sender.id !== userId) {
+            if (message.sender.id !== loggedUserId) {
                 interactedUserIds.add(message.sender.id);
             } else {
                 interactedUserIds.add(message.recipient.id);
@@ -37,7 +40,7 @@ export class ChatService {
         const interactedUsers = [];
         for (const id of interactedUserIds) {
             let lastMessage;
-            if (id === userId) {
+            if (id === loggedUserId) {
                 lastMessage = messages.find(
                     message =>
                         message.sender.id === id && message.recipient.id === id,
@@ -64,17 +67,44 @@ export class ChatService {
         return interactedUsers;
     }
 
-    async saveMessage(sendMessageDto: SendMessageDto, user_id: string) {
-        try {
-            const { recipient_id, message } = sendMessageDto;
+    async findMessagesFromChattingUser(
+        chattingUserId: string,
+        loggedUserId: string,
+    ) {
+        const messages = await this.directMessageRepository.find({
+            where: [
+                {
+                    sender: { id: loggedUserId },
+                    recipient: { id: chattingUserId },
+                },
+                {
+                    sender: { id: chattingUserId },
+                    recipient: { id: loggedUserId },
+                },
+            ],
+            order: { createdAt: 'DESC' },
+            relations: ['sender', 'recipient'],
+        });
+        return messages.map(item => ({
+            id: item.id,
+            message: item.message,
+            createdAt: item.createdAt,
+            sender: { ...getNonSensitiveUserInfo(item.sender) },
+            recipient: { ...getNonSensitiveUserInfo(item.recipient) },
+        }));
+    }
 
-            const recipientUser = await this.userService.findUser(recipient_id);
+    async saveMessage(sendMessageDto: SendMessageDto, loggedUserId: string) {
+        try {
+            const { recipientId, message } = sendMessageDto;
+
+            const recipientUser = await this.userService.findUser(recipientId);
 
             if (!recipientUser) {
                 throw new NotFoundException('Recipient not found');
             }
 
-            const senderUser = await this.userService.findUser(user_id);
+            const senderUser = await this.userService.findUser(loggedUserId);
 
             if (!senderUser) {
                 throw new NotFoundException('Sender not found');

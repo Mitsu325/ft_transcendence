@@ -4,11 +4,18 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
     Post,
     Request,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { ApiOperation, ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+    ApiOperation,
+    ApiTags,
+    ApiBearerAuth,
+    ApiBody,
+    ApiParam,
+} from '@nestjs/swagger';
 import { SendMessageDto } from './dto/send-message.dto';
 
 @ApiTags('chat')
@@ -21,6 +28,21 @@ export class ChatController {
     @Get('messages')
     async findAllMessages() {
         return await this.chatService.findAllMessages();
+    }
+
+    @ApiOperation({ description: 'Get all messages' })
+    @ApiParam({
+        name: 'chattingUserId',
+        type: 'string',
+        description: 'ID who you are talking to',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('messages/:chattingUserId')
+    async findMessagesFromChattingUser(@Param() params: any, @Request() req) {
+        return await this.chatService.findMessagesFromChattingUser(
+            params.chattingUserId,
+            req.user.sub,
+        );
     }
 
     @ApiOperation({ description: 'Get all recipients' })
