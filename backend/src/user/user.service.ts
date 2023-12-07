@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
-
-// TODO: Não retornar dados sensíveis!!
+import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 
 @Injectable()
 export class UserService {
@@ -41,8 +40,9 @@ export class UserService {
         return data;
     }
 
-    findAll(): Promise<User[]> {
-        return this.usersRepository.find();
+    async findAll() {
+        const users = await this.usersRepository.find();
+        return users.map(user => getNonSensitiveUserInfo(user));
     }
 
     async findById(id: string) {

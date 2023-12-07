@@ -89,8 +89,8 @@ export class ChatService {
             id: item.id,
             message: item.message,
             createdAt: item.createdAt,
-            sender: { ...getNonSensitiveUserInfo(item.sender) },
-            recipient: { ...getNonSensitiveUserInfo(item.recipient) },
+            sender: getNonSensitiveUserInfo(item.sender),
+            recipient: getNonSensitiveUserInfo(item.recipient),
         }));
     }
 
