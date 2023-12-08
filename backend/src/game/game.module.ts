@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GamePong } from './game.controller';
+import { GamePong } from './game.gateway';
 import { GameService } from './game.service';
 
 @Module({

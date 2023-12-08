@@ -78,17 +78,13 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (game.rooms[roomId]) {
       if (user.id === game.rooms[roomId].player1.id) {
+        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player1.name} saiu da sala.` });
+        // delete game.rooms[roomId].player1;
         delete game.rooms[roomId];
       } else {
-        const otherPlayerSocketId = game.rooms[roomId].player2.id;
-        console.log(otherPlayerSocketId);
-        console.log(game.rooms[roomId].room_id);
+        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player2.name} saiu da sala.` });
         delete game.rooms[roomId].player2;
-
-        // Emitir mensagem para o outro jogador na sala
-        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.players[client.id].name} saiu da sala.` });
       }
-
       client.leave(roomId);
       this.server.emit('game', game);
     } else {
