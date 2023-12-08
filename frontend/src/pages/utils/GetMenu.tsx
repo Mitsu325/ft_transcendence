@@ -1,6 +1,6 @@
 type MenuItem = {
   key: string;
-  label: string;
+  label: string | React.ReactNode;
   icon?: React.ReactNode;
   children?: MenuItem[];
 };

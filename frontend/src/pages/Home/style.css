@@ -1,21 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto&family=Roboto+Condensed:wght@300&display=swap');
-
-.header {
-  background: #001529;
-  top: 0;
-  left: 0;
-  right: 0;
-  position: fixed;
-}
-
-.content {
-  margin: 30px;
-}
-
-.breadcrumb {
-  margin: 16px 0;
-}
-
 .divider {
   border-color: #001529;
   margin-bottom: 60px;
