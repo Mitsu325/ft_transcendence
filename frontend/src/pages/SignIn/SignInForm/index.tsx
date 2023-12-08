@@ -4,12 +4,12 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { authService } from 'services/auth.api';
 import { LoginBody } from 'interfaces/reqBody/login.interface';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 import FailureNotification from 'components/Notification/FailureNotification';
 import { userService } from 'services/user.api';
 import { setAuthorizationHeader } from 'services/auth.service';
 import { useAuth } from 'hooks/useAuth';
-import SuccessNotification from 'components/Notification/SuccessNotification';
-import TwoFactorModal from 'components/TwoFactModal';
+import TwoFactorModal from 'components/Modal/TwoFactModal';
 
 interface AuthResponse {
   access_token: string;
