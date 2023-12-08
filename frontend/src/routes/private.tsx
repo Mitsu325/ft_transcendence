@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from 'pages/Home/home';
 import GameOptions from 'pages/GameOptions';
 import CommonLayout from 'components/Layout';
+import Chat from 'pages/Chat';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -11,6 +12,7 @@ const PrivateRoutes: React.FC = () => {
         <Route element={<CommonLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/game-options" element={<GameOptions />} />
+          <Route path="/chat" element={<Chat />} />
         </Route>
       </Routes>
     </BrowserRouter>

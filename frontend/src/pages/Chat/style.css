@@ -1,0 +1,54 @@
+.channel-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  height: 100%;
+  width: 100%;
+}
+
+.card {
+  flex: 1;
+  border: 2px solid #001529;
+  box-shadow: 5px 5px 10px #001529;
+}
+
+.card-list {
+  max-width: 450px;
+}
+
+.menu {
+  background-color: #f5f5f5;
+  color: #001529;
+  font-family: Roboto Condensed;
+  font-size: 1.2rem;
+  width: 200px;
+  height: 33px;
+  margin-top: 12px;
+}
+
+.border-dark {
+  border-block-color: #001529;
+}
+
+.mb-1 {
+  margin-bottom: 1px;
+}
+
+@media screen and (max-width: 768px) {
+  .card {
+    max-width: 100%;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .channel-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+}

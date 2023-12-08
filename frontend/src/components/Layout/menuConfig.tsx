@@ -35,19 +35,14 @@ export const menuItems = [
   },
   { key: '5', label: 'Amigos', icon: <TeamOutlined /> },
   {
-    key: 'sub2',
-    label: 'Chat',
+    key: '6',
     icon: <MessageOutlined />,
-    children: [
-      { key: '6', label: 'Criar chat' },
-      { key: '7', label: 'Enviar mensagem' },
-      { key: '8', label: 'Gerenciar usuários' },
-      { key: '9', label: 'Perfil de jogadores' },
-    ],
+    label: <Link to="/chat">Chat</Link>,
   },
 ];
 
 export const menuPaths: MenuPaths = {
   '/': '0',
   '/game-options': '1',
+  '/chat': '6',
 };
