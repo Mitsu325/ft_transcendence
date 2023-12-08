@@ -1,0 +1,15 @@
+.text-description {
+  color: #5a5a5a;
+}
+
+.ant-list .ant-list-item {
+  padding: 12px 10px;
+}
+
+.ant-list-split .ant-list-item {
+  border-block-color: #001529;
+}
+
+.ant-list-split .ant-list-item:last-child {
+  border-block-end: 1px solid;
+}
