@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import '@components/LinkButton/style.css';
