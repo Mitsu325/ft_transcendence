@@ -37,7 +37,6 @@ export class ChannelGateway
         @ConnectedSocket() client: Socket,
         @MessageBody() data: { userName: string; roomId: string },
     ) {
-        console.log('Room ID:', data.roomId);
         client.join(data.roomId);
 
         if (!usersInRooms[client.id]) {
@@ -58,31 +57,8 @@ export class ChannelGateway
             userName: string;
         },
     ) {
-        console.log(data);
-        console.log(data.roomId);
-
         this.sendMessageToRoom(data.roomId, data.message, data.userName);
     }
-
-    // private validatePassword(roomId: string, password?: string): boolean {
-    //     console.log(roomId);
-    //     if (password) console.log(password);
-    //     return true;
-    // }
-
-    // private joinRoom(
-    //     @ConnectedSocket() client: Socket,
-    //     roomId: string,
-    //     Username: string,
-    // ) {
-    //     client.join(roomId);
-    //     // if (!this.rooms.has(roomId)) {
-    //     //     this.rooms.set(roomId, new Set());
-    //     // }
-    //     // this.rooms.get(roomId).add(this.socket.id);
-    //     console.log(Username, roomId);
-    //     client.to(roomId).emit('joinedRoom', roomId, Username);
-    // }
 
     private leaveAllRooms(client: Socket) {
         this.rooms.forEach((clients, roomId) => {

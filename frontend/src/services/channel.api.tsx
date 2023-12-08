@@ -13,7 +13,7 @@ async function getChannel() {
 }
 
 async function getMessages(roomId: string | null) {
-  const result = await api.get(`/channel/message?roomId=${roomId}`);
+  const result = await api.get(`/channel/message/${roomId}`);
   return result.data || null;
 }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Request, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
@@ -51,8 +51,16 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Get all messages' })
     @ApiBearerAuth('access-token')
-    @Get('message')
-    getAllMessages(@Param('roomId') roomId: string | null) {
-        return this.channelService.getAllMessages(roomId);
+    @Get('message/:roomId')
+    async getAllMessages(@Request() req) {
+        try {
+            const channel_id = req.params.roomId;
+            console.log('canal', channel_id);
+            const messages = await this.channelService.getMessages(channel_id);
+            return messages;
+        } catch (error) {
+            console.error(error);
+            return { error: 'Erro ao buscar mensagens.' };
+        }
     }
 }

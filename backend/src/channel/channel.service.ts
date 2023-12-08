@@ -44,7 +44,38 @@ export class ChannelService {
         return message;
     }
 
-    async getAllMessages(channel_id): Promise<Messages[]> {
-        return this.MessageRepository.find({ where: { channel_id } });
+    // async getMessages(channel_id) {
+    //     try {
+    //         console.log(channel_id);
+    //         const allMsg = await this.MessageRepository.find();
+    //         return await allMsg.map(messages => ({
+    //             id: messages.id,
+    //             message: messages.message,
+    //             channel_id: messages.channel_id ? messages.channel_id.id : null,
+    //         }));
+    //     } catch (error) {
+    //         console.error(error);
+
+    //         return;
+    //     }
+    // }
+    async getMessages(channel_id) {
+        try {
+            const allMsg = await this.MessageRepository.find();
+            const channelMessages = allMsg.filter(
+                message =>
+                    message.channel_id && message.channel_id.id === channel_id,
+            );
+            const retMessages = channelMessages.map(message => ({
+                // id: message.id,
+                message: message.message,
+                channel_id: message.channel_id ? message.channel_id.id : null,
+                sender_id: message.sender_id ? message.sender_id.name : null,
+            }));
+            return retMessages;
+        } catch (error) {
+            console.error(error);
+            return;
+        }
     }
 }

@@ -15,6 +15,7 @@ interface Message {
 const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
+  const [sender, setSender] = useState<string>('');
   const { user } = useAuth();
   const userName = user?.name ?? '';
 
@@ -22,8 +23,8 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
     connect();
 
     socket.on('message', (data: { userName: string; message: string }) => {
-      console.log(data.message);
-      console.log(data.userName);
+      // console.log(data.message);
+      // console.log(data.userName);
       setMessages(prevMessages => [
         ...prevMessages,
         { userName: data.userName, message: data.message },
@@ -32,6 +33,9 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
     const getMessages = async () => {
       const msgData = await channelService.getMessages(roomId);
       if (msgData) {
+        console.log(msgData);
+        console.log(msgData.message);
+        setSender(msgData.sender_id);
         setMessages(msgData);
       }
     };
@@ -40,7 +44,6 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
   }, [roomId, userName]);
 
   const handleSendMessage = async () => {
-    const userName = user?.name ?? '';
     sendMessage(roomId, newMessage, userName);
 
     await channelService.createMessage({
@@ -51,8 +54,11 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
 
     const updatedMessages = await channelService.getMessages(roomId);
     if (updatedMessages) {
-      setMessages(updatedMessages);
+      console.log(updatedMessages);
+      setSender(updatedMessages.sender_id);
+      setMessages(updatedMessages.message);
     }
+    console.log(updatedMessages);
     setNewMessage('');
   };
 
@@ -61,7 +67,7 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
       <div className="chat-messages">
         {messages.map((data, index) => (
           <p className="chat-p" key={index}>
-            <strong>{data.userName}:</strong> {data.message}
+            <strong>{sender}:</strong> {data.message}
           </p>
         ))}
       </div>

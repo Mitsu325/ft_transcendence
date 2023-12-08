@@ -14,15 +14,15 @@ export class Messages {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Channel, channel => channel.id)
+    @ManyToOne(() => Channel, { eager: true })
     @JoinColumn({ name: 'channel_id', referencedColumnName: 'id' })
     channel_id: Channel;
 
-    @ManyToOne(() => User, user => user.id)
+    @ManyToOne(() => User, { eager: true })
     @JoinColumn({ name: 'sender_id', referencedColumnName: 'id' })
     sender_id: User;
 
-    @Column()
+    @Column({ type: 'varchar' })
     message: string;
 
     @CreateDateColumn({
