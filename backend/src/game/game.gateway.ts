@@ -10,11 +10,27 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, Player, Room, Game } from './game.service';
+import { GameService, Player, Room, Game, Match } from './game.service';
 
 const game: Game = {
   players: {},
   rooms: {},
+};
+
+const match: Match = {
+  ball: {
+    x: 0,
+    y: 0,
+    width: 5,
+    xdirection: 1,
+    ydirection: 1,
+    xspeed: 2.8,
+    yspeed: 2.2
+  },
+  player1: { x: 0, y: 0 },
+  player2: { x: 0, y: 0 },
+  score1: 0,
+  score2: 0,
 };
 
 @ApiTags('pong')

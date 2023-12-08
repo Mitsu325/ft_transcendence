@@ -4,6 +4,8 @@ import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
 import RoomCard from 'components/RoomCard';
 import { Button } from 'antd';
+// import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
+import Court from 'components/Court';
 import './style.css';
 
 let socket: Socket;
@@ -26,6 +28,7 @@ interface GameData {
   status: string;
   match: boolean;
   connected: boolean;
+  message: string;
 }
 
 export const Game = () => {
@@ -46,6 +49,7 @@ export const Game = () => {
     status: '',
     match: false,
     connected: false,
+    message: '',
   });
 
   socket = React.useMemo(() => {
@@ -55,12 +59,20 @@ export const Game = () => {
     return newSocket;
   }, []);
 
+  // const [newMessage, setNewMessage] = React.useState('');
+  // const [visible, setVisible] = React.useState(false);
+  // React.useEffect(() => {
+  //   setVisible(true);
+  //   setNewMessage(gameData.message);
+  // }, [gameData.status, gameData.message]);
+
   React.useEffect(() => {
     socket.on('connect', () => {
       socket.emit('PlayerConnected', user);
       setGameData(prevGameData => ({
         ...prevGameData,
         connected: true,
+        status: 'CONNECTED',
       }));
     });
 
@@ -78,7 +90,9 @@ export const Game = () => {
     socket.on('playerLeftRoom', (data: { message: string }) => {
       setGameData(prevGameData => ({
         ...prevGameData,
-        status: data.message,
+        status: 'LEAVE',
+        message: data.message,
+        match: false,
       }));
     });
 
@@ -87,6 +101,7 @@ export const Game = () => {
       setGameData(prevGameData => ({
         ...prevGameData,
         connected: false,
+        status: 'DISCONNECTED',
       }));
     };
   }, [user]);
@@ -117,10 +132,6 @@ export const Game = () => {
 
   const leaveRoom = () => {
     socket.emit('leaveRoom', userPlayer);
-    setGameData(prevGameData => ({
-      ...prevGameData,
-      match: false,
-    }));
   };
 
   React.useEffect(() => {
@@ -133,14 +144,25 @@ export const Game = () => {
   return (
     <>
       {gameData.match && gameData.connected ? (
-        <div style={{ display: 'flex', width: '100%' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '50vh',
+          }}
+        >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
+            <Court />
+          </div>
+          <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>
           </div>
-          <div>
-            <h2 style={{ padding: '20px' }}>{gameData.status}</h2>
-          </div>
+          {/* <div>
+            <LeaveRoomModal visible={visible} message={newMessage} />
+          </div> */}
         </div>
       ) : (
         <div style={{ display: 'flex', width: '100%' }}>
@@ -165,9 +187,9 @@ export const Game = () => {
               ))}
             </div>
           </div>
-          <div style={{ flex: '30%' }}>
+          {/* <div style={{ flex: '30%' }}>
             <h2 style={{ padding: '20px' }}>{gameData.status}</h2>
-          </div>
+          </div> */}
         </div>
       )}
     </>
