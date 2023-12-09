@@ -74,8 +74,8 @@ export class GameService {
       }
 
       if (match.matchStatus === 'PLAYING') {
-        updateCallback({ ...match }); // Emitir evento para os clientes
-        await new Promise(resolve => setTimeout(resolve, 1000 / 60));
+        updateCallback({ ...match });
+        await new Promise(resolve => setTimeout(resolve, 10000 / 60));
         await playGame();
       }
     };
@@ -83,31 +83,3 @@ export class GameService {
     await playGame();
   }
 }
-
-// @Injectable()
-// export class GameInProgress {
-//   playingGame(match: Match) {
-//     const xpos = match.ball.x + match.ball.xspeed * match.ball.xdirection;
-//     const ypos = match.ball.y + match.ball.yspeed * match.ball.ydirection;
-
-//     match.ball.x = xpos;
-//     match.ball.y = ypos;
-
-//     if (xpos > courtDimensions.width - match.ball.width || xpos < match.ball.width) {
-//       match.ball.xdirection *= -1;
-//     }
-
-//     if (ypos > courtDimensions.height - match.ball.width || ypos < match.ball.width) {
-//       match.ball.ydirection *= -1;
-//     }
-
-//     if (xpos < match.ball.width) {
-//       match.score2++;
-//     }
-
-//     if (xpos > courtDimensions.width - match.ball.width) {
-//       match.score1++;
-//     }
-//     setTimeout(() => this.playingGame(match), 1000 / 60);
-//   }
-// }

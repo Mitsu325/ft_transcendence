@@ -70,7 +70,24 @@ export const Game = () => {
     message: '',
   });
 
-  const [match, setMatch] = React.useState<Match>({} as Match);
+  // const [match, setMatch] = React.useState<Match>({} as Match);
+  const [match, setMatch] = React.useState<Match>({
+    matchStatus: 'WAITING',
+    ball: {
+      x: 580 / 2,
+      y: 320 / 2,
+      width: 20,
+      xdirection: 1,
+      ydirection: 1,
+      xspeed: 0.8,
+      yspeed: 0.2,
+    },
+    player1: { x: 0, y: 0 },
+    player2: { x: 0, y: 0 },
+    score1: 0,
+    score2: 0,
+    courtDimensions: { width: 580, height: 320 },
+  });
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -117,8 +134,14 @@ export const Game = () => {
     });
 
     socket.on('matchStarted', (receivedMacth: Match) => {
-      // console.log(receivedMacth);
       setMatch(receivedMacth);
+      // setMatch(prevMatch => ({
+      //   ...prevMatch,
+      //   matchStatus: receivedMacth.matchStatus,
+      //   ball: receivedMacth.ball,
+      //   score1: receivedMacth.score1,
+      //   score2: receivedMacth.score2,
+      // }));
     });
 
     return () => {
@@ -165,11 +188,13 @@ export const Game = () => {
   };
 
   // React.useEffect(() => {
-  //   console.log('PLAYERS');
-  //   console.log(gameData.players);
-  //   console.log('ROOMS');
-  //   console.log(gameData.rooms);
-  // }, [gameData.players, gameData.rooms]);
+  //   console.log('MATCH');
+  //   console.log(match);
+  // console.log('PLAYERS');
+  // console.log(gameData.players);
+  // console.log('ROOMS');
+  // console.log(gameData.rooms);
+  // }, [match]);
 
   return (
     <>

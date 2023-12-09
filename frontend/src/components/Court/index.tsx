@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
 
 interface Match {
@@ -26,28 +26,8 @@ interface MatchProps {
 const courtDimensions = { width: 580, height: 320 };
 
 const Court: React.FC<MatchProps> = ({ match }) => {
-  // useEffect(() => {
-  //   const sendKeyEvent = (e) => {
-  //     const { key, type } = e;
 
-  //     switch (key) {
-  //       case 'ArrowUp':
-  //       case 'ArrowDown':
-  //         sendKey(type, key);
-  //         e.preventDefault();
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   };
-  //   document.addEventListener('keydown', sendKeyEvent);
-  //   document.addEventListener('keyup', sendKeyEvent);
-
-  //   return () => {
-  //     document.addEventListener('keydown', sendKeyEvent);
-  //     document.addEventListener('keyup', sendKeyEvent);
-  //   };
-  // }, []);
+  console.log('match', match);
 
   return (
     <div style={{ position: 'relative' }}>
