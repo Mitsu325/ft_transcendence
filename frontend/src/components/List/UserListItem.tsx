@@ -16,7 +16,16 @@ const UserListItem = ({ avatar, title, description }: UserListProps) => {
       <List.Item.Meta
         avatar={<AvatarCustom src={avatar} size={48} />}
         title={
-          <a href="#" style={{ color: '#001529' }}>
+          <a
+            href="#"
+            style={{ color: '#001529', transition: 'color 0.5s' }}
+            onMouseEnter={e =>
+              ((e.target as HTMLElement).style.color = '#1677ff')
+            }
+            onMouseLeave={e =>
+              ((e.target as HTMLElement).style.color = '#001529')
+            }
+          >
             {title}
           </a>
         }

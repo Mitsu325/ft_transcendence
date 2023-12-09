@@ -29,6 +29,8 @@ const CommonLayout = () => {
       setSelectedMenuKey([key]);
       const updatedBreadcrumbItems = getMenuBreadcrumb(key, menuItems);
       setBreadcrumbItems(updatedBreadcrumbItems);
+    } else {
+      setSelectedMenuKey(['0']);
     }
   }, [location.pathname]);
 

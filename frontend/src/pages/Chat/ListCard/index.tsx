@@ -22,7 +22,7 @@ export default function ListCard() {
     [location.search],
   );
   const [selectedMenuItem, setSelectedMenuItem] = useState(
-    queryParams.get('selectedMenuItem') || 'channel',
+    queryParams.get('menu') || 'channel',
   );
 
   const handleMenuClick = ({ key }: { key: string }) => {
