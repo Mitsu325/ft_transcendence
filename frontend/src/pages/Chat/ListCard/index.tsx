@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Divider, Menu } from 'antd';
 import ChatList from './ChatList';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const menuItems = [
   {
@@ -14,11 +15,26 @@ const menuItems = [
 ];
 
 export default function ListCard() {
-  const [selectedMenuItem, setSelectedMenuItem] = useState('channel');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search],
+  );
+  const [selectedMenuItem, setSelectedMenuItem] = useState(
+    queryParams.get('selectedMenuItem') || 'channel',
+  );
 
   const handleMenuClick = ({ key }: { key: string }) => {
     setSelectedMenuItem(key);
+    queryParams.set('menu', key);
+    navigate(`?${queryParams.toString()}`);
   };
+
+  useEffect(() => {
+    const storedMenuItem = queryParams.get('menu') || 'channel';
+    setSelectedMenuItem(storedMenuItem);
+  }, [queryParams]);
 
   const renderListComponent = () => {
     switch (selectedMenuItem) {
@@ -37,7 +53,7 @@ export default function ListCard() {
         className="menu"
         items={menuItems}
         mode="horizontal"
-        defaultSelectedKeys={['channel']}
+        selectedKeys={[selectedMenuItem]}
         onClick={handleMenuClick}
       />
 

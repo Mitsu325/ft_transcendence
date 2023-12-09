@@ -12,7 +12,7 @@ const PrivateRoutes: React.FC = () => {
         <Route element={<CommonLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/game-options" element={<GameOptions />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/message" element={<Chat />} />
         </Route>
       </Routes>
     </BrowserRouter>

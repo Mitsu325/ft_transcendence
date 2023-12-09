@@ -37,12 +37,12 @@ export const menuItems = [
   {
     key: '6',
     icon: <MessageOutlined />,
-    label: <Link to="/chat">Chat</Link>,
+    label: <Link to="/message">Chat</Link>,
   },
 ];
 
 export const menuPaths: MenuPaths = {
   '/': '0',
   '/game-options': '1',
-  '/chat': '6',
+  '/message': '6',
 };
