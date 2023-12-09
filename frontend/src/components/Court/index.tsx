@@ -1,15 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
 
-const courtDimensions = {
-  width: 580,
-  height: 320,
-};
+interface Match {
+  matchStatus: string;
+  ball: {
+    x: number;
+    y: number;
+    width: number;
+    xdirection: number;
+    ydirection: number;
+    xspeed: number;
+    yspeed: number;
+  };
+  player1: { x: number; y: number };
+  player2: { x: number; y: number };
+  score1: number;
+  score2: number;
+  courtDimensions: { width: number; height: number };
+}
 
-const score1 = '0';
-const score2 = '0';
+interface MatchProps {
+  match: Match;
+}
 
-const Court = () => {
+const courtDimensions = { width: 580, height: 320 };
+
+const Court: React.FC<MatchProps> = ({ match }) => {
   // useEffect(() => {
   //   const sendKeyEvent = (e) => {
   //     const { key, type } = e;
@@ -64,7 +80,7 @@ const Court = () => {
             fontSize: '50px',
           }}
         >
-          {score1}
+          {match.score1}
         </Text>
         <Text
           x={(courtDimensions.width / 2 + 20).toString()}
@@ -74,8 +90,16 @@ const Court = () => {
             fontSize: '50px',
           }}
         >
-          {score2}
+          {match.score2}
         </Text>
+        {match.ball && (
+          <Circle
+            cx={match.ball.x.toString()}
+            cy={match.ball.y.toString()}
+            r={match.ball.width.toString()}
+            style={{ fill: '#fff' }}
+          />
+        )}
       </SVG>
     </div>
   );

@@ -31,6 +31,24 @@ interface GameData {
   message: string;
 }
 
+interface Match {
+  matchStatus: string;
+  ball: {
+    x: number;
+    y: number;
+    width: number;
+    xdirection: number;
+    ydirection: number;
+    xspeed: number;
+    yspeed: number;
+  };
+  player1: { x: number; y: number };
+  player2: { x: number; y: number };
+  score1: number;
+  score2: number;
+  courtDimensions: { width: number; height: number };
+}
+
 export const Game = () => {
   const user = useAuth()?.user;
 
@@ -51,6 +69,8 @@ export const Game = () => {
     connected: false,
     message: '',
   });
+
+  const [match, setMatch] = React.useState<Match>({} as Match);
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -96,6 +116,11 @@ export const Game = () => {
       }));
     });
 
+    socket.on('matchStarted', (receivedMacth: Match) => {
+      // console.log(receivedMacth);
+      setMatch(receivedMacth);
+    });
+
     return () => {
       socket.disconnect();
       setGameData(prevGameData => ({
@@ -128,18 +153,23 @@ export const Game = () => {
         status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
       }));
     }
+    startMatch();
   };
 
   const leaveRoom = () => {
     socket.emit('leaveRoom', userPlayer);
   };
 
-  React.useEffect(() => {
-    console.log('PLAYERS');
-    console.log(gameData.players);
-    console.log('ROOMS');
-    console.log(gameData.rooms);
-  }, [gameData.players, gameData.rooms]);
+  const startMatch = () => {
+    socket.emit('startMatch', userPlayer);
+  };
+
+  // React.useEffect(() => {
+  //   console.log('PLAYERS');
+  //   console.log(gameData.players);
+  //   console.log('ROOMS');
+  //   console.log(gameData.rooms);
+  // }, [gameData.players, gameData.rooms]);
 
   return (
     <>
@@ -155,7 +185,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
-            <Court />
+            <Court match={match} />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>

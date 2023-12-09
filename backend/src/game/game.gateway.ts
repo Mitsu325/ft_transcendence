@@ -18,6 +18,7 @@ const game: Game = {
 };
 
 const match: Match = {
+  matchStatus: 'WAITING',
   ball: {
     x: 0,
     y: 0,
@@ -31,6 +32,7 @@ const match: Match = {
   player2: { x: 0, y: 0 },
   score1: 0,
   score2: 0,
+  courtDimensions: { width: 580, height: 320 },
 };
 
 @ApiTags('pong')
@@ -88,6 +90,18 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('game', game);
   }
 
+  @SubscribeMessage('startMatch')
+  async handleStartMatch(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
+    const roomId = this.gameService.findRoomByPlayerId(user.id, game);
+
+    if (game.rooms[roomId]) {
+      const initialMatch: Match = { ...match, matchStatus: 'PLAYING' };
+      await this.gameService.playingGame(initialMatch, updatedMatch => {
+        this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
+      });
+    }
+  }
+
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
     const roomId = this.gameService.findRoomByPlayerId(user.id, game);
@@ -95,7 +109,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     if (game.rooms[roomId]) {
       if (user.id === game.rooms[roomId].player1.id) {
         this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player1.name} saiu da sala.` });
-        // delete game.rooms[roomId].player1;
         delete game.rooms[roomId];
       } else {
         this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player2.name} saiu da sala.` });

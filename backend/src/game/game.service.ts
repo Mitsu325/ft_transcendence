@@ -18,6 +18,7 @@ export interface Game {
 }
 
 export interface Match {
+  matchStatus: string;
   ball: {
     x: number;
     y: number;
@@ -31,12 +32,8 @@ export interface Match {
   player2: { x: number; y: number }
   score1: number;
   score2: number;
+  courtDimensions: { width: number; height: number };
 }
-
-const courtDimensions = {
-  width: 580,
-  height: 320
-};
 
 @Injectable()
 export class GameService {
@@ -50,32 +47,67 @@ export class GameService {
     }
     return null;
   }
-}
 
-@Injectable()
-export class GameInProgress {
-  playingGame(match: Match) {
-    const xpos = match.ball.x + match.ball.xspeed * match.ball.xdirection;
-    const ypos = match.ball.y + match.ball.yspeed * match.ball.ydirection;
+  async playingGame(match: Match, updateCallback: (updatedMatch: Match) => void): Promise<void> {
 
-    match.ball.x = xpos;
-    match.ball.y = ypos;
+    const playGame = async () => {
+      const xpos = match.ball.x + match.ball.xspeed * match.ball.xdirection;
+      const ypos = match.ball.y + match.ball.yspeed * match.ball.ydirection;
 
-    if (xpos > courtDimensions.width - match.ball.width || xpos < match.ball.width) {
-      match.ball.xdirection *= -1;
-    }
+      match.ball.x = xpos;
+      match.ball.y = ypos;
 
-    if (ypos > courtDimensions.height - match.ball.width || ypos < match.ball.width) {
-      match.ball.ydirection *= -1;
-    }
+      if (xpos > match.courtDimensions.width - match.ball.width || xpos < match.ball.width) {
+        match.ball.xdirection *= -1;
+      }
 
-    if (xpos < match.ball.width) {
-      match.score2++;
-    }
+      if (ypos > match.courtDimensions.height - match.ball.width || ypos < match.ball.width) {
+        match.ball.ydirection *= -1;
+      }
 
-    if (xpos > courtDimensions.width - match.ball.width) {
-      match.score1++;
-    }
-    setTimeout(() => this.playingGame(match), 1000 / 60);
+      if (xpos < match.ball.width) {
+        match.score2++;
+      }
+
+      if (xpos > match.courtDimensions.width - match.ball.width) {
+        match.score1++;
+      }
+
+      if (match.matchStatus === 'PLAYING') {
+        updateCallback({ ...match }); // Emitir evento para os clientes
+        await new Promise(resolve => setTimeout(resolve, 1000 / 60));
+        await playGame();
+      }
+    };
+
+    await playGame();
   }
 }
+
+// @Injectable()
+// export class GameInProgress {
+//   playingGame(match: Match) {
+//     const xpos = match.ball.x + match.ball.xspeed * match.ball.xdirection;
+//     const ypos = match.ball.y + match.ball.yspeed * match.ball.ydirection;
+
+//     match.ball.x = xpos;
+//     match.ball.y = ypos;
+
+//     if (xpos > courtDimensions.width - match.ball.width || xpos < match.ball.width) {
+//       match.ball.xdirection *= -1;
+//     }
+
+//     if (ypos > courtDimensions.height - match.ball.width || ypos < match.ball.width) {
+//       match.ball.ydirection *= -1;
+//     }
+
+//     if (xpos < match.ball.width) {
+//       match.score2++;
+//     }
+
+//     if (xpos > courtDimensions.width - match.ball.width) {
+//       match.score1++;
+//     }
+//     setTimeout(() => this.playingGame(match), 1000 / 60);
+//   }
+// }
