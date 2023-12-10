@@ -1,7 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { Divider, Menu } from 'antd';
 import ChatList from './ChatList';
-import { useLocation, useNavigate } from 'react-router-dom';
+
+interface ListCardProps {
+  selectedMenu: string;
+  handleMenuClick: (key: string) => void;
+  handleUserClick: (userId?: string) => void;
+}
 
 const menuItems = [
   {
@@ -14,47 +19,30 @@ const menuItems = [
   },
 ];
 
-export default function ListCard() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search],
-  );
-  const [selectedMenuItem, setSelectedMenuItem] = useState(
-    queryParams.get('menu') || 'channel',
-  );
-
-  const handleMenuClick = ({ key }: { key: string }) => {
-    setSelectedMenuItem(key);
-    queryParams.set('menu', key);
-    navigate(`?${queryParams.toString()}`);
-  };
-
-  useEffect(() => {
-    const storedMenuItem = queryParams.get('menu') || 'channel';
-    setSelectedMenuItem(storedMenuItem);
-  }, [queryParams]);
-
+export default function ListCard({
+  selectedMenu,
+  handleMenuClick,
+  handleUserClick,
+}: ListCardProps) {
   const renderListComponent = () => {
-    switch (selectedMenuItem) {
+    switch (selectedMenu) {
       case 'channel':
         return <h1>Channel</h1>;
       case 'chat':
-        return <ChatList />;
+        return <ChatList handleUserClick={handleUserClick} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="card card-list">
+    <div className="card list-card">
       <Menu
         className="menu"
         items={menuItems}
         mode="horizontal"
-        selectedKeys={[selectedMenuItem]}
-        onClick={handleMenuClick}
+        selectedKeys={[selectedMenu]}
+        onClick={({ key }) => handleMenuClick(key)}
       />
 
       <Divider className="border-dark mb-1" />

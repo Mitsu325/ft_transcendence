@@ -13,8 +13,13 @@
   box-shadow: 5px 5px 10px #001529;
 }
 
-.card-list {
-  max-width: 450px;
+.list-card {
+  max-width: 420px;
+}
+
+.message-card {
+  max-width: 1200px;
+  min-width: 300px;
 }
 
 .menu {

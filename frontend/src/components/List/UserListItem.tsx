@@ -7,12 +7,18 @@ type UserListProps = {
   avatar: string;
   title: string;
   description: string;
+  onUserClick: () => void;
 };
 
 // TODO: title seguir para detalhes do perfil ao clicar
-const UserListItem = ({ avatar, title, description }: UserListProps) => {
+const UserListItem = ({
+  avatar,
+  title,
+  description,
+  onUserClick,
+}: UserListProps) => {
   return (
-    <List.Item className="px-10">
+    <List.Item className="px-10 user-item" onClick={onUserClick}>
       <List.Item.Meta
         avatar={<AvatarCustom src={avatar} size={48} />}
         title={

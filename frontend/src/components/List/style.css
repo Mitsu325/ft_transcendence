@@ -13,3 +13,8 @@
 .ant-list-split .ant-list-item:last-child {
   border-block-end: 1px solid;
 }
+
+.user-item:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.06);
+}
