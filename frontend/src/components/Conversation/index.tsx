@@ -5,6 +5,8 @@ import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
 import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
 import { channelService } from '../../services/channel.api';
+import { UserOutlined } from '@ant-design/icons';
+import { Avatar } from 'antd';
 import './style.css';
 
 interface Message {
@@ -43,13 +45,6 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
 
   useEffect(() => {
     socket.on('message', (data: { message: string; userName: string }) => {
-      console.log('Received message:', data);
-      const existingMessage = messages.find(
-        message => message.message === data.message,
-      );
-      if (existingMessage) {
-        return;
-      }
       setMessages(prevMessages => [
         ...prevMessages,
         { userName: data.userName, message: data.message },
@@ -73,7 +68,7 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
 
     await channelService.createMessage({
       channel_id: String(roomId),
-      sender_id: user?.id ?? '',
+      sender_id: userPlayer.id,
       message: newMessage,
     });
     setNewMessage('');
@@ -83,9 +78,23 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
     <div className="chat-container">
       <div className="chat-messages">
         {messages.map((data, index) => (
-          <p className="chat-p" key={index}>
-            <strong>{data.userName}:</strong> {data.message}
-          </p>
+          <div className="chat-message" key={index}>
+            <Avatar
+              size={40}
+              icon={<UserOutlined />}
+              src={
+                data.userName === userPlayer.name
+                  ? userPlayer.avatar
+                  : undefined
+              }
+              alt={data.userName}
+            />
+            <div className="message-content">
+              <p className="chat-p">
+                <strong>{data.userName}:</strong> {data.message}
+              </p>
+            </div>
+          </div>
         ))}
       </div>
       <div className="chat-input">

@@ -22,3 +22,13 @@
   align-items: center;
   padding: 10px;
 }
+
+.chat-message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.message-content {
+  flex-grow: 1;
+}
