@@ -20,6 +20,7 @@ const Channels: React.FC = () => {
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [component, setComponent] = useState('modal');
   const [currentRoom, setCurrentRoom] = useState<string | null>(null);
+  const user = useAuth()?.user;
 
   useEffect(() => {
     const getChannels = async () => {
@@ -35,7 +36,6 @@ const Channels: React.FC = () => {
     setComponent('create');
   };
 
-  const { user } = useAuth();
   const handleChatClick = (roomId: string) => {
     const userName = user?.name ?? '';
     joinRoom(roomId, userName);
@@ -43,11 +43,6 @@ const Channels: React.FC = () => {
     console.log(roomId);
     setCurrentRoom(roomId);
     setComponent('conversation');
-  };
-
-  const openChannel = (channelId: string) => {
-    // setSelectedChannel(channelId);
-    handleChatClick(channelId);
   };
 
   const menuItems = [
@@ -80,7 +75,7 @@ const Channels: React.FC = () => {
                 <div
                   className="channel-item"
                   key={item.id}
-                  onClick={() => openChannel(item.id)}
+                  onClick={() => handleChatClick(item.id)}
                 >
                   <div className="icon-channel">
                     <WechatOutlined className="chat-icon" />

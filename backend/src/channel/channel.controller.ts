@@ -55,7 +55,6 @@ export class ChannelController {
     async getAllMessages(@Request() req) {
         try {
             const channel_id = req.params.roomId;
-            console.log('canal', channel_id);
             const messages = await this.channelService.getMessages(channel_id);
             return messages;
         } catch (error) {

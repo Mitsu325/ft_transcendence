@@ -3,7 +3,7 @@ import { Input, Button } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
-import { sendMessage, connect } from '../../Socket/utilsSocket';
+import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
 import { channelService } from '../../services/channel.api';
 import './style.css';
 
@@ -15,16 +15,41 @@ interface Message {
 const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
-  const [sender, setSender] = useState<string>('');
-  const { user } = useAuth();
-  const userName = user?.name ?? '';
+  const [isConnected, setIsConnected] = useState(false);
+
+  const user = useAuth()?.user;
+
+  const userPlayer = React.useMemo(() => {
+    const newPlayer = {
+      id: user?.id ?? '',
+      name: user?.name ?? '',
+      avatar: user?.avatar ?? null,
+    };
+    return newPlayer;
+  }, [user]);
 
   useEffect(() => {
-    connect();
+    if (!isConnected) {
+      connect();
+      setIsConnected(true);
+    }
+  }, [isConnected]);
 
-    socket.on('message', (data: { userName: string; message: string }) => {
-      // console.log(data.message);
-      // console.log(data.userName);
+  useEffect(() => {
+    if (!user) {
+      disconnect();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    socket.on('message', (data: { message: string; userName: string }) => {
+      console.log('Received message:', data);
+      const existingMessage = messages.find(
+        message => message.message === data.message,
+      );
+      if (existingMessage) {
+        return;
+      }
       setMessages(prevMessages => [
         ...prevMessages,
         { userName: data.userName, message: data.message },
@@ -33,32 +58,24 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
     const getMessages = async () => {
       const msgData = await channelService.getMessages(roomId);
       if (msgData) {
-        console.log(msgData);
-        console.log(msgData.message);
-        setSender(msgData.sender_id);
         setMessages(msgData);
       }
     };
 
     getMessages();
-  }, [roomId, userName]);
+    return () => {
+      socket.off();
+    };
+  }, [roomId, userPlayer.name, messages]);
 
   const handleSendMessage = async () => {
-    sendMessage(roomId, newMessage, userName);
+    sendMessage(roomId, newMessage, userPlayer.name);
 
     await channelService.createMessage({
       channel_id: String(roomId),
       sender_id: user?.id ?? '',
       message: newMessage,
     });
-
-    const updatedMessages = await channelService.getMessages(roomId);
-    if (updatedMessages) {
-      console.log(updatedMessages);
-      setSender(updatedMessages.sender_id);
-      setMessages(updatedMessages.message);
-    }
-    console.log(updatedMessages);
     setNewMessage('');
   };
 
@@ -67,13 +84,11 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
       <div className="chat-messages">
         {messages.map((data, index) => (
           <p className="chat-p" key={index}>
-            <strong>{sender}:</strong> {data.message}
+            <strong>{data.userName}:</strong> {data.message}
           </p>
         ))}
       </div>
       <div className="chat-input">
-        {/* <Button onClick={connect}>Connect Socket</Button>
-        <Button onClick={disconnect}>Disconnect Socket</Button> */}
         <Input
           type="text"
           value={newMessage}

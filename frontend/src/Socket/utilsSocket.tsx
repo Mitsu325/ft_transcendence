@@ -17,7 +17,6 @@ export const sendMessage = (
   newMessage: string,
   userName: string,
 ) => {
-  console.log('Socket está conectado:', socket.connected);
   if (socket && roomId) {
     socket.emit('sendMessage', {
       roomId: roomId,
