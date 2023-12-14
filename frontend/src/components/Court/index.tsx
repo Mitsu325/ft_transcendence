@@ -20,7 +20,7 @@ interface Match {
 }
 
 interface CourtProps {
-  matchData: { match: Match };
+  matchData: any;
   onSendKey: (type: string, key: string) => void;
 }
 

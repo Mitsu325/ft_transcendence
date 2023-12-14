@@ -198,7 +198,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
-            <Court matchData={{ match }} onSendKey={sendKey} />
+            <Court matchData={match} onSendKey={sendKey} />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>
