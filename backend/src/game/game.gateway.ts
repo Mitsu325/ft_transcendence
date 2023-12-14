@@ -130,7 +130,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.log('Player with the same ID already exists:', player.id);
     }
-
     this.server.emit('game', game);
   }
 }

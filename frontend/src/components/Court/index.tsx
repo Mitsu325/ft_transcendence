@@ -19,18 +19,41 @@ interface Match {
   courtDimensions: { width: number; height: number };
 }
 
-interface MatchProps {
+interface CourtProps {
   matchData: { match: Match };
+  onSendKey: (type: string, key: string) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
 
-const Court: React.FC<any> = ({ matchData }) => {
+const Court: React.FC<CourtProps> = ({ matchData, onSendKey }) => {
   const [match, setMatch] = React.useState<Match>();
 
   React.useEffect(() => {
     setMatch(matchData.match);
   }, [matchData]);
+
+  React.useEffect(() => {
+    const sendKeyEvent = (e: any) => {
+      const { key, type } = e;
+
+      switch (key) {
+        case 'ArrowUp':
+        case 'ArrowDown':
+          onSendKey(type, key);
+          e.preventDefault();
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', sendKeyEvent);
+    document.addEventListener('keyup', sendKeyEvent);
+
+    return () => {
+      document.removeEventListener('keydown', sendKeyEvent);
+      document.removeEventListener('keyup', sendKeyEvent);
+    };
+  }, []);
 
   return (
     <div style={{ position: 'relative' }}>

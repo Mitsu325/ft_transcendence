@@ -170,6 +170,11 @@ export const Game = () => {
     socket.emit('startMatch', userPlayer);
   };
 
+  const sendKey = (type: string, key: string) => {
+    console.log(type, key);
+    socket.emit('sendKey', { type, key });
+  };
+
   // React.useEffect(() => {
   //   console.log('MATCH');
   //   console.log(match);
@@ -193,7 +198,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
-            <Court matchData={match} />
+            <Court matchData={{ match }} onSendKey={sendKey} />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>
