@@ -70,24 +70,7 @@ export const Game = () => {
     message: '',
   });
 
-  // const [match, setMatch] = React.useState<Match>({} as Match);
-  const [match, setMatch] = React.useState<Match>({
-    matchStatus: 'WAITING',
-    ball: {
-      x: 580 / 2,
-      y: 320 / 2,
-      width: 20,
-      xdirection: 1,
-      ydirection: 1,
-      xspeed: 0.8,
-      yspeed: 0.2,
-    },
-    player1: { x: 0, y: 0 },
-    player2: { x: 0, y: 0 },
-    score1: 0,
-    score2: 0,
-    courtDimensions: { width: 580, height: 320 },
-  });
+  const [match, setMatch] = React.useState<Match>({} as Match);
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -210,7 +193,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
-            <Court match={match} />
+            <Court matchData={match} />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>

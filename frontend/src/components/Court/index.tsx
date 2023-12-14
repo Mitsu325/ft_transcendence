@@ -20,14 +20,17 @@ interface Match {
 }
 
 interface MatchProps {
-  match: Match;
+  matchData: { match: Match };
 }
 
 const courtDimensions = { width: 580, height: 320 };
 
-const Court: React.FC<MatchProps> = ({ match }) => {
+const Court: React.FC<any> = ({ matchData }) => {
+  const [match, setMatch] = React.useState<Match>();
 
-  console.log('match', match);
+  React.useEffect(() => {
+    setMatch(matchData.match);
+  }, [matchData]);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -60,7 +63,7 @@ const Court: React.FC<MatchProps> = ({ match }) => {
             fontSize: '50px',
           }}
         >
-          {match.score1}
+          {match?.score1}
         </Text>
         <Text
           x={(courtDimensions.width / 2 + 20).toString()}
@@ -70,9 +73,9 @@ const Court: React.FC<MatchProps> = ({ match }) => {
             fontSize: '50px',
           }}
         >
-          {match.score2}
+          {match?.score2}
         </Text>
-        {match.ball && (
+        {match?.ball && (
           <Circle
             cx={match.ball.x.toString()}
             cy={match.ball.y.toString()}

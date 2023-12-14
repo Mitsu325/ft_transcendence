@@ -75,7 +75,7 @@ export class GameService {
 
       if (match.matchStatus === 'PLAYING') {
         updateCallback({ ...match });
-        await new Promise(resolve => setTimeout(resolve, 10000 / 60));
+        await new Promise(resolve => setTimeout(resolve, 1000 / 60));
         await playGame();
       }
     };

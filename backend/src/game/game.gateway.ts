@@ -22,7 +22,7 @@ const match: Match = {
   ball: {
     x: 580 / 2,
     y: 320 / 2,
-    width: 20,
+    width: 5,
     xdirection: 1,
     ydirection: 1,
     xspeed: 2.8,
@@ -98,7 +98,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       const initialMatch: Match = { ...match, matchStatus: 'PLAYING' };
       await this.gameService.playingGame(initialMatch, updatedMatch => {
         this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
-        console.log('matchStarted', updatedMatch);
       });
     }
   }
