@@ -35,6 +35,17 @@ export interface Match {
   courtDimensions: { width: number; height: number };
 }
 
+export interface MatchPadle {
+  player1: { y: number, playerSpeed: number };
+  player2: { y: number, playerSpeed: number }
+}
+
+export interface Padle {
+  type: string;
+  key: string;
+  player: string;
+}
+
 @Injectable()
 export class GameService {
   findRoomByPlayerId(playerId: string, game: Game): string | null {
@@ -79,22 +90,18 @@ export class GameService {
         await playGame();
       }
     };
-
-    const movePadle = async () => {
-      const movePlayer1 = async (type: string, key: string) => {
-        if (key === 'ArrowUp') {
-          match.player1.y += 5;
-        } else {
-          match.player1.y -= 5;
-        }
-      };
-      if (match.matchStatus === 'PLAYING') {
-        updateCallback({ ...match });
-        // await new Promise(resolve => setTimeout(resolve, 1000 / 60));
-        await movePadle();
-      }
-    };
-
     await playGame();
+  }
+
+  async movePadle(padle: Padle, match: Match, player: string): Promise<Match> {
+    const updatedMatch: Match = { ...match };
+    if (player === '1') {
+      if (padle.key === 'ArrowUp') updatedMatch.player1.y -= 5;
+      if (padle.key === 'ArrowDown') updatedMatch.player1.y += 5;
+    } else if (player === '2') {
+      if (padle.key === 'ArrowUp') updatedMatch.player2.y -= 5;
+      if (padle.key === 'ArrowDown') updatedMatch.player2.y += 5;
+    }
+    return updatedMatch;
   }
 }

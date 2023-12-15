@@ -37,13 +37,7 @@ interface Match {
     x: number;
     y: number;
     width: number;
-    xdirection: number;
-    ydirection: number;
-    xspeed: number;
-    yspeed: number;
   };
-  player1: { y: number };
-  player2: { y: number };
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
