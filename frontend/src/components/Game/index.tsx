@@ -43,6 +43,11 @@ interface Match {
   courtDimensions: { width: number; height: number };
 }
 
+interface MatchPadle {
+  player1: { y: number; playerSpeed: number };
+  player2: { y: number; playerSpeed: number };
+}
+
 export const Game = () => {
   const user = useAuth()?.user;
 
@@ -65,6 +70,7 @@ export const Game = () => {
   });
 
   const [match, setMatch] = React.useState<Match>({} as Match);
+  const [padle, setPadle] = React.useState<MatchPadle>({} as MatchPadle);
 
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
@@ -114,6 +120,11 @@ export const Game = () => {
       setMatch(receivedMacth);
     });
 
+    socket.on('movePadle', (receivedPadle: MatchPadle) => {
+      setPadle(receivedPadle);
+      console.log(receivedPadle);
+    });
+
     return () => {
       socket.disconnect();
       setGameData(prevGameData => ({
@@ -158,24 +169,19 @@ export const Game = () => {
   };
 
   const sendKey = (type: string, key: string) => {
-    console.log(type, key, userPlayer);
     const player = userPlayer.id;
-    const padle = {
+    const padleObj = {
       type,
       key,
       player,
     };
-    socket.emit('sendKey', padle);
+    socket.emit('sendKey', padleObj);
   };
 
-  // React.useEffect(() => {
-  //   console.log('MATCH');
-  //   console.log(match);
-  // console.log('PLAYERS');
-  // console.log(gameData.players);
-  // console.log('ROOMS');
-  // console.log(gameData.rooms);
-  // }, [match]);
+  React.useEffect(() => {
+    console.log('PADLE');
+    console.log(padle);
+  }, [padle]);
 
   return (
     <>

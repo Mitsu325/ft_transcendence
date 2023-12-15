@@ -28,8 +28,6 @@ export interface Match {
     xspeed: number;
     yspeed: number
   };
-  player1: { y: number };
-  player2: { y: number }
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
@@ -93,15 +91,28 @@ export class GameService {
     await playGame();
   }
 
-  async movePadle(padle: Padle, match: Match, player: string): Promise<Match> {
-    const updatedMatch: Match = { ...match };
-    if (player === '1') {
-      if (padle.key === 'ArrowUp') updatedMatch.player1.y -= 5;
-      if (padle.key === 'ArrowDown') updatedMatch.player1.y += 5;
-    } else if (player === '2') {
-      if (padle.key === 'ArrowUp') updatedMatch.player2.y -= 5;
-      if (padle.key === 'ArrowDown') updatedMatch.player2.y += 5;
+  async movePadle(padle: Padle, matchPadle: MatchPadle, player: string, matchStatus: Match): Promise<MatchPadle> {
+    const updatedPadle: MatchPadle = { ...matchPadle };
+
+    if (padle.key === 'ArrowUp') {
+      if (player === '1') {
+        updatedPadle.player1.y -= 5;
+      } else {
+        updatedPadle.player2.y -= 5;
+      }
+    } else if (padle.key === 'ArrowDown') {
+      if (player === '1') {
+        updatedPadle.player1.y += 5;
+      } else {
+        updatedPadle.player2.y += 5;
+      }
     }
-    return updatedMatch;
+
+    if (player === '1' && updatedPadle.player1.y < 0) updatedPadle.player1.y = 0;
+    if (player === '2' && updatedPadle.player2.y < 0) updatedPadle.player2.y = 0;
+    if (player === '1' && updatedPadle.player1.y > matchStatus.courtDimensions.height - 50) updatedPadle.player1.y = matchStatus.courtDimensions.height - 50;
+    if (player === '2' && updatedPadle.player2.y > matchStatus.courtDimensions.height - 50) updatedPadle.player2.y = matchStatus.courtDimensions.height - 50;
+
+    return updatedPadle;
   }
 }

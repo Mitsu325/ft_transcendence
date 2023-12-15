@@ -34,8 +34,6 @@ const match: Match = {
     xspeed: 2.8,
     yspeed: 2.2
   },
-  player1: { y: 135 },
-  player2: { y: 135 },
   score1: 0,
   score2: 0,
   courtDimensions: { width: 580, height: 320 },
@@ -116,12 +114,12 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendKey')
   async handleSendKey(@MessageBody() padle: Padle, @ConnectedSocket() client: Socket) {
     const roomId = this.gameService.findRoomByPlayerId(padle.player, game);
-    console.log('roomId', game.rooms[roomId]);
+    const matchStatus: Match = { ...match };
     const player = game.rooms[roomId].player1.id === padle.player ? '1' : '2';
 
     if (game.rooms[roomId]) {
-      const updatedMatch = await this.gameService.movePadle(padle, match, player);
-      this.server.to(game.rooms[roomId].room_id).emit('movePadle', { match: { ...updatedMatch } });
+      const updatedPadle = await this.gameService.movePadle(padle, matchPadle, player, matchStatus);
+      this.server.to(game.rooms[roomId].room_id).emit('movePadle', { matchPadle: { ...updatedPadle } });
     }
   }
 
