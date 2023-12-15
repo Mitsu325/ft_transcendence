@@ -12,6 +12,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { GameService, Player, Room, Game, Match } from './game.service';
 
+interface Padle {
+  type: string;
+  key: string;
+  player: string;
+}
+
 const game: Game = {
   players: {},
   rooms: {},
@@ -28,8 +34,8 @@ const match: Match = {
     xspeed: 2.8,
     yspeed: 2.2
   },
-  player1: { x: 0, y: 0 },
-  player2: { x: 0, y: 0 },
+  player1: { y: 135 },
+  player2: { y: 135 },
   score1: 0,
   score2: 0,
   courtDimensions: { width: 580, height: 320 },
@@ -100,6 +106,11 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
       });
     }
+  }
+
+  @SubscribeMessage('sendKey')
+  async handleSendKey(@MessageBody() padle: Padle, @ConnectedSocket() client: Socket) {
+    console.log(padle);
   }
 
   @SubscribeMessage('leaveRoom')

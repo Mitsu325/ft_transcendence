@@ -12,8 +12,8 @@ interface Match {
     xspeed: number;
     yspeed: number;
   };
-  player1: { x: number; y: number };
-  player2: { x: number; y: number };
+  player1: { y: number };
+  player2: { y: number };
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
@@ -67,6 +67,20 @@ const Court: React.FC<CourtProps> = ({ matchData, onSendKey }) => {
           width={courtDimensions.width.toString()}
           height={courtDimensions.height.toString()}
           style={{ fill: 'rgb(0, 0, 0)' }}
+        />
+        <Rect
+          x="5"
+          y={(match?.player1.y ?? 135).toString()}
+          width="5"
+          height="50"
+          style={{ fill: 'rgb(255, 255, 255)' }}
+        />
+        <Rect
+          x={(courtDimensions.width - 10).toString()}
+          y={(match?.player2.y ?? 135).toString()}
+          width="5"
+          height="50"
+          style={{ fill: 'rgb(255, 255, 255)' }}
         />
         <Line
           x1={(courtDimensions.width / 2).toString()}

@@ -42,8 +42,8 @@ interface Match {
     xspeed: number;
     yspeed: number;
   };
-  player1: { x: number; y: number };
-  player2: { x: number; y: number };
+  player1: { y: number };
+  player2: { y: number };
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
@@ -118,13 +118,6 @@ export const Game = () => {
 
     socket.on('matchStarted', (receivedMacth: Match) => {
       setMatch(receivedMacth);
-      // setMatch(prevMatch => ({
-      //   ...prevMatch,
-      //   matchStatus: receivedMacth.matchStatus,
-      //   ball: receivedMacth.ball,
-      //   score1: receivedMacth.score1,
-      //   score2: receivedMacth.score2,
-      // }));
     });
 
     return () => {
@@ -171,8 +164,14 @@ export const Game = () => {
   };
 
   const sendKey = (type: string, key: string) => {
-    console.log(type, key);
-    socket.emit('sendKey', { type, key });
+    console.log(type, key, userPlayer);
+    const player = userPlayer.id;
+    const padle = {
+      type,
+      key,
+      player,
+    };
+    socket.emit('sendKey', padle);
   };
 
   // React.useEffect(() => {

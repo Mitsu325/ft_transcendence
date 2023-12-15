@@ -28,8 +28,8 @@ export interface Match {
     xspeed: number;
     yspeed: number
   };
-  player1: { x: number; y: number };
-  player2: { x: number; y: number }
+  player1: { y: number };
+  player2: { y: number }
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
@@ -77,6 +77,21 @@ export class GameService {
         updateCallback({ ...match });
         await new Promise(resolve => setTimeout(resolve, 1000 / 60));
         await playGame();
+      }
+    };
+
+    const movePadle = async () => {
+      const movePlayer1 = async (type: string, key: string) => {
+        if (key === 'ArrowUp') {
+          match.player1.y += 5;
+        } else {
+          match.player1.y -= 5;
+        }
+      };
+      if (match.matchStatus === 'PLAYING') {
+        updateCallback({ ...match });
+        // await new Promise(resolve => setTimeout(resolve, 1000 / 60));
+        await movePadle();
       }
     };
 
