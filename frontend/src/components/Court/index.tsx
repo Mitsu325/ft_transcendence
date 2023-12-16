@@ -13,19 +13,30 @@ interface Match {
   courtDimensions: { width: number; height: number };
 }
 
+interface MatchPadle {
+  player1: { y: number; playerSpeed: number };
+  player2: { y: number; playerSpeed: number };
+}
+
 interface CourtProps {
   matchData: any;
+  matchPadles: any;
   onSendKey: (type: string, key: string) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
 
-const Court: React.FC<CourtProps> = ({ matchData, onSendKey }) => {
+const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
   const [match, setMatch] = React.useState<Match>();
+  const [padle, setPadle] = React.useState<MatchPadle>();
 
   React.useEffect(() => {
     setMatch(matchData.match);
   }, [matchData]);
+
+  React.useEffect(() => {
+    setPadle(matchPadles.matchPadle);
+  }, [matchPadles]);
 
   React.useEffect(() => {
     const sendKeyEvent = (e: any) => {
@@ -64,14 +75,15 @@ const Court: React.FC<CourtProps> = ({ matchData, onSendKey }) => {
         />
         <Rect
           x="5"
-          y="135"
+          y={padle?.player1.y.toString()}
+          // y="135"
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}
         />
         <Rect
           x={(courtDimensions.width - 10).toString()}
-          y="135"
+          y={padle?.player2.y.toString()}
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}

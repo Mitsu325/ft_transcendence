@@ -116,8 +116,9 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = this.gameService.findRoomByPlayerId(padle.player, game);
     const matchStatus: Match = { ...match };
     const player = game.rooms[roomId].player1.id === padle.player ? '1' : '2';
+    const direction = padle.type === 'keyup' ? 'STOP' : 'GO';
 
-    if (game.rooms[roomId]) {
+    if (game.rooms[roomId] && direction === 'GO') {
       const updatedPadle = await this.gameService.movePadle(padle, matchPadle, player, matchStatus);
       this.server.to(game.rooms[roomId].room_id).emit('movePadle', { matchPadle: { ...updatedPadle } });
     }

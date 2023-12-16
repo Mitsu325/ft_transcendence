@@ -122,7 +122,6 @@ export const Game = () => {
 
     socket.on('movePadle', (receivedPadle: MatchPadle) => {
       setPadle(receivedPadle);
-      console.log(receivedPadle);
     });
 
     return () => {
@@ -168,7 +167,11 @@ export const Game = () => {
     socket.emit('startMatch', userPlayer);
   };
 
+  // let lastType = '';
   const sendKey = (type: string, key: string) => {
+    // if (lastType === type) return;
+    // lastType = type;
+
     const player = userPlayer.id;
     const padleObj = {
       type,
@@ -178,10 +181,10 @@ export const Game = () => {
     socket.emit('sendKey', padleObj);
   };
 
-  React.useEffect(() => {
-    console.log('PADLE');
-    console.log(padle);
-  }, [padle]);
+  // React.useEffect(() => {
+  //   console.log('PADLE');
+  //   console.log(padle);
+  // }, [padle]);
 
   return (
     <>
@@ -197,7 +200,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
           <div>
-            <Court matchData={match} onSendKey={sendKey} />
+            <Court matchData={match} matchPadles={padle} onSendKey={sendKey} />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>
