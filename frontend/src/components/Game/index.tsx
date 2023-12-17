@@ -198,7 +198,7 @@ export const Game = () => {
             height: '50vh',
           }}
         >
-          <h1 style={{ padding: '20px' }}>*** JOGO ***</h1>
+          <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
           <div>
             <Court matchData={match} matchPadles={padle} onSendKey={sendKey} />
           </div>
@@ -212,13 +212,14 @@ export const Game = () => {
       ) : (
         <div style={{ display: 'flex', width: '100%' }}>
           <div style={{ flex: '70%', marginRight: '30px' }}>
-            <h1 style={{ padding: '20px' }}>*** JOGADORES ***</h1>
+            <h1 style={{ padding: '20px' }}>LOUNGE</h1>
+            <h2 style={{ padding: '20px' }}>*** JOGADORES ***</h2>
             <div className="players-container">
               {gameData.players.map(player => (
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>
-            <h1 style={{ padding: '20px' }}>*** SALAS ***</h1>
+            <h2 style={{ padding: '20px' }}>*** SALAS ***</h2>
             <div>
               <Button onClick={createRoom}>Criar sala</Button>
             </div>

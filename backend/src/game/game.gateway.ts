@@ -65,8 +65,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         client.leave(roomId);
         delete game.rooms[roomId];
       } else {
-        delete game.rooms[roomId]?.player2;
         client.leave(roomId);
+        delete game.rooms[roomId]?.player2;
       }
       delete game.players[client.id];
     }
