@@ -57,14 +57,17 @@ export class GameService {
     return null;
   }
 
-  async playingGame(match: Match, updateCallback: (updatedMatch: Match) => void): Promise<void> {
+  async playingGame(match: Match, matchPadle: MatchPadle, updateCallback: (updatedMatch: Match) => void): Promise<void> {
 
     const playGame = async () => {
+
       const xpos = match.ball.x + match.ball.xspeed * match.ball.xdirection;
       const ypos = match.ball.y + match.ball.yspeed * match.ball.ydirection;
 
       match.ball.x = xpos;
       match.ball.y = ypos;
+
+      const updatedMatchWithColision = await this.handleColision(match, matchPadle);
 
       if (xpos > match.courtDimensions.width - match.ball.width || xpos < match.ball.width) {
         match.ball.xdirection *= -1;
@@ -82,6 +85,8 @@ export class GameService {
         match.score1++;
       }
 
+      updateCallback(updatedMatchWithColision);
+
       if (match.matchStatus === 'PLAYING') {
         updateCallback({ ...match });
         await new Promise(resolve => setTimeout(resolve, 1000 / 60));
@@ -96,15 +101,15 @@ export class GameService {
 
     if (padle.key === 'ArrowUp') {
       if (player === '1') {
-        updatedPadle.player1.y -= 5;
+        updatedPadle.player1.y -= 5 * matchPadle.player1.playerSpeed;
       } else {
-        updatedPadle.player2.y -= 5;
+        updatedPadle.player2.y -= 5 * matchPadle.player1.playerSpeed;
       }
     } else if (padle.key === 'ArrowDown') {
       if (player === '1') {
-        updatedPadle.player1.y += 5;
+        updatedPadle.player1.y += 5 * matchPadle.player1.playerSpeed;
       } else {
-        updatedPadle.player2.y += 5;
+        updatedPadle.player2.y += 5 * matchPadle.player1.playerSpeed;
       }
     }
 
@@ -114,5 +119,22 @@ export class GameService {
     if (player === '2' && updatedPadle.player2.y > matchStatus.courtDimensions.height - 50) updatedPadle.player2.y = matchStatus.courtDimensions.height - 50;
 
     return updatedPadle;
+  }
+
+  async handleColision(match: Match, matchPadle: MatchPadle): Promise<Match> {
+    const updatedMatch: Match = { ...match };
+
+    if (updatedMatch.ball.x < 10) {
+      if (updatedMatch.ball.y > matchPadle.player1.y && updatedMatch.ball.y < matchPadle.player1.y + 50) {
+        updatedMatch.ball.xdirection *= -1;
+      }
+    }
+
+    if (updatedMatch.ball.x > updatedMatch.courtDimensions.width - 15) {
+      if (updatedMatch.ball.y > matchPadle.player2.y && updatedMatch.ball.y < matchPadle.player2.y + 50) {
+        updatedMatch.ball.xdirection *= -1;
+      }
+    }
+    return updatedMatch;
   }
 }

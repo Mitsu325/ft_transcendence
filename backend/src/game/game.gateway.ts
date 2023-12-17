@@ -40,8 +40,8 @@ const match: Match = {
 };
 
 const matchPadle: MatchPadle = {
-  player1: { y: 135, playerSpeed: 1 },
-  player2: { y: 135, playerSpeed: 1 },
+  player1: { y: 135, playerSpeed: 1.5 },
+  player2: { y: 135, playerSpeed: 1.5 },
 };
 
 @ApiTags('pong')
@@ -105,7 +105,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (game.rooms[roomId]) {
       const initialMatch: Match = { ...match, matchStatus: 'PLAYING' };
-      await this.gameService.playingGame(initialMatch, updatedMatch => {
+      await this.gameService.playingGame(initialMatch, matchPadle, updatedMatch => {
         this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
       });
     }
