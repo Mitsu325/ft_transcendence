@@ -125,13 +125,13 @@ export class GameService {
     const updatedMatch: Match = { ...match };
 
     if (updatedMatch.ball.x < 10) {
-      if (updatedMatch.ball.y > matchPadle.player1.y && updatedMatch.ball.y < matchPadle.player1.y + 50) {
+      if (updatedMatch.ball.y > matchPadle.player1.y - 5 && updatedMatch.ball.y < matchPadle.player1.y + 55) {
         updatedMatch.ball.xdirection *= -1;
       }
     }
 
     if (updatedMatch.ball.x > updatedMatch.courtDimensions.width - 15) {
-      if (updatedMatch.ball.y > matchPadle.player2.y && updatedMatch.ball.y < matchPadle.player2.y + 50) {
+      if (updatedMatch.ball.y > matchPadle.player2.y - 5 && updatedMatch.ball.y < matchPadle.player2.y + 55) {
         updatedMatch.ball.xdirection *= -1;
       }
     }
