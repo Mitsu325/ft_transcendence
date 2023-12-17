@@ -167,11 +167,7 @@ export const Game = () => {
     socket.emit('startMatch', userPlayer);
   };
 
-  // let lastType = '';
   const sendKey = (type: string, key: string) => {
-    // if (lastType === type) return;
-    // lastType = type;
-
     const player = userPlayer.id;
     const padleObj = {
       type,
