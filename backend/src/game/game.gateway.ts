@@ -10,7 +10,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, Player, Room, Game, Match, MatchPadle } from './game.service';
+import { GameService, Player, Room, Game, Match, MatchPadle, initialMatch } from './game.service';
 
 interface Padle {
   type: string;
@@ -21,22 +21,6 @@ interface Padle {
 const game: Game = {
   players: {},
   rooms: {},
-};
-
-const match: Match = {
-  matchStatus: 'WAITING',
-  ball: {
-    x: 580 / 2,
-    y: 320 / 2,
-    width: 5,
-    xdirection: 1,
-    ydirection: 1,
-    xspeed: 2.8,
-    yspeed: 2.2
-  },
-  score1: 0,
-  score2: 0,
-  courtDimensions: { width: 580, height: 320 },
 };
 
 const matchPadle: MatchPadle = {
@@ -60,14 +44,11 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const playerId = game.players[client.id]?.id;
     const roomId = this.gameService.findRoomByPlayerId(playerId, game);
 
+    if (roomId) {
+      this.gameService.removeRoomAndNotify(roomId, playerId, game, this.server);
+      client.leave(roomId);
+    }
     if (playerId) {
-      if (playerId === game.rooms[roomId]?.player1.id) {
-        client.leave(roomId);
-        delete game.rooms[roomId];
-      } else {
-        client.leave(roomId);
-        delete game.rooms[roomId]?.player2;
-      }
       delete game.players[client.id];
     }
     this.server.emit('game', game);
@@ -77,9 +58,11 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   handleCreateRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
     const playerAlreadyInRoom = Object.values(game.rooms).find(room => room.player1.id === user.id || (room.player2 && room.player2.id === user.id));
 
+
     if (!playerAlreadyInRoom) {
       client.join(client.id);
-      game.rooms[client.id] = { room_id: client.id, player1: { ...user }, player2: null };
+      const match: Match = { ...initialMatch };
+      game.rooms[client.id] = { room_id: client.id, player1: { ...user }, player2: null, match: { ...match } };
     } else {
       console.log('The Player is already in the room:', client.id);
     }
@@ -104,8 +87,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = this.gameService.findRoomByPlayerId(user.id, game);
 
     if (game.rooms[roomId]) {
-      const initialMatch: Match = { ...match, matchStatus: 'PLAYING' };
-      await this.gameService.playingGame(initialMatch, matchPadle, updatedMatch => {
+      const startMatch: Match = { ...game.rooms[roomId].match, matchStatus: 'PLAYING' };
+      await this.gameService.playingGame(startMatch, matchPadle, updatedMatch => {
         this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
       });
     }
@@ -114,7 +97,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendKey')
   async handleSendKey(@MessageBody() padle: Padle, @ConnectedSocket() client: Socket) {
     const roomId = this.gameService.findRoomByPlayerId(padle.player, game);
-    const matchStatus: Match = { ...match };
+    const matchStatus: Match = { ...game.rooms[roomId].match };
     const player = game.rooms[roomId].player1.id === padle.player ? '1' : '2';
     const direction = padle.type === 'keyup' ? 'STOP' : 'GO';
 
@@ -129,13 +112,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = this.gameService.findRoomByPlayerId(user.id, game);
 
     if (game.rooms[roomId]) {
-      if (user.id === game.rooms[roomId].player1.id) {
-        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player1.name} saiu da sala.` });
-        delete game.rooms[roomId];
-      } else {
-        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', { message: `${game.rooms[roomId].player2.name} saiu da sala.` });
-        delete game.rooms[roomId].player2;
-      }
+      this.gameService.removeRoomAndNotify(roomId, user.id, game, this.server);
       client.leave(roomId);
       this.server.emit('game', game);
     } else {

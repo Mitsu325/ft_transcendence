@@ -1,4 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+
+export const initialMatch: Match = {
+  matchStatus: 'WAITING',
+  ball: {
+    x: 580 / 2,
+    y: 320 / 2,
+    width: 5,
+    xdirection: 1,
+    ydirection: 1,
+    xspeed: 2.8,
+    yspeed: 2.2
+  },
+  score1: 0,
+  score2: 0,
+  courtDimensions: { width: 580, height: 320 },
+};
 
 export interface Player {
   id: string;
@@ -10,6 +27,7 @@ export interface Room {
   room_id: string;
   player1: Player;
   player2: Player;
+  match: Match;
 }
 
 export interface Game {
@@ -79,10 +97,14 @@ export class GameService {
 
       if (xpos < match.ball.width) {
         match.score2++;
+        match.ball.x = match.courtDimensions.width / 2;
+        match.ball.y = match.courtDimensions.height / 2;
       }
 
       if (xpos > match.courtDimensions.width - match.ball.width) {
         match.score1++;
+        match.ball.x = match.courtDimensions.width / 2;
+        match.ball.y = match.courtDimensions.height / 2;
       }
 
       updateCallback(updatedMatchWithColision);
@@ -113,8 +135,8 @@ export class GameService {
       }
     }
 
-    if (player === '1' && updatedPadle.player1.y < 0) updatedPadle.player1.y = 0;
-    if (player === '2' && updatedPadle.player2.y < 0) updatedPadle.player2.y = 0;
+    if (player === '1' && updatedPadle.player1.y < 5) updatedPadle.player1.y = 2;
+    if (player === '2' && updatedPadle.player2.y < 5) updatedPadle.player2.y = 2;
     if (player === '1' && updatedPadle.player1.y > matchStatus.courtDimensions.height - 50) updatedPadle.player1.y = matchStatus.courtDimensions.height - 50;
     if (player === '2' && updatedPadle.player2.y > matchStatus.courtDimensions.height - 50) updatedPadle.player2.y = matchStatus.courtDimensions.height - 50;
 
@@ -124,7 +146,7 @@ export class GameService {
   async handleColision(match: Match, matchPadle: MatchPadle): Promise<Match> {
     const updatedMatch: Match = { ...match };
 
-    if (updatedMatch.ball.x < 10) {
+    if (updatedMatch.ball.x < 15) {
       if (updatedMatch.ball.y > matchPadle.player1.y - 5 && updatedMatch.ball.y < matchPadle.player1.y + 55) {
         updatedMatch.ball.xdirection *= -1;
       }
@@ -136,5 +158,18 @@ export class GameService {
       }
     }
     return updatedMatch;
+  }
+
+  removeRoomAndNotify(roomId: string, player: string, game: Game, server: Server): void {
+    if (game.rooms[roomId]) {
+      const room = game.rooms[roomId];
+      game.rooms[roomId].match = initialMatch;
+      if (player === room.player1.id) {
+        server.to(room.room_id).emit('playerLeftRoom', { message: `${room.player1.name} saiu da sala.` });
+      } else if (room.player2 && player === room.player2.id) {
+        server.to(room.room_id).emit('playerLeftRoom', { message: `${room.player2.name} saiu da sala.` });
+      }
+      delete game.rooms[roomId];
+    }
   }
 }

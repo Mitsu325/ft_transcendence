@@ -6,47 +6,16 @@ import RoomCard from 'components/RoomCard';
 import { Button } from 'antd';
 // import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
 import Court from 'components/Court';
+import {
+  RoomGame,
+  GameData,
+  Match,
+  MatchPadle,
+  initialMatch,
+} from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 
 let socket: Socket;
-
-interface Player {
-  id: string;
-  name: string;
-  avatar: string | null;
-}
-
-interface RoomGame {
-  room_id: string;
-  player1: Player;
-  player2: Player | null;
-}
-
-interface GameData {
-  players: Player[];
-  rooms: RoomGame[];
-  status: string;
-  match: boolean;
-  connected: boolean;
-  message: string;
-}
-
-interface Match {
-  matchStatus: string;
-  ball: {
-    x: number;
-    y: number;
-    width: number;
-  };
-  score1: number;
-  score2: number;
-  courtDimensions: { width: number; height: number };
-}
-
-interface MatchPadle {
-  player1: { y: number; playerSpeed: number };
-  player2: { y: number; playerSpeed: number };
-}
 
 export const Game = () => {
   const user = useAuth()?.user;

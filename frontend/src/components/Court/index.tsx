@@ -1,22 +1,6 @@
 import React from 'react';
 import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
-
-interface Match {
-  matchStatus: string;
-  ball: {
-    x: number;
-    y: number;
-    width: number;
-  };
-  score1: number;
-  score2: number;
-  courtDimensions: { width: number; height: number };
-}
-
-interface MatchPadle {
-  player1: { y: number; playerSpeed: number };
-  player2: { y: number; playerSpeed: number };
-}
+import { Match, MatchPadle } from 'interfaces/gameInterfaces/interfaces';
 
 interface CourtProps {
   matchData: any;
@@ -75,7 +59,7 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
         />
         <Rect
           x="5"
-          y={padle?.player1.y.toString()}
+          y={padle?.player1.y ? padle?.player1.y.toString() : '135'}
           // y="135"
           width="5"
           height="50"
@@ -83,7 +67,7 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
         />
         <Rect
           x={(courtDimensions.width - 10).toString()}
-          y={padle?.player2.y.toString()}
+          y={padle?.player2.y ? padle?.player2.y.toString() : '135'}
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}
