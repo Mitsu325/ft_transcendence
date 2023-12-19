@@ -6,7 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
-// import { User } from '../user/entities/user.entity';
+import { comparePass } from 'src/utils/hash.util';
+import * as crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class ChannelService {
@@ -61,5 +63,27 @@ export class ChannelService {
             console.error(error);
             return;
         }
+    }
+
+    async verifyPassword(roomId: string, password: string): Promise<boolean> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: roomId },
+            });
+            if (!channel) {
+                return false;
+            }
+            return await comparePass(password, channel.password);
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    async generateToken(roomId: string): Promise<string> {
+        const key = crypto.randomBytes(32).toString('hex');
+        const token = jwt.sign(roomId, key, { expiresIn: '24h' });
+
+        return token;
     }
 }

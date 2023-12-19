@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Request, Post } from '@nestjs/common';
+import { Body, Controller, Get, Request, Post, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
@@ -59,7 +59,41 @@ export class ChannelController {
             return messages;
         } catch (error) {
             console.error(error);
-            return { error: 'Erro ao buscar mensagens.' };
+            return { error: 'Error fetching messages.' };
+        }
+    }
+
+    @ApiOperation({ description: 'Verify channel password' })
+    @ApiBearerAuth('access-token')
+    @Post('verify-password')
+    async verifyPass(
+        @Body() params: { roomId: string; password: string },
+    ): Promise<{ success: boolean }> {
+        const { roomId, password } = params;
+        try {
+            const isPasswordCorrect = await this.channelService.verifyPassword(
+                roomId,
+                password,
+            );
+            return { success: isPasswordCorrect };
+        } catch (error) {
+            console.error('Error checking channel password:', error);
+        }
+    }
+
+    @ApiOperation({
+        description: 'Creates a token to access the protected channel.',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('token/:roomId')
+    async generateToken(
+        @Param('roomId') roomId: string,
+    ): Promise<{ token: string }> {
+        try {
+            const token = await this.channelService.generateToken(roomId);
+            return { token };
+        } catch (error) {
+            console.error('Error generating token:', error);
         }
     }
 }

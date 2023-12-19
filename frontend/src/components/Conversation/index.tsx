@@ -4,7 +4,7 @@ import { SendOutlined } from '@ant-design/icons';
 import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
 import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
-import { channelService } from '../../services/channel.api';
+import { channelApi } from '../../services/channel.api';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
 import './style.css';
@@ -14,7 +14,7 @@ interface Message {
   message: string;
 }
 
-const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
+const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState(false);
@@ -51,7 +51,7 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
       ]);
     });
     const getMessages = async () => {
-      const msgData = await channelService.getMessages(roomId);
+      const msgData = await channelApi.getMessages(roomId);
       if (msgData) {
         setMessages(msgData);
       }
@@ -66,7 +66,7 @@ const Conversation: React.FC<{ roomId: string | null }> = ({ roomId }) => {
   const handleSendMessage = async () => {
     sendMessage(roomId, newMessage, userPlayer.name);
 
-    await channelService.createMessage({
+    await channelApi.createMessage({
       channel_id: String(roomId),
       sender_id: userPlayer.id,
       message: newMessage,

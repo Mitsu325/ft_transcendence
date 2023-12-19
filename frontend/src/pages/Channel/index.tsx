@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Divider } from 'antd';
+import { Menu, Divider, Modal, Input } from 'antd';
 import { MenuInfo } from 'rc-menu/lib/interface';
 import { WechatOutlined } from '@ant-design/icons';
 import 'pages/Channel/style.css';
 import CreateChannel from '../../components/CreateChannel';
 import Conversation from '../../components/Conversation';
-import { channelService } from '../../services/channel.api';
+import { channelApi } from '../../services/channel.api';
 import { joinRoom } from 'Socket/utilsSocket';
 import { useAuth } from 'hooks/useAuth';
+
 interface ChannelItemProps {
   id: string;
   name_channel: string;
@@ -16,15 +17,17 @@ interface ChannelItemProps {
 }
 
 const Channels: React.FC = () => {
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [password, setPassword] = useState('');
   const [current, setCurrent] = useState('channel');
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [component, setComponent] = useState('modal');
-  const [currentRoom, setCurrentRoom] = useState<string | null>(null);
+  const [currentRoom, setCurrentRoom] = useState<string>('');
   const user = useAuth()?.user;
 
   useEffect(() => {
     const getChannels = async () => {
-      const channelsData = await channelService.getChannel();
+      const channelsData = await channelApi.getChannel();
       setChannels(channelsData);
     };
 
@@ -36,13 +39,75 @@ const Channels: React.FC = () => {
     setComponent('create');
   };
 
-  const handleChatClick = (roomId: string) => {
-    const userName = user?.name ?? '';
-    joinRoom(roomId, userName);
+  const handleOpenPasswordModal = () => {
+    setPasswordModalVisible(true);
+  };
 
-    console.log(roomId);
+  const handleClosePasswordModal = () => {
+    setPasswordModalVisible(false);
+    setPassword('');
+  };
+
+  const handleVerifyPassword = async () => {
+    setPasswordModalVisible(false);
+  };
+
+  const handleJoin = async (roomId: string, userName: string) => {
+    joinRoom(roomId, userName);
     setCurrentRoom(roomId);
     setComponent('conversation');
+  };
+
+  const getToken = async (roomId: string) => {
+    try {
+      const response = await channelApi.getToken(roomId);
+      const { token } = response.data;
+      localStorage.setItem('channel-token', token);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChatClick = async (roomId: string) => {
+    const channel = channels.find(item => item.id === roomId);
+    const token = localStorage.getItem('channel-token');
+    const userName = user?.name ?? '';
+
+    if (!channel) {
+      return;
+    }
+
+    switch (channel.type) {
+      case 'Público':
+        handleJoin(roomId, userName);
+        break;
+      case 'Protegido':
+        if (!token) {
+          handleOpenPasswordModal();
+          if (password) {
+            const checkPass = await channelApi.verifyChannelPassword(
+              roomId,
+              password,
+            );
+            if (checkPass) {
+              getToken(roomId);
+              handleJoin(roomId, userName);
+            } else {
+              alert('Senha incorreta. Tente novamente.');
+            }
+          }
+        } else {
+          setCurrentRoom(roomId);
+          setComponent('conversation');
+        }
+        break;
+      case 'Privado':
+        alert('Canal privado, apenas usuários convidados podem participar.');
+        break;
+      default:
+        console.warn(`Tipo de canal desconhecido: $(channel.type)`);
+        break;
+    }
   };
 
   const menuItems = [
@@ -88,7 +153,19 @@ const Channels: React.FC = () => {
               ))}
             </div>
           )}
-
+          <Modal
+            title="Digite a senha do canal"
+            open={passwordModalVisible}
+            onOk={handleVerifyPassword}
+            onCancel={handleClosePasswordModal}
+          >
+            <Input
+              type="password"
+              placeholder="Senha"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </Modal>
           {current === 'chat' && (
             <div className="menu-chats">
               <p>Chat</p>

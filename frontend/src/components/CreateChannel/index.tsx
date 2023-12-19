@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from 'hooks/useAuth';
-import { channelService } from '../../services/channel.api';
+import { channelApi } from '../../services/channel.api';
 import { Modal, Input, Button } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import './style.css';
@@ -25,7 +25,7 @@ const CreateChannel: React.FC = () => {
   const { user } = useAuth();
   const sendForm = async () => {
     if (user && user.id) {
-      const result = await channelService.createChannel({
+      const result = await channelApi.createChannel({
         name_channel: channelName,
         type: channelType,
         owner: user.id,

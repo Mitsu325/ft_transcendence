@@ -22,9 +22,30 @@ async function createMessage(params: messageInterface) {
   return result.data || null;
 }
 
-export const channelService = {
+async function verifyChannelPassword(roomId: string, password: string) {
+  try {
+    const result = await api.post('/channel/verify-password', {
+      roomId: roomId,
+      password: password,
+    });
+
+    return result.data.success;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+async function getToken(roomId: string) {
+  const result = await api.get(`/channel/token/${roomId}`);
+  return result;
+}
+
+export const channelApi = {
   createChannel,
   getChannel,
   getMessages,
   createMessage,
+  verifyChannelPassword,
+  getToken,
 };
