@@ -125,7 +125,9 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.removeRoomAndNotify(roomId, user.id, game, this.server);
       client.leave(roomId);
       this.server.emit('game', game);
-      this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', 'GameOver: Player left the room!');
+      try {
+        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', 'GameOver: Player left the room!');
+      } catch (error) { }
     } else {
       console.error(`Room not found for user ${user.id}`);
     }
