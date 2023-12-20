@@ -10,7 +10,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, Player, Room, Game, Match, MatchPadle, initialMatch } from './game.service';
+import { GameService, Player, Room, Game, Match, MatchPadle, FinalMatch, initialMatch } from './game.service';
 
 interface Padle {
   type: string;
@@ -27,6 +27,8 @@ const matchPadle: MatchPadle = {
   player1: { y: 135, playerSpeed: 1.5 },
   player2: { y: 135, playerSpeed: 1.5 },
 };
+
+let matchStatus: FinalMatch;
 
 @ApiTags('pong')
 @Controller('pong')
@@ -88,9 +90,17 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (game.rooms[roomId]) {
       const startMatch: Match = { ...game.rooms[roomId].match, matchStatus: 'PLAYING' };
-      await this.gameService.playingGame(startMatch, matchPadle, updatedMatch => {
-        this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
-      });
+      try {
+        await this.gameService.playingGame(startMatch, matchPadle, updatedMatch => {
+          this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
+          matchStatus = {
+            player1: game.rooms[roomId].player1.id,
+            score1: updatedMatch.score1,
+            player2: game.rooms[roomId].player2.id,
+            score2: updatedMatch.score2,
+          };
+        });
+      } catch (error) { }
     }
   }
 

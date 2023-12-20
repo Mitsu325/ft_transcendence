@@ -47,3 +47,7 @@ export const initialMatch: Match = {
   score2: 0,
   courtDimensions: { width: 580, height: 320 },
 };
+
+export const initialMatchPadle: MatchPadle = {
+  player1: { y: 135, playerSpeed: 1.5 },
+} as MatchPadle;

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 export const initialMatch: Match = {
   matchStatus: 'WAITING',
@@ -49,6 +49,13 @@ export interface Match {
   score1: number;
   score2: number;
   courtDimensions: { width: number; height: number };
+}
+
+export interface FinalMatch {
+  player1: string;
+  score1: number;
+  player2: string;
+  score2: number;
 }
 
 export interface MatchPadle {
@@ -108,6 +115,7 @@ export class GameService {
       }
 
       updateCallback(updatedMatchWithColision);
+
 
       if (match.matchStatus === 'PLAYING') {
         updateCallback({ ...match });

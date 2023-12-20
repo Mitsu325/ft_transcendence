@@ -12,6 +12,7 @@ import {
   Match,
   MatchPadle,
   initialMatch,
+  initialMatchPadle,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 
@@ -105,6 +106,8 @@ export const Game = () => {
 
   const createRoom = () => {
     socket.emit('CreateRoom', userPlayer);
+    setMatch(initialMatch);
+    setPadle(initialMatchPadle);
     setGameData(prevGameData => ({
       ...prevGameData,
       match: true,
@@ -130,6 +133,8 @@ export const Game = () => {
 
   const leaveRoom = () => {
     socket.emit('leaveRoom', userPlayer);
+    setMatch(initialMatch);
+    setPadle(initialMatchPadle);
   };
 
   const startMatch = () => {
@@ -145,11 +150,6 @@ export const Game = () => {
     };
     socket.emit('sendKey', padleObj);
   };
-
-  // React.useEffect(() => {
-  //   console.log('PADLE');
-  //   console.log(padle);
-  // }, [padle]);
 
   return (
     <>

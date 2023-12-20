@@ -60,7 +60,6 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
         <Rect
           x="5"
           y={padle?.player1.y ? padle?.player1.y.toString() : '135'}
-          // y="135"
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}
