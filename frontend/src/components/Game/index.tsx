@@ -66,6 +66,14 @@ export const Game = () => {
       }));
     });
 
+    socket.on('ping', (latency: number) => {
+      if (latency !== undefined) {
+        socket.emit('pong', latency);
+      } else {
+        socket.emit('ping');
+      }
+    });
+
     socket.on('game', (receivedGame: GameData) => {
       const playersArray = Object.values(receivedGame.players);
       const roomsArray = Object.values(receivedGame.rooms);
@@ -94,6 +102,10 @@ export const Game = () => {
 
     socket.on('movePadle', (receivedPadle: MatchPadle) => {
       setPadle(receivedPadle);
+    });
+
+    socket.on('ping', () => {
+      console.log('ping');
     });
 
     return () => {

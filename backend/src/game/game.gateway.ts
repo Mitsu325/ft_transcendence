@@ -39,8 +39,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly gameService: GameService) { }
 
-  handleConnection(client: Socket, ...args: any[]) {
-  }
+  handleConnection(client: Socket, ...args: any[]) { }
 
   handleDisconnect(client: Socket) {
     const playerId = game.players[client.id]?.id;
@@ -59,7 +58,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('CreateRoom')
   handleCreateRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
     const playerAlreadyInRoom = Object.values(game.rooms).find(room => room.player1.id === user.id || (room.player2 && room.player2.id === user.id));
-
 
     if (!playerAlreadyInRoom) {
       client.join(client.id);
@@ -110,6 +108,10 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     const matchStatus: Match = { ...game.rooms[roomId].match };
     const player = game.rooms[roomId].player1.id === padle.player ? '1' : '2';
     const direction = padle.type === 'keyup' ? 'STOP' : 'GO';
+
+    if (padle.type === 'keyup') {
+      this.gameService.latencyGame(roomId, player, game, this.server);
+    }
 
     if (game.rooms[roomId] && direction === 'GO') {
       const updatedPadle = await this.gameService.movePadle(padle, matchPadle, player, matchStatus);

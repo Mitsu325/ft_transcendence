@@ -116,7 +116,6 @@ export class GameService {
 
       updateCallback(updatedMatchWithColision);
 
-
       if (match.matchStatus === 'PLAYING') {
         updateCallback({ ...match });
         await new Promise(resolve => setTimeout(resolve, 1000 / 60));
@@ -124,6 +123,26 @@ export class GameService {
       }
     };
     await playGame();
+  }
+
+  async latencyGame(roomId: string, player: string, game: Game, server: Server): Promise<void> {
+
+    const room = game.rooms[roomId];
+    const startTime = new Date().getTime();
+
+    const getLatency = async () => {
+      // server.to(room.room_id).emit('ping');
+
+      const currentTime = new Date().getTime();
+      const latency = currentTime - startTime;
+      server.to(room.room_id).emit('ping', latency);
+
+      console.log(latency, '-->', player);
+
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      await getLatency();
+    };
+    await getLatency();
   }
 
   async movePadle(padle: Padle, matchPadle: MatchPadle, player: string, matchStatus: Match): Promise<MatchPadle> {
