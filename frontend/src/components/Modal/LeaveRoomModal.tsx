@@ -12,10 +12,6 @@ const LeaveRoomModal: React.FC<LeaveRoomModalProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(visible);
 
-  // const showModal = () => {
-  //   setIsModalOpen(visible);
-  // };
-
   const handleOk = () => {
     setIsModalOpen(false);
   };
@@ -27,7 +23,7 @@ const LeaveRoomModal: React.FC<LeaveRoomModalProps> = ({
   return (
     <>
       <Modal
-        title="Basic Modal"
+        title="Game Over"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}

@@ -4,7 +4,7 @@ import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
 import RoomCard from 'components/RoomCard';
 import { Button } from 'antd';
-// import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
+import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
 import Court from 'components/Court';
 import {
   RoomGame,
@@ -49,12 +49,12 @@ export const Game = () => {
     return newSocket;
   }, []);
 
-  // const [newMessage, setNewMessage] = React.useState('');
-  // const [visible, setVisible] = React.useState(false);
-  // React.useEffect(() => {
-  //   setVisible(true);
-  //   setNewMessage(gameData.message);
-  // }, [gameData.status, gameData.message]);
+  const [newMessage, setNewMessage] = React.useState('');
+  const [visible, setVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    setVisible(true);
+  }, [newMessage]);
 
   React.useEffect(() => {
     socket.on('connect', () => {
@@ -78,6 +78,8 @@ export const Game = () => {
     });
 
     socket.on('playerLeftRoom', (data: { message: string }) => {
+      setNewMessage(data.message);
+
       setGameData(prevGameData => ({
         ...prevGameData,
         status: 'LEAVE',
@@ -96,6 +98,7 @@ export const Game = () => {
 
     return () => {
       socket.disconnect();
+      setNewMessage('Seu adversário se desconectou');
       setGameData(prevGameData => ({
         ...prevGameData,
         connected: false,
@@ -170,9 +173,6 @@ export const Game = () => {
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>
           </div>
-          {/* <div>
-            <LeaveRoomModal visible={visible} message={newMessage} />
-          </div> */}
         </div>
       ) : (
         <div style={{ display: 'flex', width: '100%' }}>
@@ -198,9 +198,9 @@ export const Game = () => {
               ))}
             </div>
           </div>
-          {/* <div style={{ flex: '30%' }}>
-            <h2 style={{ padding: '20px' }}>{gameData.status}</h2>
-          </div> */}
+          <div>
+            <LeaveRoomModal visible={visible} message={newMessage} />
+          </div>
         </div>
       )}
     </>
