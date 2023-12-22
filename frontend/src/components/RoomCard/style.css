@@ -5,8 +5,7 @@
 
 .room-card {
   margin: 10px;
-  display: flex;
-  align-items: center;
+  display: block;
 }
 
 .room-info {

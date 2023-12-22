@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Avatar } from 'antd';
 import './style.css';
+// import { AlignCenterOutlined } from '@ant-design/icons';
 
 interface Player {
   id: string;
@@ -29,17 +30,35 @@ function getRandomColor() {
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, getInRoom }) => (
-  <div key={room.room_id} className="room-card">
+  <div
+    key={room.room_id}
+    className="room-card"
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
     <a href="#" onClick={() => getInRoom(room)}>
       <Avatar
         src={room.player1.avatar}
         style={{ backgroundColor: getRandomColor() }}
       >
-        Sala
+        {room.player2?.name ? 'X' : 'Livre'}
       </Avatar>
     </a>
-    <div className="room-info">
+    <div
+      className="room-info"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <p className="room-name">{room.player1.name}</p>
+      <p className="room-name">{room.player2?.name ? 'X' : ''}</p>
+      <p className="room-name">{room.player2?.name}</p>
     </div>
   </div>
 );

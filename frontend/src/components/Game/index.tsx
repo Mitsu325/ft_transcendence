@@ -130,7 +130,7 @@ export const Game = () => {
   };
 
   const getInRoom = (room: RoomGame) => {
-    if (userPlayer.id !== room.player1.id) {
+    if (userPlayer.id !== room.player1.id && room.player2 === null) {
       room.player2 = userPlayer;
       socket.emit('GetInRoom', room);
       setGameData(prevGameData => ({
@@ -138,10 +138,13 @@ export const Game = () => {
         match: true,
       }));
     } else {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
-      }));
+      setNewMessage('');
+      setNewMessage('Sala ocupada');
+      // console.log('Sala ocupada');
+      // setGameData(prevGameData => ({
+      //   ...prevGameData,
+      //   status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
+      // }));
     }
     startMatch();
   };
