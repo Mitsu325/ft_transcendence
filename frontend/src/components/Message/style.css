@@ -1,0 +1,16 @@
+.message-text {
+  color: #001529;
+}
+
+.hour-text {
+  color: #5a5a5a;
+  font-size: 0.85rem;
+  text-align: right;
+  display: block;
+}
+
+.send-button {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+}

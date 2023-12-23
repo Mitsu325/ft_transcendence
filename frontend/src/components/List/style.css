@@ -1,5 +1,8 @@
 .text-description {
   color: #5a5a5a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ant-list .ant-list-item {
@@ -17,4 +20,10 @@
 .user-item:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.06);
+}
+
+.text-details {
+  color: #5a5a5a;
+  font-size: 0.85rem;
+  margin-right: 4px;
 }

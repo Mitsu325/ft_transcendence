@@ -16,7 +16,10 @@ const SignInPage: React.FC = () => {
   return (
     <Layout className="page-container">
       <Header />
-      <Content className="content" style={{ background: colorBgContainer }}>
+      <Content
+        className="content-space"
+        style={{ background: colorBgContainer }}
+      >
         <h1 className="page-title mb-48">
           Bem vindo ao Portal de Jogos do 42 JMP Team
         </h1>

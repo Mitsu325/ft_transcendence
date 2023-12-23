@@ -54,6 +54,7 @@ export default function OAuth42() {
     const params = {
       client_id: CLIENT_ID,
       redirect_uri: 'http://localhost:3000',
+      scope: 'public',
       response_type: 'code',
     };
 

@@ -6,8 +6,9 @@ import 'components/List/style.css';
 type UserListProps = {
   avatar: string;
   title: string;
-  description: string;
-  onUserClick: () => void;
+  description?: string;
+  date?: string;
+  onUserClick?: () => void;
 };
 
 // TODO: title seguir para detalhes do perfil ao clicar
@@ -15,6 +16,7 @@ const UserListItem = ({
   avatar,
   title,
   description,
+  date,
   onUserClick,
 }: UserListProps) => {
   return (
@@ -37,6 +39,7 @@ const UserListItem = ({
         }
         description={<p className="text-description">{description}</p>}
       />
+      <span className="text-details">{date}</span>
     </List.Item>
   );
 };
