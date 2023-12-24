@@ -31,7 +31,7 @@ export class DirectMessage extends BaseEntity {
 
     @CreateDateColumn({
         name: 'created_at',
-        type: 'timestamp',
+        type: 'timestamptz',
         default: () => 'CURRENT_TIMESTAMP',
     })
     createdAt: Date;

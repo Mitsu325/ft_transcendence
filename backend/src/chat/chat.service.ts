@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { isSameDay, format } from 'date-fns';
+
 import { DirectMessage } from './entities/direct-message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UserService } from 'src/user/user.service';
@@ -37,6 +39,7 @@ export class ChatService {
             }
         });
 
+        const currentDate = new Date();
         const interactedUsers = [];
         for (const id of interactedUserIds) {
             let lastMessage;
@@ -53,14 +56,18 @@ export class ChatService {
             }
             if (!lastMessage) continue;
 
-            const sender = getNonSensitiveUserInfo(lastMessage.sender);
-            const recipient = getNonSensitiveUserInfo(lastMessage.recipient);
+            const chatUser =
+                id == lastMessage.sender.id
+                    ? getNonSensitiveUserInfo(lastMessage.sender)
+                    : getNonSensitiveUserInfo(lastMessage.recipient);
+            delete chatUser.username;
+
             interactedUsers.push({
-                id: lastMessage.id,
-                message: lastMessage.message,
-                createdAt: lastMessage.createdAt,
-                sender: { ...sender },
-                recipient: { ...recipient },
+                chatUser,
+                text: lastMessage.message,
+                date: isSameDay(currentDate, lastMessage.createdAt)
+                    ? format(lastMessage.createdAt, 'HH:mm')
+                    : format(lastMessage.createdAt, 'MM/dd/yyyy'),
             });
         }
 
@@ -71,7 +78,7 @@ export class ChatService {
         chattingUserId: string,
         loggedUserId: string,
     ) {
-        const messages = await this.directMessageRepository.find({
+        let messages = await this.directMessageRepository.find({
             where: [
                 {
                     sender: { id: loggedUserId },
@@ -85,13 +92,29 @@ export class ChatService {
             order: { createdAt: 'DESC' },
             relations: ['sender', 'recipient'],
         });
-        return messages.map(item => ({
-            id: item.id,
-            message: item.message,
-            createdAt: item.createdAt,
-            sender: getNonSensitiveUserInfo(item.sender),
-            recipient: getNonSensitiveUserInfo(item.recipient),
-        }));
+        messages = messages.reverse();
+
+        const formattedMessages = [];
+        let date;
+        for (const item of messages) {
+            if (!date || !isSameDay(date, item.createdAt)) {
+                date = item.createdAt;
+                formattedMessages.push({
+                    type: 'divider',
+                    text: format(date, 'MM/dd/yyyy'),
+                });
+            }
+            const senderUser = getNonSensitiveUserInfo(item.sender);
+            delete senderUser.username;
+            formattedMessages.push({
+                id: item.id,
+                type: 'text',
+                text: item.message,
+                senderUser,
+                hour: format(item.createdAt, 'HH:mm'),
+            });
+        }
+        return formattedMessages;
     }
 
     async saveMessage(sendMessageDto: SendMessageDto, loggedUserId: string) {
