@@ -6,6 +6,12 @@ import WelcomeChat from './MessageCard/WelcomeChat';
 import MessageList from './MessageCard/MessageList';
 import 'pages/Chat/style.css';
 
+type ChattingUser = {
+  id: string;
+  avatar: string;
+  name: string;
+};
+
 const menuItems = [
   {
     label: 'Canais',
@@ -27,7 +33,7 @@ export default function Chat() {
   const [selectedMenu, setSelectedMenuItem] = useState(
     queryParams.get('menu') || 'channel',
   );
-  const [selectedUser, setSelectedUser] = useState<string | undefined>();
+  const [selectedUser, setSelectedUser] = useState<ChattingUser | undefined>();
 
   const handleMenuClick = (key: string) => {
     setSelectedMenuItem(key);
@@ -35,8 +41,8 @@ export default function Chat() {
     navigate(`?${queryParams.toString()}`);
   };
 
-  const handleUserClick = (userId?: string) => {
-    setSelectedUser(userId);
+  const handleUserClick = (chattingUser?: ChattingUser) => {
+    setSelectedUser(chattingUser);
   };
 
   useEffect(() => {
@@ -62,7 +68,13 @@ export default function Chat() {
       if (!selectedUser) {
         return <WelcomeChat />;
       }
-      return <MessageList selectedUser={selectedUser} />;
+      return (
+        <MessageList
+          id={selectedUser.id}
+          name={selectedUser.name}
+          avatar={selectedUser.avatar}
+        />
+      );
     }
   };
 
