@@ -31,7 +31,6 @@ type TextMessage = {
 
 type Message = DividerMessage | TextMessage;
 
-// TODO: listar os elementos do antigo para o novo
 // TODO: iniciar scroll de baixo para cima
 
 export default function MessageList(selectedUser: ChattingUser) {
@@ -77,6 +76,21 @@ export default function MessageList(selectedUser: ChattingUser) {
     }
   };
 
+  const sendMessage = async (message: string) => {
+    try {
+      const res = await chatService.sendMessage({
+        recipientId: selectedUser.id,
+        message,
+      });
+      console.log(res);
+    } catch (error) {
+      FailureNotification({
+        message: 'Ops! Não foi possível enviar a mensagem.',
+        description: 'Verifique sua conexão e tente novamente',
+      });
+    }
+  };
+
   return (
     <>
       <div className="message-header">
@@ -91,7 +105,7 @@ export default function MessageList(selectedUser: ChattingUser) {
         renderItem={item => renderComponent(item)}
       />
       <Divider className="border-dark m-0" />
-      <MessageInput />
+      <MessageInput handleClick={sendMessage} />
     </>
   );
 }
