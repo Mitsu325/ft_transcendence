@@ -1,25 +1,39 @@
 import React from 'react';
 import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
-import { Match, MatchPadle } from 'interfaces/gameInterfaces/interfaces';
+import {
+  MatchPadles,
+  Ball,
+  initialBall,
+  initialPadles,
+} from 'interfaces/gameInterfaces/interfaces';
 
 interface CourtProps {
-  matchData: any;
+  roomId: string;
+  matchBall: any;
   matchPadles: any;
   onSendKey: (type: string, key: string) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
 
-const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
-  const [match, setMatch] = React.useState<Match>();
-  const [padle, setPadle] = React.useState<MatchPadle>();
+const Court: React.FC<CourtProps> = ({
+  roomId,
+  matchBall,
+  matchPadles,
+  onSendKey,
+}) => {
+  const [ball, setBall] = React.useState<Ball>();
+  const [padles, setPadles] = React.useState<MatchPadles>();
 
   React.useEffect(() => {
-    setMatch(matchData.match);
-  }, [matchData]);
+    setBall(matchBall);
+    // console.log(roomId);
+    // console.log('court ball', ball);
+  }, [matchBall]);
 
   React.useEffect(() => {
-    setPadle(matchPadles.matchPadle);
+    setPadles(matchPadles);
+    // console.log('court padles', matchPadles);
   }, [matchPadles]);
 
   React.useEffect(() => {
@@ -59,14 +73,14 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
         />
         <Rect
           x="5"
-          y={padle?.player1.y ? padle?.player1.y.toString() : '135'}
+          y={padles?.player1.y ? padles?.player1.y.toString() : '135'}
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}
         />
         <Rect
           x={(courtDimensions.width - 10).toString()}
-          y={padle?.player2.y ? padle?.player2.y.toString() : '135'}
+          y={padles?.player2.y ? padles?.player2.y.toString() : '135'}
           width="5"
           height="50"
           style={{ fill: 'rgb(255, 255, 255)' }}
@@ -89,7 +103,7 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
             fontSize: '50px',
           }}
         >
-          {match?.score1}
+          {/* {match?.score1} */}
         </Text>
         <Text
           x={(courtDimensions.width / 2 + 20).toString()}
@@ -99,13 +113,13 @@ const Court: React.FC<CourtProps> = ({ matchData, matchPadles, onSendKey }) => {
             fontSize: '50px',
           }}
         >
-          {match?.score2}
+          {/* {match?.score2} */}
         </Text>
-        {match?.ball && (
+        {ball && (
           <Circle
-            cx={match.ball.x.toString()}
-            cy={match.ball.y.toString()}
-            r={match.ball.width.toString()}
+            cx={ball?.x?.toString() ?? '0'}
+            cy={ball?.y?.toString() ?? '0'}
+            r={ball?.width?.toString() ?? '0'}
             style={{ fill: '#fff' }}
           />
         )}

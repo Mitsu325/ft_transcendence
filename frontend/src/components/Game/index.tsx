@@ -9,10 +9,10 @@ import Court from 'components/Court';
 import {
   RoomGame,
   GameData,
-  Match,
-  MatchPadle,
-  initialMatch,
-  initialMatchPadle,
+  MatchPadles,
+  Ball,
+  initialPadles,
+  initialBall,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 
@@ -39,9 +39,6 @@ export const Game = () => {
     message: '',
   });
 
-  const [match, setMatch] = React.useState<Match>({} as Match);
-  const [padle, setPadle] = React.useState<MatchPadle>({} as MatchPadle);
-
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
       reconnectionDelay: 10000,
@@ -49,6 +46,13 @@ export const Game = () => {
     return newSocket;
   }, []);
 
+  const [userRoomId, setUserRoomId] = React.useState<string>(socket.id);
+  const [balls, setBalls] = React.useState<{ [roomId: string]: Ball }>({
+    [socket.id]: initialBall,
+  });
+  const [padles, setPadles] = React.useState<{ [roomId: string]: MatchPadles }>(
+    { [socket.id]: initialPadles },
+  );
   const [newMessage, setNewMessage] = React.useState('');
   const [visible, setVisible] = React.useState(false);
 
@@ -96,12 +100,22 @@ export const Game = () => {
       }));
     });
 
-    socket.on('matchStarted', (receivedMacth: Match) => {
-      setMatch(receivedMacth);
+    socket.on('matchStarted', (roomId, recevedBall) => {
+      setBalls(prevBalls => ({
+        ...prevBalls,
+        [roomId]: recevedBall,
+      }));
     });
 
-    socket.on('movePadle', (receivedPadle: MatchPadle) => {
-      setPadle(receivedPadle);
+    // socket.on('matchStarted', (roomId, ball) => {
+    //   console.log('matchStarted', roomId, ball);
+    // });
+
+    socket.on('movePadles', (roomId, receivedPadles) => {
+      setPadles(prevPadles => ({
+        ...prevPadles,
+        [roomId]: receivedPadles,
+      }));
     });
 
     socket.on('ping', () => {
@@ -116,17 +130,17 @@ export const Game = () => {
         connected: false,
         status: 'DISCONNECTED',
       }));
+      console.log(gameData);
     };
   }, [user]);
 
   const createRoom = () => {
     socket.emit('CreateRoom', userPlayer);
-    setMatch(initialMatch);
-    setPadle(initialMatchPadle);
     setGameData(prevGameData => ({
       ...prevGameData,
       match: true,
     }));
+    setUserRoomId(socket.id);
   };
 
   const getInRoom = (room: RoomGame) => {
@@ -140,34 +154,46 @@ export const Game = () => {
     } else {
       setNewMessage('');
       setNewMessage('Sala ocupada');
-      // console.log('Sala ocupada');
-      // setGameData(prevGameData => ({
-      //   ...prevGameData,
-      //   status: `Você criou a sala ( ${room.player1.name} ), espere alguém entrar para jogar!`,
-      // }));
     }
-    startMatch();
+    let room_id = socket.id;
+    gameData.rooms.forEach(room => {
+      if (room.player2?.id === userPlayer.id) {
+        room_id = room.room_id;
+      }
+    });
+    setUserRoomId(room_id);
+    startMatch(room_id);
   };
 
   const leaveRoom = () => {
-    socket.emit('leaveRoom', userPlayer);
-    setMatch(initialMatch);
-    setPadle(initialMatchPadle);
+    const roomIndex = gameData.rooms.findIndex(
+      room => room.room_id === userRoomId,
+    );
+    if (roomIndex !== -1) {
+      gameData.rooms.splice(roomIndex, 1);
+    }
+    socket.emit('leaveRoom', { userPlayer, userRoomId });
   };
 
-  const startMatch = () => {
-    socket.emit('startMatch', userPlayer);
+  const startMatch = (room_id: string) => {
+    socket.emit('startMatch', room_id);
   };
 
   const sendKey = (type: string, key: string) => {
     const player = userPlayer.id;
+    const room = userRoomId;
     const padleObj = {
       type,
       key,
       player,
+      room,
     };
     socket.emit('sendKey', padleObj);
   };
+
+  // React.useEffect(() => {
+  //   console.log('balls', balls);
+  // }, [balls]);
 
   return (
     <>
@@ -183,7 +209,12 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
           <div>
-            <Court matchData={match} matchPadles={padle} onSendKey={sendKey} />
+            <Court
+              roomId={userRoomId}
+              matchBall={balls[userRoomId]}
+              matchPadles={padles[userRoomId]}
+              onSendKey={sendKey}
+            />
           </div>
           <div style={{ padding: '20px' }}>
             <Button onClick={leaveRoom}>Sair da sala</Button>

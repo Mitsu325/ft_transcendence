@@ -10,12 +10,13 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, Player, Room, Game, Match, MatchPadle, FinalMatch, initialMatch } from './game.service';
+import { GameService, BallMoverService, Player, Room, Game, MatchPadle, FinalMatch } from './game.service';
 
 interface Padle {
   type: string;
   key: string;
   player: string;
+  room: string;
 }
 
 const game: Game = {
@@ -23,9 +24,21 @@ const game: Game = {
   rooms: {},
 };
 
-const matchPadle: MatchPadle = {
+const initialPadles: MatchPadle = {
   player1: { y: 135, playerSpeed: 1.5 },
   player2: { y: 135, playerSpeed: 1.5 },
+};
+
+const initialScores = { score1: 0, score2: 0 };
+
+const initialBall = {
+  x: 580 / 2,
+  y: 320 / 2,
+  width: 5,
+  xdirection: 1,
+  ydirection: 1,
+  xspeed: 2.8,
+  yspeed: 2.2
 };
 
 let matchStatus: FinalMatch;
@@ -61,12 +74,19 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!playerAlreadyInRoom) {
       client.join(client.id);
-      const match: Match = { ...initialMatch };
-      game.rooms[client.id] = { room_id: client.id, player1: { ...user }, player2: null, match: { ...match } };
+      game.rooms[client.id] = {
+        room_id: client.id,
+        player1: { ...user },
+        player2: null,
+        padles: initialPadles,
+        scores: initialScores,
+        ball: initialBall,
+      };
     } else {
       console.log('The Player is already in the room:', client.id);
     }
     this.server.emit('game', game);
+    console.log('create room', game.rooms[client.id].room_id);
   }
 
   @SubscribeMessage('GetInRoom')
@@ -76,63 +96,71 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     if (!playerAlreadyInRoom && game.rooms[room.room_id].player2 === null) {
       client.join(room.room_id);
       game.rooms[room.room_id].player2 = { ...room.player2 };
+      this.server.emit('game', game);
     } else {
       console.log('The Player is already in the room:', client.id);
     }
-    this.server.emit('game', game);
+    console.log('geting room', game.rooms[room.room_id].room_id);
   }
 
   @SubscribeMessage('startMatch')
-  async handleStartMatch(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.findRoomByPlayerId(user.id, game);
+  async handleStartMatch(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
 
-    if (game.rooms[roomId]) {
-      const startMatch: Match = { ...game.rooms[roomId].match, matchStatus: 'PLAYING' };
-      try {
-        await this.gameService.playingGame(startMatch, matchPadle, updatedMatch => {
-          this.server.to(game.rooms[roomId].room_id).emit('matchStarted', { match: { ...updatedMatch } });
-          matchStatus = {
-            player1: game.rooms[roomId].player1.id,
-            score1: updatedMatch.score1,
-            player2: game.rooms[roomId].player2.id,
-            score2: updatedMatch.score2,
-          };
-        });
-      } catch (error) { }
+    let loopGame: NodeJS.Timeout;
+
+    if (!game.rooms[room]) {
+      clearInterval(loopGame);
+      console.log('The room does not exist:', room);
+    }
+
+    if (game.rooms[room]) {
+      const ballMoverService = new BallMoverService();
+      const initD = Date.now() / 2 === 0 ? 1 : -1;
+      game.rooms[room].ball = { ...initialBall, xdirection: initD, ydirection: initD };
+      loopGame = setInterval(async () => {
+        try {
+          game.rooms[room].ball = await ballMoverService.moveBall(game.rooms[room].ball);
+          this.server.to(room).emit('matchStarted', room, game.rooms[room].ball);
+          // console.log('room: ', client.id, 'ball: ', game.rooms[room].ball);
+        }
+        catch (error) { }
+      }, 1000 / 60);
+    } else {
+      clearInterval(loopGame);
     }
   }
 
   @SubscribeMessage('sendKey')
   async handleSendKey(@MessageBody() padle: Padle, @ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.findRoomByPlayerId(padle.player, game);
-    const matchStatus: Match = { ...game.rooms[roomId].match };
-    const player = game.rooms[roomId].player1.id === padle.player ? '1' : '2';
+    const player = game.rooms[padle.room].player1.id === padle.player ? '1' : '2';
     const direction = padle.type === 'keyup' ? 'STOP' : 'GO';
 
     // if (padle.type === 'keyup') {
-    //   this.gameService.latencyGame(roomId, player, game, this.server);
+    //   this.gameService.latencyGame(padle.room, player, game, this.server);
     // }
 
-    if (game.rooms[roomId] && direction === 'GO') {
-      const updatedPadle = await this.gameService.movePadle(padle, matchPadle, player, matchStatus);
-      this.server.to(game.rooms[roomId].room_id).emit('movePadle', { matchPadle: { ...updatedPadle } });
+    if (game.rooms[padle.room] && direction === 'GO') {
+      game.rooms[padle.room].padles = await this.gameService.movePadle(
+        padle,
+        initialPadles,
+        player,
+      );
+      this.server.to(padle.room).emit('movePadles', padle.room, game.rooms[padle.room].padles);
     }
   }
 
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.findRoomByPlayerId(user.id, game);
-
-    if (game.rooms[roomId]) {
-      this.gameService.removeRoomAndNotify(roomId, user.id, game, this.server);
-      client.leave(roomId);
-      this.server.emit('game', game);
+  handleLeaveRoom(@MessageBody() room: { userPlayer: Player, userRoomId: string }, @ConnectedSocket() client: Socket) {
+    if (game.rooms[room.userRoomId]) {
       try {
-        this.server.to(game.rooms[roomId].room_id).emit('playerLeftRoom', 'GameOver: Player left the room!');
+        this.server.to(room.userRoomId).emit('playerLeftRoom', 'GameOver: Player left the room!');
       } catch (error) { }
+      this.gameService.removeRoomAndNotify(room.userRoomId, room.userPlayer.id, game, this.server);
+      client.leave(room.userRoomId);
     } else {
-      console.error(`Room not found for user ${user.id}`);
+      console.error(`Room not found for user ${room.userPlayer.id}`);
     }
+    this.server.emit('game', game);
   }
 
   @SubscribeMessage('PlayerConnected')

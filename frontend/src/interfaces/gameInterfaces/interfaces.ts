@@ -31,23 +31,32 @@ export interface Match {
   courtDimensions: { width: number; height: number };
 }
 
-export interface MatchPadle {
+export interface Ball {
+  x: number;
+  y: number;
+  width: number;
+  xdirection: number;
+  ydirection: number;
+  xspeed: number;
+  yspeed: number;
+}
+
+export interface MatchPadles {
   player1: { y: number; playerSpeed: number };
   player2: { y: number; playerSpeed: number };
 }
 
-export const initialMatch: Match = {
-  matchStatus: 'WAITING',
-  ball: {
-    x: 580 / 2,
-    y: 320 / 2,
-    width: 5,
-  },
-  score1: 0,
-  score2: 0,
-  courtDimensions: { width: 580, height: 320 },
+export const initialBall: Ball = {
+  x: 580 / 2,
+  y: 320 / 2,
+  width: 5,
+  xdirection: 1,
+  ydirection: 1,
+  xspeed: 2.8,
+  yspeed: 2.2,
 };
 
-export const initialMatchPadle: MatchPadle = {
+export const initialPadles: MatchPadles = {
   player1: { y: 135, playerSpeed: 1.5 },
-} as MatchPadle;
+  player2: { y: 135, playerSpeed: 1.5 },
+};
