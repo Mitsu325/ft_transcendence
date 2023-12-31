@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import authConfig from 'src/configs/auth.config';
 import { UserService } from 'src/user/user.service';
 import { comparePass, hashPassword } from 'src/utils/hash.util';
+import { jwtConstants } from 'src/configs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -130,5 +131,12 @@ export class AuthService {
                 error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
             throw new HttpException(errorMessage, status);
         }
+    }
+
+    async getJwtUser(token: string) {
+        const payload = await this.jwtService.verifyAsync(token, {
+            secret: jwtConstants.secret,
+        });
+        return payload.sub;
     }
 }

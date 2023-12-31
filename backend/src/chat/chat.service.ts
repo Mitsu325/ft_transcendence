@@ -141,10 +141,14 @@ export class ChatService {
             const directMessage = await this.directMessageRepository
                 .create(params)
                 .save();
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { sender, recipient, ...data } = directMessage;
-            return data;
+            const formattedMessage = {
+                id: directMessage.id,
+                type: 'text',
+                text: directMessage.message,
+                senderUser: getNonSensitiveUserInfo(directMessage.sender),
+                hour: format(directMessage.createdAt, 'HH:mm'),
+            };
+            return formattedMessage;
         } catch (error) {
             throw error;
         }

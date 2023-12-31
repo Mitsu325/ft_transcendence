@@ -7,9 +7,14 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { UserModule } from 'src/user/user.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-    imports: [UserModule, TypeOrmModule.forFeature([DirectMessage])],
+    imports: [
+        AuthModule,
+        UserModule,
+        TypeOrmModule.forFeature([DirectMessage]),
+    ],
     controllers: [ChatController],
     providers: [
         ChatService,
