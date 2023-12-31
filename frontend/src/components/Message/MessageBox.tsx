@@ -7,6 +7,7 @@ type MessageBoxProps = {
     id: string;
     avatar: string;
     name: string;
+    username?: string;
   };
   text: string;
   hour: string;

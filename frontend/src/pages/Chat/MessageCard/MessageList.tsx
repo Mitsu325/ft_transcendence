@@ -5,6 +5,8 @@ import MessageBox from 'components/Message/MessageBox';
 import MessageInput from 'components/Message/MessageInput';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
+import { socket } from 'socket';
+import { useAuth } from 'hooks/useAuth';
 
 type ChattingUser = {
   id: string;
@@ -25,6 +27,7 @@ type TextMessage = {
     id: string;
     avatar: string;
     name: string;
+    username?: string;
   };
   hour: string;
 };
@@ -34,6 +37,7 @@ type Message = DividerMessage | TextMessage;
 // TODO: iniciar scroll de baixo para cima
 
 export default function MessageList(selectedUser: ChattingUser) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
@@ -54,6 +58,18 @@ export default function MessageList(selectedUser: ChattingUser) {
 
     fetchData();
   }, [selectedUser]);
+
+  useEffect(() => {
+    socket.on('message', ({ senderId, message }) => {
+      if (user?.id !== selectedUser.id && senderId === selectedUser.id) {
+        setMessages(prevMessages => [...prevMessages, message]);
+      }
+    });
+
+    return () => {
+      socket.off('message');
+    };
+  }, [selectedUser, user]);
 
   const renderComponent = (item: Message) => {
     if (item.type === 'text') {
@@ -82,7 +98,16 @@ export default function MessageList(selectedUser: ChattingUser) {
         recipientId: selectedUser.id,
         message,
       });
-      console.log(res);
+      if (res) {
+        setMessages([...messages, res]);
+        socket.emit('message', { recipientId: selectedUser.id, message: res });
+        if (user?.id !== selectedUser.id) {
+          socket.emit('send-message', {
+            recipient: selectedUser,
+            message: res,
+          });
+        }
+      }
     } catch (error) {
       FailureNotification({
         message: 'Ops! Não foi possível enviar a mensagem.',

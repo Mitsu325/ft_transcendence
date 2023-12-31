@@ -5,6 +5,7 @@ import ChatList from './ListCard/ChatList';
 import WelcomeChat from './MessageCard/WelcomeChat';
 import MessageList from './MessageCard/MessageList';
 import 'pages/Chat/style.css';
+import { socket } from 'socket';
 
 type ChattingUser = {
   id: string;
@@ -48,6 +49,14 @@ export default function Chat() {
   useEffect(() => {
     const storedMenuItem = queryParams.get('menu') || 'channel';
     setSelectedMenuItem(storedMenuItem);
+    if (storedMenuItem === 'chat') {
+      socket.auth = { token: localStorage.getItem('token') };
+      socket.connect();
+    }
+
+    return () => {
+      socket.disconnect();
+    };
   }, [queryParams]);
 
   const renderListComponent = () => {
@@ -55,7 +64,12 @@ export default function Chat() {
       case 'channel':
         return <h1>Channel</h1>;
       case 'chat':
-        return <ChatList handleUserClick={handleUserClick} />;
+        return (
+          <ChatList
+            handleUserClick={handleUserClick}
+            selectedUser={selectedUser}
+          />
+        );
       default:
         return null;
     }

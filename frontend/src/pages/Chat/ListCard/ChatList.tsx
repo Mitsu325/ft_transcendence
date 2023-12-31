@@ -4,6 +4,7 @@ import UserListItem from 'components/List/UserListItem';
 import { SearchProps } from 'antd/es/input';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
+import { socket } from 'socket';
 
 const { Search } = Input;
 
@@ -14,6 +15,7 @@ type ChattingUser = {
 };
 
 interface ChatListProps {
+  selectedUser: ChattingUser | undefined;
   handleUserClick: (chattingUser?: ChattingUser) => void;
 }
 
@@ -22,12 +24,16 @@ type Chat = {
     id: string;
     avatar: string;
     name: string;
+    username?: string;
   };
   text: string;
   date: string;
 };
 
-export default function ChatList({ handleUserClick }: ChatListProps) {
+export default function ChatList({
+  handleUserClick,
+  selectedUser,
+}: ChatListProps) {
   const [chats, setChats] = useState<Chat[]>([]);
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
@@ -50,6 +56,35 @@ export default function ChatList({ handleUserClick }: ChatListProps) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    socket.on('message', ({ senderId, message }) => {
+      setChats(prevChat => [
+        {
+          chatUser: message.senderUser,
+          text: message.text,
+          date: message.hour,
+        },
+        ...prevChat.filter(chat => chat.chatUser.id !== senderId),
+      ]);
+    });
+
+    socket.on('send-message', ({ recipient, message }) => {
+      setChats(prevChat => [
+        {
+          chatUser: recipient,
+          text: message.text,
+          date: message.hour,
+        },
+        ...prevChat.filter(chat => chat.chatUser.id !== recipient.id),
+      ]);
+    });
+
+    () => {
+      socket.off('message');
+      socket.off('send-message');
+    };
+  }, []);
+
   return (
     <>
       <Search
@@ -65,6 +100,7 @@ export default function ChatList({ handleUserClick }: ChatListProps) {
         dataSource={chats}
         renderItem={item => (
           <UserListItem
+            active={selectedUser?.id === item.chatUser.id}
             avatar={item.chatUser.avatar}
             title={item.chatUser.name}
             description={item.text}

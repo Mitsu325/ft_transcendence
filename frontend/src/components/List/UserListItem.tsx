@@ -8,6 +8,7 @@ type UserListProps = {
   title: string;
   description?: string;
   date?: string;
+  active: boolean;
   onUserClick?: () => void;
 };
 
@@ -17,10 +18,14 @@ const UserListItem = ({
   title,
   description,
   date,
+  active,
   onUserClick,
 }: UserListProps) => {
   return (
-    <List.Item className="px-10 user-item" onClick={onUserClick}>
+    <List.Item
+      className={['px-10 user-item', active && 'user-item-active'].join(' ')}
+      onClick={onUserClick}
+    >
       <List.Item.Meta
         avatar={<AvatarCustom src={avatar} size={48} />}
         title={
