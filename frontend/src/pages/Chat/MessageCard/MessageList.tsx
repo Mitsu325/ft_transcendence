@@ -12,6 +12,7 @@ type ChattingUser = {
   id: string;
   avatar: string;
   name: string;
+  username?: string;
 };
 
 type DividerMessage = {
@@ -92,28 +93,33 @@ export default function MessageList(selectedUser: ChattingUser) {
     }
   };
 
-  const sendMessage = async (message: string) => {
-    try {
-      const res = await chatService.sendMessage({
+  const sendMessage = (message: string) => {
+    chatService
+      .sendMessage({
         recipientId: selectedUser.id,
         message,
-      });
-      if (res) {
-        setMessages([...messages, res]);
-        socket.emit('message', { recipientId: selectedUser.id, message: res });
-        if (user?.id !== selectedUser.id) {
-          socket.emit('send-message', {
-            recipient: selectedUser,
+      })
+      .then(res => {
+        if (res) {
+          setMessages([...messages, res]);
+          socket.emit('message', {
+            recipientId: selectedUser.id,
             message: res,
           });
+          if (user?.id !== selectedUser.id) {
+            socket.emit('send-message', {
+              recipient: selectedUser,
+              message: res,
+            });
+          }
         }
-      }
-    } catch (error) {
-      FailureNotification({
-        message: 'Ops! Não foi possível enviar a mensagem.',
-        description: 'Verifique sua conexão e tente novamente',
+      })
+      .catch(() => {
+        FailureNotification({
+          message: 'Ops! Não foi possível enviar a mensagem.',
+          description: 'Verifique sua conexão e tente novamente',
+        });
       });
-    }
   };
 
   return (

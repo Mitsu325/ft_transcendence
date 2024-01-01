@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
@@ -65,5 +65,20 @@ export class UserService {
 
     findEmail(email: string) {
         return this.usersRepository.findOne({ where: { email } });
+    }
+
+    async findUsersByName(name: string) {
+        const users = await this.usersRepository.find({
+            where: [
+                { name: ILike(`%${name}%`) },
+                { username: ILike(`%${name}%`) },
+            ],
+        });
+        return users.map(user => getNonSensitiveUserInfo(user));
+    }
+
+    async getUserSensitiveDataById(userId: string) {
+        const user = await this.findById(userId);
+        return getNonSensitiveUserInfo(user);
     }
 }

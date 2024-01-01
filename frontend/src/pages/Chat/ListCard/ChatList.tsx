@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { List, Input, Divider } from 'antd';
+import { List, Divider, Select, SelectProps } from 'antd';
 import UserListItem from 'components/List/UserListItem';
-import { SearchProps } from 'antd/es/input';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import { socket } from 'socket';
-
-const { Search } = Input;
+import { userService } from 'services/user.api';
 
 type ChattingUser = {
   id: string;
   avatar: string;
   name: string;
+  username?: string;
 };
 
 interface ChatListProps {
@@ -31,13 +30,14 @@ type Chat = {
 };
 
 export default function ChatList({
-  handleUserClick,
   selectedUser,
+  handleUserClick,
 }: ChatListProps) {
   const [chats, setChats] = useState<Chat[]>([]);
-
-  const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
-    console.log(info?.source, value);
+  const [users, setUsers] = useState<SelectProps['options']>([]);
+  const [searchValue, setSearchValue] = useState<string>();
+  let timeout: ReturnType<typeof setTimeout> | null;
+  let currentSearchValue: string;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,19 +79,62 @@ export default function ChatList({
       ]);
     });
 
-    () => {
+    return () => {
       socket.off('message');
       socket.off('send-message');
     };
-  }, []);
+  }, [selectedUser]);
+
+  const handleSearch = (newValue: string) => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    currentSearchValue = newValue;
+
+    const getUsers = () => {
+      userService.searchUserByName(newValue).then(res => {
+        if (currentSearchValue === newValue) {
+          setUsers(res);
+        }
+      });
+    };
+
+    if (newValue) {
+      timeout = setTimeout(getUsers, 300);
+    } else {
+      setUsers([]);
+    }
+  };
+
+  const handleChange = (newValue: string) => {
+    if (newValue) {
+      setSearchValue(newValue);
+      userService.getUserById(newValue).then(res => {
+        if (res) {
+          handleUserClick(res);
+        }
+      });
+    }
+  };
 
   return (
     <>
-      <Search
-        placeholder="Buscar"
+      <Select
+        showSearch
         allowClear
-        onSearch={onSearch}
+        placeholder="Buscar"
         className="input-search mt-12 mb-1"
+        value={searchValue}
+        defaultActiveFirstOption={false}
+        suffixIcon={null}
+        filterOption={false}
+        onSearch={handleSearch}
+        onChange={handleChange}
+        options={(users || []).map(user => ({
+          value: user.id,
+          label: user.username ? `${user.name} | ${user.username}` : user.name,
+        }))}
       />
       <Divider className="border-dark mt-12 mb-1" />
       <List

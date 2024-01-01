@@ -11,6 +11,7 @@ type ChattingUser = {
   id: string;
   avatar: string;
   name: string;
+  username?: string;
 };
 
 const menuItems = [
