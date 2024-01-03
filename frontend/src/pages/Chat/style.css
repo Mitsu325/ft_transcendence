@@ -18,6 +18,7 @@
 
 .list-card {
   max-width: 420px;
+  height: 75vh;
 }
 
 .message-card {
@@ -51,7 +52,7 @@
 }
 
 .chat-list {
-  height: 55vh;
+  height: 54vh;
   overflow-y: auto;
 }
 
