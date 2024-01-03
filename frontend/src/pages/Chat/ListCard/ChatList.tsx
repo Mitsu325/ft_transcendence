@@ -138,7 +138,7 @@ export default function ChatList({
       />
       <Divider className="border-dark mt-12 mb-1" />
       <List
-        className="chat-list scroll"
+        className="chat-list"
         itemLayout="horizontal"
         dataSource={chats}
         renderItem={item => (

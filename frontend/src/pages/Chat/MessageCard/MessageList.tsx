@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Divider, List } from 'antd';
 import AvatarCustom from 'components/Avatar';
 import MessageBox from 'components/Message/MessageBox';
@@ -7,6 +7,7 @@ import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import { socket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
+import InfiniteScroll from 'components/InfiniteScroll';
 
 type ChattingUser = {
   id: string;
@@ -40,24 +41,33 @@ type Message = DividerMessage | TextMessage;
 export default function MessageList(selectedUser: ChattingUser) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const limit = 20;
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await chatService.getMessagesFromChattingUser(
-          selectedUser.id,
-        );
+    setInitialLoadComplete(false);
+    chatService
+      .getMessagesFromChattingUser(selectedUser.id, { page: 1, limit })
+      .then(res => {
         setMessages(res);
-      } catch (error) {
+        setPage(1);
+        setInitialLoadComplete(true);
+        if (res.length < limit) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+      })
+      .catch(() => {
         FailureNotification({
           message: 'Ops! Encontramos algumas falhas durante o processo',
           description:
             'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
         });
-      }
-    };
-
-    fetchData();
+      });
   }, [selectedUser]);
 
   useEffect(() => {
@@ -71,6 +81,18 @@ export default function MessageList(selectedUser: ChattingUser) {
       socket.off('message');
     };
   }, [selectedUser, user]);
+
+  useEffect(() => {
+    if (initialLoadComplete) {
+      scrollToBottom();
+    }
+  }, [initialLoadComplete]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView();
+    }
+  };
 
   const renderComponent = (item: Message) => {
     if (item.type === 'text') {
@@ -122,6 +144,27 @@ export default function MessageList(selectedUser: ChattingUser) {
       });
   };
 
+  const loadMoreMessages = async () => {
+    try {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      const res = await chatService.getMessagesFromChattingUser(
+        selectedUser.id,
+        { page: nextPage, limit },
+      );
+      setMessages(prevMessages => [...res, ...prevMessages]);
+      if (res.length < limit) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      FailureNotification({
+        message: 'Ops! Encontramos algumas falhas durante o processo',
+        description:
+          'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
+      });
+    }
+  };
+
   return (
     <>
       <div className="message-header">
@@ -129,12 +172,18 @@ export default function MessageList(selectedUser: ChattingUser) {
         <h1 className="title ml-12">{selectedUser.name}</h1>
       </div>
       <Divider className="border-dark m-0" />
-      <List
-        className="message-list scroll"
-        itemLayout="horizontal"
-        dataSource={messages}
-        renderItem={item => renderComponent(item)}
-      />
+      <InfiniteScroll
+        customClassName={'message-list'}
+        fetchMoreData={loadMoreMessages}
+        hasMore={hasMore}
+      >
+        <List
+          itemLayout="horizontal"
+          dataSource={messages}
+          renderItem={item => renderComponent(item)}
+        />
+        <div ref={messagesEndRef} />
+      </InfiniteScroll>
       <Divider className="border-dark m-0" />
       <MessageInput handleClick={sendMessage} />
     </>

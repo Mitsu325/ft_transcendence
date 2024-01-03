@@ -7,6 +7,7 @@ import { DirectMessage } from './entities/direct-message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UserService } from 'src/user/user.service';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
+import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
 
 @Injectable()
 export class ChatService {
@@ -77,7 +78,23 @@ export class ChatService {
     async findMessagesFromChattingUser(
         chattingUserId: string,
         loggedUserId: string,
+        pagination: PaginationOptions,
     ) {
+        const { page, limit } = pagination;
+        const totalCount = await this.directMessageRepository.count({
+            where: [
+                {
+                    sender: { id: loggedUserId },
+                    recipient: { id: chattingUserId },
+                },
+                {
+                    sender: { id: chattingUserId },
+                    recipient: { id: loggedUserId },
+                },
+            ],
+        });
+
+        const skip = (page - 1) * limit;
         let messages = await this.directMessageRepository.find({
             where: [
                 {
@@ -91,13 +108,21 @@ export class ChatService {
             ],
             order: { createdAt: 'DESC' },
             relations: ['sender', 'recipient'],
+            skip,
+            take: limit + 1,
         });
+
+        if (!messages.length) {
+            return [];
+        }
+
         messages = messages.reverse();
 
+        const hasNextPage = totalCount > page * limit;
         const formattedMessages = [];
-        let date;
+        let date = messages.length ? messages[0].createdAt : '';
         for (const item of messages) {
-            if (!date || !isSameDay(date, item.createdAt)) {
+            if (!isSameDay(date, item.createdAt)) {
                 date = item.createdAt;
                 formattedMessages.push({
                     type: 'divider',
@@ -112,6 +137,15 @@ export class ChatService {
                 text: item.message,
                 senderUser,
                 hour: format(item.createdAt, 'HH:mm'),
+            });
+        }
+        if (messages.length > limit) {
+            formattedMessages.shift();
+        }
+        if (!hasNextPage) {
+            formattedMessages.unshift({
+                type: 'divider',
+                text: format(messages[0].createdAt, 'MM/dd/yyyy'),
             });
         }
         return formattedMessages;

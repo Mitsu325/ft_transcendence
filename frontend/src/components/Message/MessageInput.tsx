@@ -26,7 +26,6 @@ const MessageInput = ({ handleClick }: MessageInputProps) => {
     <div style={{ position: 'relative' }}>
       <TextArea
         style={{ borderRadius: '0', paddingRight: '2.8rem' }}
-        className="scroll"
         autoSize={{ minRows: 2, maxRows: 6 }}
         placeholder="Escreva uma mensagem"
         value={message}

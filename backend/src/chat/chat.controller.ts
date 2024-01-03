@@ -15,8 +15,11 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiParam,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { SendMessageDto } from './dto/send-message.dto';
+import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
 
 @ApiTags('chat')
 @Controller('chat')
@@ -36,12 +39,19 @@ export class ChatController {
         type: 'string',
         description: 'ID who you are talking to',
     })
+    @ApiQuery({ name: 'limit', type: Number, required: false })
+    @ApiQuery({ name: 'page', type: Number, required: false })
     @ApiBearerAuth('access-token')
     @Get('messages/:chattingUserId')
-    async findMessagesFromChattingUser(@Param() params: any, @Request() req) {
+    async findMessagesFromChattingUser(
+        @Param() params: any,
+        @Pagination() pagination: PaginationOptions,
+        @Request() req,
+    ) {
         return await this.chatService.findMessagesFromChattingUser(
             params.chattingUserId,
             req.user.sub,
+            pagination,
         );
     }
 
