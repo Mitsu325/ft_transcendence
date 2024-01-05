@@ -10,9 +10,11 @@ import {
   RoomGame,
   GameData,
   MatchPadles,
+  MatchScores,
   Ball,
   initialPadles,
   initialBall,
+  initialScores,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 
@@ -52,6 +54,9 @@ export const Game = () => {
   });
   const [padles, setPadles] = React.useState<{ [roomId: string]: MatchPadles }>(
     { [socket.id]: initialPadles },
+  );
+  const [scores, setScores] = React.useState<{ [roomId: string]: MatchScores }>(
+    { [socket.id]: initialScores },
   );
   const [newMessage, setNewMessage] = React.useState('');
   const [visible, setVisible] = React.useState(false);
@@ -107,14 +112,17 @@ export const Game = () => {
       }));
     });
 
-    // socket.on('matchStarted', (roomId, ball) => {
-    //   console.log('matchStarted', roomId, ball);
-    // });
-
     socket.on('movePadles', (roomId, receivedPadles) => {
       setPadles(prevPadles => ({
         ...prevPadles,
         [roomId]: receivedPadles,
+      }));
+    });
+
+    socket.on('matchScores', (roomId, receivedScores) => {
+      setScores(prevScores => ({
+        ...prevScores,
+        [roomId]: receivedScores,
       }));
     });
 
@@ -130,7 +138,6 @@ export const Game = () => {
         connected: false,
         status: 'DISCONNECTED',
       }));
-      console.log(gameData);
     };
   }, [user]);
 
@@ -213,6 +220,7 @@ export const Game = () => {
               roomId={userRoomId}
               matchBall={balls[userRoomId]}
               matchPadles={padles[userRoomId]}
+              matchScores={scores[userRoomId]}
               onSendKey={sendKey}
             />
           </div>

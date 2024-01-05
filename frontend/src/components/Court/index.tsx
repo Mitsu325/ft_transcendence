@@ -3,38 +3,43 @@ import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
 import {
   MatchPadles,
   Ball,
-  initialBall,
-  initialPadles,
+  // initialBall,
+  // initialPadles,
+  MatchScores,
 } from 'interfaces/gameInterfaces/interfaces';
 
 interface CourtProps {
   roomId: string;
   matchBall: any;
   matchPadles: any;
+  matchScores: any;
   onSendKey: (type: string, key: string) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
 
 const Court: React.FC<CourtProps> = ({
-  roomId,
+  // roomId,
   matchBall,
   matchPadles,
+  matchScores,
   onSendKey,
 }) => {
   const [ball, setBall] = React.useState<Ball>();
   const [padles, setPadles] = React.useState<MatchPadles>();
+  const [scores, setScores] = React.useState<MatchScores>();
 
   React.useEffect(() => {
     setBall(matchBall);
-    // console.log(roomId);
-    // console.log('court ball', ball);
   }, [matchBall]);
 
   React.useEffect(() => {
     setPadles(matchPadles);
-    // console.log('court padles', matchPadles);
   }, [matchPadles]);
+
+  React.useEffect(() => {
+    setScores(matchScores);
+  }, [matchScores]);
 
   React.useEffect(() => {
     const sendKeyEvent = (e: any) => {
@@ -103,7 +108,7 @@ const Court: React.FC<CourtProps> = ({
             fontSize: '50px',
           }}
         >
-          {/* {match?.score1} */}
+          {scores?.score1}
         </Text>
         <Text
           x={(courtDimensions.width / 2 + 20).toString()}
@@ -113,7 +118,7 @@ const Court: React.FC<CourtProps> = ({
             fontSize: '50px',
           }}
         >
-          {/* {match?.score2} */}
+          {scores?.score2}
         </Text>
         {ball && (
           <Circle

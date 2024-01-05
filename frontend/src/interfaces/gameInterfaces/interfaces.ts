@@ -46,6 +46,11 @@ export interface MatchPadles {
   player2: { y: number; playerSpeed: number };
 }
 
+export interface MatchScores {
+  score1: number;
+  score2: number;
+}
+
 export const initialBall: Ball = {
   x: 580 / 2,
   y: 320 / 2,
@@ -59,4 +64,9 @@ export const initialBall: Ball = {
 export const initialPadles: MatchPadles = {
   player1: { y: 135, playerSpeed: 1.5 },
   player2: { y: 135, playerSpeed: 1.5 },
+};
+
+export const initialScores: MatchScores = {
+  score1: 0,
+  score2: 0,
 };

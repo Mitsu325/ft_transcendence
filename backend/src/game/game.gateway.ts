@@ -10,7 +10,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, BallMoverService, Player, Room, Game, MatchPadle, FinalMatch } from './game.service';
+import { GameService, BallMoverService, PadlesMoverService, ScoresService, Player, Room, Game, MatchPadle, FinalMatch } from './game.service';
 
 interface Padle {
   type: string;
@@ -79,14 +79,15 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         player1: { ...user },
         player2: null,
         padles: initialPadles,
+        padlesService: null,
         scores: initialScores,
+        scoresService: null,
         ball: initialBall,
       };
     } else {
       console.log('The Player is already in the room:', client.id);
     }
     this.server.emit('game', game);
-    console.log('create room', game.rooms[client.id].room_id);
   }
 
   @SubscribeMessage('GetInRoom')
@@ -100,7 +101,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.log('The Player is already in the room:', client.id);
     }
-    console.log('geting room', game.rooms[room.room_id].room_id);
   }
 
   @SubscribeMessage('startMatch')
@@ -115,13 +115,16 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (game.rooms[room]) {
       const ballMoverService = new BallMoverService();
+      game.rooms[room].scoresService = new ScoresService();
       const initD = Date.now() / 2 === 0 ? 1 : -1;
       game.rooms[room].ball = { ...initialBall, xdirection: initD, ydirection: initD };
+      game.rooms[room].scores = initialScores;
       loopGame = setInterval(async () => {
         try {
           game.rooms[room].ball = await ballMoverService.moveBall(game.rooms[room].ball);
           this.server.to(room).emit('matchStarted', room, game.rooms[room].ball);
-          // console.log('room: ', client.id, 'ball: ', game.rooms[room].ball);
+          await game.rooms[room].scoresService.handleScores(game.rooms[room]);
+          this.server.to(room).emit('matchScores', room, game.rooms[room].scores);
         }
         catch (error) { }
       }, 1000 / 60);
@@ -139,8 +142,13 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     //   this.gameService.latencyGame(padle.room, player, game, this.server);
     // }
 
+    if (!game.rooms[padle.room].padlesService) {
+      game.rooms[padle.room].padlesService = new PadlesMoverService();
+      console.log('create padle instance', game.rooms[padle.room].room_id, game.rooms[padle.room].padlesService)
+    }
+
     if (game.rooms[padle.room] && direction === 'GO') {
-      game.rooms[padle.room].padles = await this.gameService.movePadle(
+      game.rooms[padle.room].padles = await game.rooms[padle.room].padlesService.movePadle(
         padle,
         initialPadles,
         player,
