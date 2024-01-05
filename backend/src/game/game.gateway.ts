@@ -83,6 +83,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         scores: initialScores,
         scoresService: null,
         ball: initialBall,
+        ballService: null,
       };
     } else {
       console.log('The Player is already in the room:', client.id);
@@ -114,20 +115,20 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (game.rooms[room]) {
-      const ballMoverService = new BallMoverService();
+      game.rooms[room].ballService = new BallMoverService();
       game.rooms[room].scoresService = new ScoresService();
       const initD = Date.now() / 2 === 0 ? 1 : -1;
       game.rooms[room].ball = { ...initialBall, xdirection: initD, ydirection: initD };
       game.rooms[room].scores = initialScores;
       loopGame = setInterval(async () => {
         try {
-          game.rooms[room].ball = await ballMoverService.moveBall(game.rooms[room].ball);
+          game.rooms[room].ball = await game.rooms[room].ballService.moveBall(game.rooms[room].ball);
           this.server.to(room).emit('matchStarted', room, game.rooms[room].ball);
           await game.rooms[room].scoresService.handleScores(game.rooms[room]);
           this.server.to(room).emit('matchScores', room, game.rooms[room].scores);
         }
         catch (error) { }
-      }, 1000 / 60);
+      }, 1000 / 50);
     } else {
       clearInterval(loopGame);
     }
@@ -144,7 +145,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!game.rooms[padle.room].padlesService) {
       game.rooms[padle.room].padlesService = new PadlesMoverService();
-      console.log('create padle instance', game.rooms[padle.room].room_id, game.rooms[padle.room].padlesService)
     }
 
     if (game.rooms[padle.room] && direction === 'GO') {

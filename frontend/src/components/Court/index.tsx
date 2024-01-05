@@ -3,8 +3,6 @@ import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
 import {
   MatchPadles,
   Ball,
-  // initialBall,
-  // initialPadles,
   MatchScores,
 } from 'interfaces/gameInterfaces/interfaces';
 
@@ -19,7 +17,6 @@ interface CourtProps {
 const courtDimensions = { width: 580, height: 320 };
 
 const Court: React.FC<CourtProps> = ({
-  // roomId,
   matchBall,
   matchPadles,
   matchScores,

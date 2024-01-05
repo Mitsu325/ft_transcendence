@@ -32,6 +32,7 @@ export interface Room {
   scores: MatchScore;
   scoresService: ScoresService;
   ball: Ball;
+  ballService: BallMoverService;
 }
 
 export interface Game {
@@ -195,5 +196,6 @@ export class GameService {
       }
       delete game.rooms[roomId];
     }
+    console.log('rooms: ', game.rooms);
   }
 }

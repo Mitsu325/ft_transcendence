@@ -198,9 +198,9 @@ export const Game = () => {
     socket.emit('sendKey', padleObj);
   };
 
-  // React.useEffect(() => {
-  //   console.log('balls', balls);
-  // }, [balls]);
+  React.useEffect(() => {
+    console.log('gameData: ', gameData);
+  }, [gameData]);
 
   return (
     <>
