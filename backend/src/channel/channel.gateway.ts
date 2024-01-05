@@ -74,8 +74,6 @@ export class ChannelGateway
         message: string,
         userName: string,
     ) {
-        console.log(`Recebida mensagem na sala ${roomId}: ${message}`);
-        console.log(userName, roomId);
         this.server
             .to(roomId)
             .emit('message', { message: message, userName: userName });
