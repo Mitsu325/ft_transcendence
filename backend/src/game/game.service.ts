@@ -7,6 +7,11 @@ export interface Player {
   avatar: null | string;
 }
 
+export interface Players {
+  player1: string;
+  player2: string;
+}
+
 export interface Room {
   room_id: string;
   player1: Player;
@@ -70,6 +75,18 @@ export class BallMoverService {
 
     if (xpos < 15 || xpos > courtDimensions.width - 15) {
       room.scores = await room.scoresService.handleScores(room);
+    }
+
+    if (room.ball.x < 15) {
+      if (room.ball.y > room.padles.player1.y - 5 && room.ball.y < room.padles.player1.y + 55) {
+        room.ball.xdirection *= -1;
+      }
+    }
+
+    if (room.ball.x > courtDimensions.width - 15) {
+      if (room.ball.y > room.padles.player2.y - 5 && room.ball.y < room.padles.player2.y + 55) {
+        room.ball.xdirection *= -1;
+      }
     }
 
     if (xpos > courtDimensions.width - room.ball.width || xpos < room.ball.width) {
@@ -174,6 +191,5 @@ export class GameService {
       }
       delete game.rooms[roomId];
     }
-    // console.log('rooms: ', game.rooms);
   }
 }

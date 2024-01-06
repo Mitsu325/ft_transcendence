@@ -99,6 +99,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       client.join(room.room_id);
       game.rooms[room.room_id].player2 = { ...room.player2 };
       this.server.emit('game', game);
+      this.server.to(room.room_id).emit('players', game.rooms[room.room_id].player1, game.rooms[room.room_id].player2);
     } else {
       console.log('The Player is already in the room:', client.id);
     }

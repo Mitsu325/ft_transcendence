@@ -15,6 +15,7 @@ import {
   initialPadles,
   initialBall,
   initialScores,
+  Players,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 
@@ -49,6 +50,10 @@ export const Game = () => {
   }, []);
 
   const [userRoomId, setUserRoomId] = React.useState<string>(socket.id);
+  const [players, setPlayers] = React.useState<Players>({
+    player1: 'Anfitrião',
+    player2: 'Convidado',
+  });
   const [balls, setBalls] = React.useState<{ [roomId: string]: Ball }>({
     [socket.id]: initialBall,
   });
@@ -112,6 +117,13 @@ export const Game = () => {
       }));
     });
 
+    socket.on('players', (player1, player2) => {
+      setPlayers({
+        player1: player1.name,
+        player2: player2?.name ?? '',
+      });
+    });
+
     socket.on('movePadles', (roomId, receivedPadles) => {
       setPadles(prevPadles => ({
         ...prevPadles,
@@ -121,13 +133,6 @@ export const Game = () => {
         },
       }));
     });
-
-    // socket.on('movePadles', (roomId, receivedPadles) => {
-    //   setPadles(prevPadles => ({
-    //     ...prevPadles,
-    //     [roomId]: receivedPadles,
-    //   }));
-    // });
 
     socket.on('movePadles', (roomId, receivedPadles) => {
       setPadles(prevPadles => ({
@@ -148,13 +153,6 @@ export const Game = () => {
         },
       }));
     });
-
-    // socket.on('matchScores', (roomId, receivedScores) => {
-    //   setScores(prevScores => ({
-    //     ...prevScores,
-    //     [roomId]: receivedScores,
-    //   }));
-    // });
 
     socket.on('ping', () => {
       console.log('ping');
@@ -247,6 +245,9 @@ export const Game = () => {
           }}
         >
           <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
+          <h2>
+            {players.player1} X {players.player2}
+          </h2>
           <div>
             <Court
               roomId={userRoomId}

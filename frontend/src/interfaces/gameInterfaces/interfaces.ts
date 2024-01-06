@@ -4,6 +4,11 @@ export interface Player {
   avatar: string | null;
 }
 
+export interface Players {
+  player1: string;
+  player2: string;
+}
+
 export interface RoomGame {
   room_id: string;
   player1: Player;
