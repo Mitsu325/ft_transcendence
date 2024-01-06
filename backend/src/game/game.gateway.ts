@@ -122,9 +122,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       game.rooms[room].scores = initialScores;
       loopGame = setInterval(async () => {
         try {
-          game.rooms[room].ball = await game.rooms[room].ballService.moveBall(game.rooms[room].ball);
+          await game.rooms[room].ballService.moveBall(game.rooms[room]);
           this.server.to(room).emit('matchStarted', room, game.rooms[room].ball);
-          await game.rooms[room].scoresService.handleScores(game.rooms[room]);
           this.server.to(room).emit('matchScores', room, game.rooms[room].scores);
         }
         catch (error) { }

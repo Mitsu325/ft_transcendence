@@ -53,10 +53,10 @@ export const Game = () => {
     [socket.id]: initialBall,
   });
   const [padles, setPadles] = React.useState<{ [roomId: string]: MatchPadles }>(
-    { [socket.id]: initialPadles },
+    { ['0']: initialPadles },
   );
   const [scores, setScores] = React.useState<{ [roomId: string]: MatchScores }>(
-    { [socket.id]: initialScores },
+    { ['0']: initialScores },
   );
   const [newMessage, setNewMessage] = React.useState('');
   const [visible, setVisible] = React.useState(false);
@@ -115,16 +115,46 @@ export const Game = () => {
     socket.on('movePadles', (roomId, receivedPadles) => {
       setPadles(prevPadles => ({
         ...prevPadles,
-        [roomId]: receivedPadles,
+        [roomId]: {
+          ...(prevPadles[roomId] || {}),
+          ...receivedPadles,
+        },
+      }));
+    });
+
+    // socket.on('movePadles', (roomId, receivedPadles) => {
+    //   setPadles(prevPadles => ({
+    //     ...prevPadles,
+    //     [roomId]: receivedPadles,
+    //   }));
+    // });
+
+    socket.on('movePadles', (roomId, receivedPadles) => {
+      setPadles(prevPadles => ({
+        ...prevPadles,
+        [roomId]: {
+          ...(prevPadles[roomId] || {}),
+          ...receivedPadles,
+        },
       }));
     });
 
     socket.on('matchScores', (roomId, receivedScores) => {
       setScores(prevScores => ({
         ...prevScores,
-        [roomId]: receivedScores,
+        [roomId]: {
+          ...(prevScores[roomId] || {}),
+          ...receivedScores,
+        },
       }));
     });
+
+    // socket.on('matchScores', (roomId, receivedScores) => {
+    //   setScores(prevScores => ({
+    //     ...prevScores,
+    //     [roomId]: receivedScores,
+    //   }));
+    // });
 
     socket.on('ping', () => {
       console.log('ping');
@@ -198,9 +228,11 @@ export const Game = () => {
     socket.emit('sendKey', padleObj);
   };
 
-  React.useEffect(() => {
-    console.log('gameData: ', gameData);
-  }, [gameData]);
+  // React.useEffect(() => {
+  // console.log('padles: ', padles);
+  // console.log('scores: ', scores);
+  // }, [padles]);
+  // }, [scores]);
 
   return (
     <>

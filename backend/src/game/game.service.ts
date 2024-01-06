@@ -1,22 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Server } from 'socket.io';
 
-// export const initialMatch: Match = {
-//   matchStatus: 'WAITING',
-//   ball: {
-//     x: 580 / 2,
-//     y: 320 / 2,
-//     width: 5,
-//     xdirection: 1,
-//     ydirection: 1,
-//     xspeed: 2.8,
-//     yspeed: 2.2
-//   },
-//   score1: 0,
-//   score2: 0,
-//   courtDimensions: { width: 580, height: 320 },
-// };
-
 export interface Player {
   id: string;
   name: string;
@@ -77,21 +61,25 @@ const courtDimensions = { width: 580, height: 320 };
 
 @Injectable()
 export class BallMoverService {
-  async moveBall(ball: Ball): Promise<Ball> {
-    const xpos = ball.x + ball.xspeed * ball.xdirection;
-    const ypos = ball.y + ball.yspeed * ball.ydirection;
+  async moveBall(room: Room): Promise<void> {
+    const xpos = room.ball.x + room.ball.xspeed * room.ball.xdirection;
+    const ypos = room.ball.y + room.ball.yspeed * room.ball.ydirection;
 
-    ball.x = xpos;
-    ball.y = ypos;
+    room.ball.x = xpos;
+    room.ball.y = ypos;
 
-    if (xpos > courtDimensions.width - ball.width || xpos < ball.width) {
-      ball.xdirection *= -1;
+    if (xpos < 15 || xpos > courtDimensions.width - 15) {
+      room.scores = await room.scoresService.handleScores(room);
     }
 
-    if (ypos > courtDimensions.height - ball.width || ypos < ball.width) {
-      ball.ydirection *= -1;
+    if (xpos > courtDimensions.width - room.ball.width || xpos < room.ball.width) {
+      room.ball.xdirection *= -1;
     }
-    return ball;
+
+    if (ypos > courtDimensions.height - room.ball.width || ypos < room.ball.width) {
+      room.ball.ydirection *= -1;
+    }
+    return void 0;
   }
 }
 
@@ -125,31 +113,21 @@ export class PadlesMoverService {
 
 @Injectable()
 export class ScoresService {
-  async handleScores(room: Room): Promise<void> {
-    if (room.ball.x < 15) {
-      if (room.ball.y > room.padles.player1.y - 5 && room.ball.y < room.padles.player1.y + 55) {
-        room.ball.xdirection *= -1;
-      }
-    }
-
-    if (room.ball.x > courtDimensions.width - 15) {
-      if (room.ball.y > room.padles.player2.y - 5 && room.ball.y < room.padles.player2.y + 55) {
-        room.ball.xdirection *= -1;
-      }
-    }
+  async handleScores(room: Room): Promise<MatchScore> {
+    const updatedScores: MatchScore = { ...room.scores };
 
     if (room.ball.x < room.ball.width) {
-      room.scores.score2++;
+      updatedScores.score2++;
       room.ball.x = courtDimensions.width / 2;
       room.ball.y = courtDimensions.height / 2;
     }
 
     if (room.ball.x > courtDimensions.width - room.ball.width) {
-      room.scores.score1++;
+      updatedScores.score1++;
       room.ball.x = courtDimensions.width / 2;
       room.ball.y = courtDimensions.height / 2;
     }
-    return void 0;
+    return updatedScores;
   }
 }
 
@@ -196,6 +174,6 @@ export class GameService {
       }
       delete game.rooms[roomId];
     }
-    console.log('rooms: ', game.rooms);
+    // console.log('rooms: ', game.rooms);
   }
 }
