@@ -110,6 +110,12 @@ export const Game = () => {
       }));
     });
 
+    socket.on('cleanRoom', receivedRoom => {
+      setScores({ [receivedRoom.room_id]: receivedRoom.scores });
+      setBalls({ [receivedRoom.room_id]: receivedRoom.ball });
+      setPadles({ [receivedRoom.room_id]: receivedRoom.padles });
+    });
+
     socket.on('matchStarted', (roomId, recevedBall) => {
       setBalls(prevBalls => ({
         ...prevBalls,
@@ -170,11 +176,13 @@ export const Game = () => {
   }, [user]);
 
   const createRoom = () => {
-    socket.emit('CreateRoom', userPlayer);
     setGameData(prevGameData => ({
       ...prevGameData,
+      status: 'CREATED',
+      message: 'Sala criada',
       match: true,
     }));
+    socket.emit('CreateRoom', userPlayer);
     setUserRoomId(socket.id);
   };
 
@@ -227,10 +235,8 @@ export const Game = () => {
   };
 
   // React.useEffect(() => {
-  // console.log('padles: ', padles);
-  // console.log('scores: ', scores);
-  // }, [padles]);
-  // }, [scores]);
+  //   console.log('gameData: ', gameData);
+  // }, [gameData]);
 
   return (
     <>
