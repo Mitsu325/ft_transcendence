@@ -97,8 +97,6 @@ export class BallMoverService {
     if (ypos > courtDimensions.height - room.ball.width || ypos < room.ball.width) {
       room.ball.ydirection *= -1;
     }
-
-    // console.log(room);
     return void 0;
   }
 }

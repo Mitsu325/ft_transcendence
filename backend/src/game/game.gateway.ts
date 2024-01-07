@@ -60,7 +60,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (roomId) {
       this.gameService.removeRoomAndNotify(roomId, playerId, game, this.server);
-      // clearInterval(game.rooms[roomId].loopGame);
       client.leave(roomId);
     }
     if (playerId) {
@@ -86,9 +85,6 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         ballService: null,
         loopGame: null,
       };
-      // } else {
-      // console.log('The Player is already in the room:', client.id);
-      // }
       this.server.emit('game', game);
       this.server.emit('cleanRoom', game.rooms[client.id]);
     }
