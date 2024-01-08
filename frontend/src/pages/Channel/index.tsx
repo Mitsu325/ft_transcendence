@@ -23,6 +23,7 @@ const Channels: React.FC = () => {
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
   const [component, setComponent] = useState('modal');
   const [currentRoom, setCurrentRoom] = useState<string>('');
+  const [activeChannel, setActiveChannel] = useState<string | null>(null);
   const user = useAuth()?.user;
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const Channels: React.FC = () => {
   const handleChatClick = async (roomId: string) => {
     const channel = channels.find(item => item.id === roomId);
     const token = localStorage.getItem('channel-token');
+    setActiveChannel(roomId);
     const userName = user?.name ?? '';
 
     if (!channel) {
@@ -138,9 +140,15 @@ const Channels: React.FC = () => {
             <div>
               {channels.map(item => (
                 <div
-                  className="channel-item"
+                  className={`channel-item ${
+                    activeChannel === item.id ? 'active' : ''
+                  }`}
                   key={item.id}
                   onClick={() => handleChatClick(item.id)}
+                  style={{
+                    borderLeft:
+                      activeChannel === item.id ? '5px solid #1677FF' : 'none',
+                  }}
                 >
                   <div className="icon-channel">
                     <WechatOutlined className="chat-icon" />
@@ -173,7 +181,7 @@ const Channels: React.FC = () => {
           )}
         </div>
 
-        <div className="chat">
+        <div className="messages">
           {component === 'create' && <CreateChannel />}
           {component === 'conversation' && (
             <>

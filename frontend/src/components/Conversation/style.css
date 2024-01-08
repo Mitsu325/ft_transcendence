@@ -32,3 +32,9 @@
 .message-content {
   flex-grow: 1;
 }
+
+.send-button {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+}

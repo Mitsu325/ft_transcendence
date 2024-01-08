@@ -9,6 +9,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
 import './style.css';
 
+const { TextArea } = Input;
 interface Message {
   userName: string;
   message: string;
@@ -63,6 +64,12 @@ const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
     };
   }, [roomId, userPlayer.name, messages]);
 
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setNewMessage(event.target.value);
+  };
+
   const handleSendMessage = async () => {
     sendMessage(roomId, newMessage, userPlayer.name);
 
@@ -97,17 +104,21 @@ const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
           </div>
         ))}
       </div>
-      <div className="chat-input">
-        <Input
-          type="text"
+      <div style={{ position: 'relative' }}>
+        <TextArea
+          style={{ borderRadius: '0', paddingRight: '2.8rem' }}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+          placeholder="Escreva uma mensagem"
           value={newMessage}
-          onChange={e => setNewMessage(e.target.value)}
-          placeholder="Digite uma mensagem"
+          onChange={handleInputChange}
         />
         <Button
-          onClick={handleSendMessage}
+          className="send-button"
           type="primary"
           icon={<SendOutlined />}
+          size={'middle'}
+          onClick={handleSendMessage}
+          disabled={!newMessage}
         />
       </div>
     </div>
