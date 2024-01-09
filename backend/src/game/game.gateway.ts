@@ -179,8 +179,9 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('PlayerConnected')
   handlePlayerConnected(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
     const existingPlayer = game.players[client.id];
+    const playerAlreadyInGame = Object.values(game.players).find(existingPlayer => existingPlayer.id === player.id);
 
-    if (!existingPlayer) {
+    if (!existingPlayer && !playerAlreadyInGame) {
       game.players[client.id] = { id: player.id, name: player.username, avatar: player.avatar };
     } else {
       console.log('Player with the same ID already exists:', player.id);

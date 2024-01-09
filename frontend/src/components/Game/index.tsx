@@ -101,7 +101,6 @@ export const Game = () => {
 
     socket.on('playerLeftRoom', (data: { message: string }) => {
       setNewMessage(data.message);
-
       setGameData(prevGameData => ({
         ...prevGameData,
         status: 'LEAVE',
