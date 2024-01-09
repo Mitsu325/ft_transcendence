@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Socket } from 'dgram';
 import { Server } from 'socket.io';
 
 export interface Player {
@@ -22,7 +23,7 @@ export interface Room {
   scoresService: ScoresService;
   ball: Ball;
   ballService: BallMoverService;
-  loopGame: NodeJS.Timeout;
+  isRunning: boolean;
 }
 
 export interface Game {

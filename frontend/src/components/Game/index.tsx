@@ -140,16 +140,6 @@ export const Game = () => {
       }));
     });
 
-    socket.on('movePadles', (roomId, receivedPadles) => {
-      setPadles(prevPadles => ({
-        ...prevPadles,
-        [roomId]: {
-          ...(prevPadles[roomId] || {}),
-          ...receivedPadles,
-        },
-      }));
-    });
-
     socket.on('matchScores', (roomId, receivedScores) => {
       setScores(prevScores => ({
         ...prevScores,
@@ -233,10 +223,6 @@ export const Game = () => {
     };
     socket.emit('sendKey', padleObj);
   };
-
-  // React.useEffect(() => {
-  //   console.log('gameData: ', gameData);
-  // }, [gameData]);
 
   return (
     <>
