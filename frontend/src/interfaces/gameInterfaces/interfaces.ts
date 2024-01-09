@@ -56,6 +56,10 @@ export interface MatchScores {
   score2: number;
 }
 
+export interface MatchLevel {
+  level: number;
+}
+
 export const initialBall: Ball = {
   x: 580 / 2,
   y: 320 / 2,

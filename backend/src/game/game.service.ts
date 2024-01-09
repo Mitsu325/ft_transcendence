@@ -24,6 +24,7 @@ export interface Room {
   ball: Ball;
   ballService: BallMoverService;
   isRunning: boolean;
+  level: number;
 }
 
 export interface Game {
@@ -69,8 +70,8 @@ const courtDimensions = { width: 580, height: 320 };
 @Injectable()
 export class BallMoverService {
   async moveBall(room: Room): Promise<void> {
-    const xpos = room.ball.x + room.ball.xspeed * room.ball.xdirection;
-    const ypos = room.ball.y + room.ball.yspeed * room.ball.ydirection;
+    const xpos = room.ball.x + room.ball.xspeed * room.ball.xdirection * room.level;
+    const ypos = room.ball.y + room.ball.yspeed * room.ball.ydirection * room.level;
 
     room.ball.x = xpos;
     room.ball.y = ypos;

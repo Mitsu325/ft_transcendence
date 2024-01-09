@@ -11,6 +11,7 @@ import {
   GameData,
   MatchPadles,
   MatchScores,
+  MatchLevel,
   Ball,
   initialPadles,
   initialBall,
@@ -63,6 +64,10 @@ export const Game = () => {
   const [scores, setScores] = React.useState<{ [roomId: string]: MatchScores }>(
     { ['0']: initialScores },
   );
+  const [level, setLevel] = React.useState<{ [roomId: string]: MatchLevel }>({
+    ['0']: { level: 1 },
+  });
+
   const [newMessage, setNewMessage] = React.useState('');
   const [visible, setVisible] = React.useState(false);
 
@@ -149,6 +154,16 @@ export const Game = () => {
       }));
     });
 
+    socket.on('matchLevel', (roomId, receivedLevel) => {
+      setLevel(prevLevel => ({
+        ...prevLevel,
+        [roomId]: {
+          ...(prevLevel[roomId] || {}),
+          ...receivedLevel,
+        },
+      }));
+    });
+
     socket.on('ping', () => {
       console.log('ping');
     });
@@ -223,6 +238,17 @@ export const Game = () => {
     socket.emit('sendKey', padleObj);
   };
 
+  const sendLevel = (level: number) => {
+    const player = userPlayer.id;
+    const room = userRoomId;
+    const matchLevel = {
+      level,
+      player,
+      room,
+    };
+    socket.emit('sendLevel', matchLevel);
+  };
+
   return (
     <>
       {gameData.match && gameData.connected ? (
@@ -245,7 +271,9 @@ export const Game = () => {
               matchBall={balls[userRoomId]}
               matchPadles={padles[userRoomId]}
               matchScores={scores[userRoomId]}
+              matchLevel={level[userRoomId]}
               onSendKey={sendKey}
+              onSendLevel={sendLevel}
             />
           </div>
           <div style={{ padding: '20px' }}>

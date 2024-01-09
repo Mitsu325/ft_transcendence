@@ -84,6 +84,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         ball: initialBall,
         ballService: null,
         isRunning: false,
+        level: 1,
       };
       this.server.emit('game', game);
       this.server.emit('cleanRoom', game.rooms[client.id]);
@@ -158,6 +159,14 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         player,
       );
       this.server.to(padle.room).emit('movePadles', padle.room, game.rooms[padle.room].padles);
+    }
+  }
+
+  @SubscribeMessage('sendLevel')
+  async handleSendLevel(@MessageBody() matchLevel: any, @ConnectedSocket() client: Socket) {
+    if (game.rooms[matchLevel.room]) {
+      game.rooms[matchLevel.room].level = matchLevel.level;
+      this.server.to(matchLevel.room).emit('matchLevel', matchLevel.room, game.rooms[matchLevel.room].level);
     }
   }
 

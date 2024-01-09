@@ -6,6 +6,7 @@ import {
   MatchPadles,
   Ball,
   MatchScores,
+  MatchLevel,
 } from 'interfaces/gameInterfaces/interfaces';
 
 interface CourtProps {
@@ -13,7 +14,9 @@ interface CourtProps {
   matchBall: Ball;
   matchPadles: MatchPadles;
   matchScores: MatchScores;
+  matchLevel: MatchLevel;
   onSendKey: (type: string, key: string) => void;
+  onSendLevel: (level: number) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
@@ -24,21 +27,38 @@ const courtCollorOptions = [
   { label: 'azul', value: 'rgb(18, 10, 143)' },
 ];
 
+const levelMatchOptions = [
+  { label: 'fácil', value: 1 },
+  { label: 'médio', value: 1.5 },
+  { label: 'difícil', value: 2 },
+];
+
 const Court: React.FC<CourtProps> = ({
   matchBall,
   matchPadles,
   matchScores,
+  matchLevel,
   onSendKey,
+  onSendLevel,
 }) => {
   const [ball, setBall] = React.useState<Ball>();
   const [padles, setPadles] = React.useState<MatchPadles>();
   const [scores, setScores] = React.useState<MatchScores>();
   const [courtCollor, setCourtCollor] = React.useState<string>('rgb(0, 0, 0)');
+  const [levelMatch, setLevelMatch] = React.useState<number>(1);
+  // const [selectedLevel, setselectedLevel] = React.useState<MatchLevel>();
 
-  const onChange = ({ target: { value } }: RadioChangeEvent) => {
-    console.log('radio4 checked', value);
+  const onChangeCollor = ({ target: { value } }: RadioChangeEvent) => {
     setCourtCollor(value);
   };
+
+  const onChangeLevel = ({ target: { value } }: RadioChangeEvent) => {
+    setLevelMatch(value);
+  };
+
+  React.useEffect(() => {
+    onSendLevel(levelMatch);
+  }, [levelMatch]);
 
   React.useEffect(() => {
     setBall(matchBall);
@@ -51,6 +71,11 @@ const Court: React.FC<CourtProps> = ({
   React.useEffect(() => {
     setScores(matchScores);
   }, [matchScores]);
+
+  React.useEffect(() => {
+    // setselectedLevel(matchLevel);
+    console.log(matchLevel);
+  }, [matchLevel]);
 
   React.useEffect(() => {
     const sendKeyEvent = (e: any) => {
@@ -149,13 +174,30 @@ const Court: React.FC<CourtProps> = ({
       </SVG>
       <div style={{ marginTop: '10px' }}>
         <h3>...escolha a cor da quadra...</h3>
+      </div>
+      <div style={{ marginTop: '5px' }}>
         <Radio.Group
           options={courtCollorOptions}
-          onChange={onChange}
+          onChange={onChangeCollor}
           value={courtCollor}
           optionType="button"
           buttonStyle="solid"
         />
+      </div>
+      <div style={{ marginTop: '10px' }}>
+        <h3>...escolha o nível do jogo...</h3>
+      </div>
+      <div style={{ marginTop: '5px' }}>
+        <Radio.Group
+          options={levelMatchOptions}
+          onChange={onChangeLevel}
+          value={levelMatch}
+          optionType="button"
+          buttonStyle="solid"
+        />
+      </div>
+      <div style={{ marginTop: '10px' }}>
+        <h3>... Nível do jogo = {levelMatch.toString()} ...</h3>
       </div>
     </div>
   );
