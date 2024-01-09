@@ -166,7 +166,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   async handleSendLevel(@MessageBody() matchLevel: any, @ConnectedSocket() client: Socket) {
     if (game.rooms[matchLevel.room]) {
       game.rooms[matchLevel.room].level = matchLevel.level;
-      this.server.to(matchLevel.room).emit('matchLevel', matchLevel.room, game.rooms[matchLevel.room].level);
+      this.server.to(matchLevel.room).emit('matchLevel', matchLevel.room, { level: matchLevel.level });
     }
   }
 

@@ -155,6 +155,8 @@ export const Game = () => {
     });
 
     socket.on('matchLevel', (roomId, receivedLevel) => {
+      // console.log('room: ', roomId);
+      // console.log('level: ', receivedLevel);
       setLevel(prevLevel => ({
         ...prevLevel,
         [roomId]: {
@@ -248,6 +250,10 @@ export const Game = () => {
     };
     socket.emit('sendLevel', matchLevel);
   };
+
+  // React.useEffect(() => {
+  //   console.log('level: ', level);
+  // }, [level]);
 
   return (
     <>

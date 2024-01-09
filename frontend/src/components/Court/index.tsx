@@ -46,7 +46,8 @@ const Court: React.FC<CourtProps> = ({
   const [scores, setScores] = React.useState<MatchScores>();
   const [courtCollor, setCourtCollor] = React.useState<string>('rgb(0, 0, 0)');
   const [levelMatch, setLevelMatch] = React.useState<number>(1);
-  // const [selectedLevel, setselectedLevel] = React.useState<MatchLevel>();
+  const [selectedLevel, setselectedLevel] = React.useState<string>('fácil');
+  const [disabled, setDisabled] = React.useState(false);
 
   const onChangeCollor = ({ target: { value } }: RadioChangeEvent) => {
     setCourtCollor(value);
@@ -54,6 +55,7 @@ const Court: React.FC<CourtProps> = ({
 
   const onChangeLevel = ({ target: { value } }: RadioChangeEvent) => {
     setLevelMatch(value);
+    setDisabled(true);
   };
 
   React.useEffect(() => {
@@ -73,8 +75,16 @@ const Court: React.FC<CourtProps> = ({
   }, [matchScores]);
 
   React.useEffect(() => {
-    // setselectedLevel(matchLevel);
-    console.log(matchLevel);
+    if (matchLevel?.level == 1) {
+      setselectedLevel('fácil');
+      setDisabled(false);
+    } else if (matchLevel?.level == 1.5) {
+      setselectedLevel('médio');
+      setDisabled(true);
+    } else if (matchLevel?.level == 2) {
+      setselectedLevel('difícil');
+      setDisabled(true);
+    }
   }, [matchLevel]);
 
   React.useEffect(() => {
@@ -189,6 +199,7 @@ const Court: React.FC<CourtProps> = ({
       </div>
       <div style={{ marginTop: '5px' }}>
         <Radio.Group
+          disabled={disabled}
           options={levelMatchOptions}
           onChange={onChangeLevel}
           value={levelMatch}
@@ -197,7 +208,9 @@ const Court: React.FC<CourtProps> = ({
         />
       </div>
       <div style={{ marginTop: '10px' }}>
-        <h3>... Nível do jogo = {levelMatch.toString()} ...</h3>
+        <h3>
+          ... Nível do jogo foi definido como {selectedLevel?.toString()} ...
+        </h3>
       </div>
     </div>
   );
