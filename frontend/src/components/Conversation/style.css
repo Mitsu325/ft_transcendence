@@ -1,36 +1,58 @@
-.chat-container {
+.icon {
+  font-size: 40px;
+  color: #001529;
+  margin: 15px 0px 0px 30px;
   display: flex;
-  flex-direction: column;
-  height: 80vh;
+  align-items: center;
 }
 
+p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.divider-ch {
+  margin-bottom: 1px;
+  margin-top: 14px;
+  border-color: #001529;
+}
 .chat-messages {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   overflow-y: auto;
   padding: 10px;
   color: #001529;
 }
 
-.chat-p {
+.message-container {
+  margin-bottom: 10px;
+}
+
+.avatar {
+  display: inline-block;
+  margin-left: 15px;
+  margin-top: 5px;
+}
+
+.username-container {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 10px;
+  flex-grow:;
+}
+
+.username {
   color: #001529;
-  margin: 5px;
+  margin-bottom: 15px;
+  padding-top: 7px;
   font-size: 1.1rem;
 }
 
-.chat-input {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.chat-message {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.message-content {
-  flex-grow: 1;
+.msg {
+  text-align: left;
+  padding: 5px;
+  font-size: 1rem;
 }
 
 .send-button {

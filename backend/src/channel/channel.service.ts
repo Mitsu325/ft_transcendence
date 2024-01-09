@@ -8,7 +8,7 @@ import { ChannelDto } from './dto/channel.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { comparePass } from 'src/utils/hash.util';
 import * as crypto from 'crypto';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class ChannelService {
@@ -82,8 +82,13 @@ export class ChannelService {
 
     async generateToken(roomId: string): Promise<string> {
         const key = crypto.randomBytes(32).toString('hex');
-        const token = jwt.sign(roomId, key, { expiresIn: '24h' });
 
-        return token;
+        try {
+            const token = jwt.sign({ roomId }, key, { expiresIn: '10m' });
+            return token;
+        } catch (error) {
+            console.error('Erro ao gerar token:', error);
+            throw error;
+        }
     }
 }

@@ -19,9 +19,10 @@ interface ChannelItemProps {
 const Channels: React.FC = () => {
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [password, setPassword] = useState('');
+  const [nameChannel, setNameChannel] = useState('');
   const [current, setCurrent] = useState('channel');
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
-  const [component, setComponent] = useState('modal');
+  const [component, setComponent] = useState('create');
   const [currentRoom, setCurrentRoom] = useState<string>('');
   const [activeChannel, setActiveChannel] = useState<string | null>(null);
   const user = useAuth()?.user;
@@ -69,9 +70,10 @@ const Channels: React.FC = () => {
     }
   };
 
-  const handleChatClick = async (roomId: string) => {
+  const handleChatClick = async (roomId: string, name: string) => {
     const channel = channels.find(item => item.id === roomId);
     const token = localStorage.getItem('channel-token');
+    setNameChannel(name);
     setActiveChannel(roomId);
     const userName = user?.name ?? '';
 
@@ -144,7 +146,7 @@ const Channels: React.FC = () => {
                     activeChannel === item.id ? 'active' : ''
                   }`}
                   key={item.id}
-                  onClick={() => handleChatClick(item.id)}
+                  onClick={() => handleChatClick(item.id, item.name_channel)}
                   style={{
                     borderLeft:
                       activeChannel === item.id ? '5px solid #1677FF' : 'none',
@@ -185,7 +187,7 @@ const Channels: React.FC = () => {
           {component === 'create' && <CreateChannel />}
           {component === 'conversation' && (
             <>
-              <Conversation roomId={currentRoom} />
+              <Conversation roomId={currentRoom} nameChannel={nameChannel} />
             </>
           )}
         </div>

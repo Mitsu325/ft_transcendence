@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button } from 'antd';
-import { SendOutlined } from '@ant-design/icons';
+import { Input, Button, Divider } from 'antd';
+import { SendOutlined, WechatOutlined } from '@ant-design/icons';
 import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
 import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
@@ -15,7 +15,10 @@ interface Message {
   message: string;
 }
 
-const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
+const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
+  roomId,
+  nameChannel,
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState(false);
@@ -82,24 +85,33 @@ const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
   };
 
   return (
-    <div className="chat-container">
+    <>
+      <div className="icon">
+        <WechatOutlined style={{ marginRight: '15px' }} />
+        <p>{nameChannel}</p>
+      </div>
+      <div className="channel-card"></div>
+      <Divider className="divider-ch" />
       <div className="chat-messages">
         {messages.map((data, index) => (
-          <div className="chat-message" key={index}>
-            <Avatar
-              size={40}
-              icon={<UserOutlined />}
-              src={
-                data.userName === userPlayer.name
-                  ? userPlayer.avatar
-                  : undefined
-              }
-              alt={data.userName}
-            />
-            <div className="message-content">
-              <p className="chat-p">
-                <strong>{data.userName}:</strong> {data.message}
-              </p>
+          <div className="message-container" key={index}>
+            <div className="avatar">
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                src={
+                  data.userName === userPlayer.name
+                    ? userPlayer.avatar
+                    : undefined
+                }
+                alt={data.userName}
+              />
+              <div className="username-container">
+                <p className="username">
+                  <strong>{data.userName}</strong>
+                </p>
+              </div>
+              <p className="msg">{data.message}</p>
             </div>
           </div>
         ))}
@@ -121,7 +133,7 @@ const Conversation: React.FC<{ roomId: string }> = ({ roomId }) => {
           disabled={!newMessage}
         />
       </div>
-    </div>
+    </>
   );
 };
 
