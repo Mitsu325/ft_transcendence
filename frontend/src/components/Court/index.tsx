@@ -1,5 +1,7 @@
 import React from 'react';
 import SVG, { Circle, Rect, Line, Text } from 'react-svg-draw';
+import type { RadioChangeEvent } from 'antd';
+import { Radio } from 'antd';
 import {
   MatchPadles,
   Ball,
@@ -8,13 +10,19 @@ import {
 
 interface CourtProps {
   roomId: string;
-  matchBall: any;
-  matchPadles: any;
-  matchScores: any;
+  matchBall: Ball;
+  matchPadles: MatchPadles;
+  matchScores: MatchScores;
   onSendKey: (type: string, key: string) => void;
 }
 
 const courtDimensions = { width: 580, height: 320 };
+
+const courtCollorOptions = [
+  { label: 'preta', value: 'rgb(0, 0, 0)' },
+  { label: 'verde', value: 'rgb(0, 100, 0)' },
+  { label: 'azul', value: 'rgb(18, 10, 143)' },
+];
 
 const Court: React.FC<CourtProps> = ({
   matchBall,
@@ -25,6 +33,12 @@ const Court: React.FC<CourtProps> = ({
   const [ball, setBall] = React.useState<Ball>();
   const [padles, setPadles] = React.useState<MatchPadles>();
   const [scores, setScores] = React.useState<MatchScores>();
+  const [courtCollor, setCourtCollor] = React.useState<string>('rgb(0, 0, 0)');
+
+  const onChange = ({ target: { value } }: RadioChangeEvent) => {
+    console.log('radio4 checked', value);
+    setCourtCollor(value);
+  };
 
   React.useEffect(() => {
     setBall(matchBall);
@@ -61,7 +75,14 @@ const Court: React.FC<CourtProps> = ({
   }, []);
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <SVG
         width={courtDimensions.width.toString()}
         height={courtDimensions.height.toString()}
@@ -71,7 +92,7 @@ const Court: React.FC<CourtProps> = ({
           y="0"
           width={courtDimensions.width.toString()}
           height={courtDimensions.height.toString()}
-          style={{ fill: 'rgb(0, 0, 0)' }}
+          style={{ fill: courtCollor }}
         />
         <Rect
           x="5"
@@ -126,6 +147,16 @@ const Court: React.FC<CourtProps> = ({
           />
         )}
       </SVG>
+      <div style={{ marginTop: '10px' }}>
+        <h3>...escolha a cor da quadra...</h3>
+        <Radio.Group
+          options={courtCollorOptions}
+          onChange={onChange}
+          value={courtCollor}
+          optionType="button"
+          buttonStyle="solid"
+        />
+      </div>
     </div>
   );
 };
