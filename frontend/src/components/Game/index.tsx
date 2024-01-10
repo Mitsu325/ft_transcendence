@@ -77,7 +77,8 @@ export const Game = () => {
 
   React.useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('PlayerConnected', user);
+      socket.emit('playerConnected', user);
+      socket.emit('monitoringPlayers', user?.id);
       setGameData(prevGameData => ({
         ...prevGameData,
         connected: true,
@@ -155,8 +156,6 @@ export const Game = () => {
     });
 
     socket.on('matchLevel', (roomId, receivedLevel) => {
-      // console.log('room: ', roomId);
-      // console.log('level: ', receivedLevel);
       setLevel(prevLevel => ({
         ...prevLevel,
         [roomId]: {

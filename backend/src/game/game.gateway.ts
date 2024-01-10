@@ -185,7 +185,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('game', game);
   }
 
-  @SubscribeMessage('PlayerConnected')
+  @SubscribeMessage('playerConnected')
   handlePlayerConnected(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
     const existingPlayer = game.players[client.id];
     const playerAlreadyInGame = Object.values(game.players).find(existingPlayer => existingPlayer.id === player.id);
@@ -196,5 +196,28 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       console.log('Player with the same ID already exists:', player.id);
     }
     this.server.emit('game', game);
+  }
+
+  @SubscribeMessage('monitoringPlayers')
+  handleMonitoringPlayers(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
+    let loopMonitoring: NodeJS.Timeout;
+
+    loopMonitoring = setInterval(async () => {
+      try {
+        const playerAlreadyInRoom = Object.values(game.rooms).find(existingRoom => existingRoom.player1.id === player
+          || (existingRoom.player2 && existingRoom.player2.id === player));
+        const timestamp = Date.now();
+        const date = new Date(timestamp);
+
+        const formatoMinSeg = date.toLocaleTimeString('pt-BR', { minute: '2-digit', second: '2-digit' });
+
+        console.log(formatoMinSeg);
+        console.log('Player_____: ', player)
+        console.log('In Room?_____: ', playerAlreadyInRoom.room_id)
+        // console.log('MonitoringPlayers: ', game.rooms);
+        console.log('Game____: ', game);
+      }
+      catch (error) { }
+    }, 30000);
   }
 }
