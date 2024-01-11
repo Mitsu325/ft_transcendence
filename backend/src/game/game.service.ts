@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'dgram';
 import { Server } from 'socket.io';
 
 export interface Player {

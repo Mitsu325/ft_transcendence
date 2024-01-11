@@ -122,6 +122,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       const initD = Date.now() / 2 === 0 ? 1 : -1;
       game.rooms[room].ball = { ...initialBall, xdirection: initD, ydirection: initD };
       game.rooms[room].scores = initialScores;
+      game.rooms[room].padles = initialPadles;
       loopGame = setInterval(async () => {
         if (!game.rooms[room]?.isRunning) {
           clearInterval(loopGame);
