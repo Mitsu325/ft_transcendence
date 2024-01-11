@@ -57,6 +57,7 @@ export class ChannelService {
                 message: message.message,
                 channel_id: message.channel_id ? message.channel_id.id : null,
                 userName: message.sender_id ? message.sender_id.name : null,
+                createdAt: message.createdAt,
             }));
             return retMessages;
         } catch (error) {
@@ -84,7 +85,7 @@ export class ChannelService {
         const key = crypto.randomBytes(32).toString('hex');
 
         try {
-            const token = jwt.sign({ roomId }, key, { expiresIn: '10m' });
+            const token = jwt.sign({ roomId }, key, { expiresIn: '24h' });
             return token;
         } catch (error) {
             console.error('Erro ao gerar token:', error);

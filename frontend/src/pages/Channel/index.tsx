@@ -8,7 +8,7 @@ import Conversation from '../../components/Conversation';
 import { channelApi } from '../../services/channel.api';
 import { joinRoom } from 'Socket/utilsSocket';
 import { useAuth } from 'hooks/useAuth';
-
+// import AlertMessage from 'components/AlertMessage';
 interface ChannelItemProps {
   id: string;
   name_channel: string;
@@ -51,7 +51,24 @@ const Channels: React.FC = () => {
   };
 
   const handleVerifyPassword = async () => {
-    setPasswordModalVisible(false);
+    if (password) {
+      const checkPass = await channelApi.verifyChannelPassword(
+        activeChannel ?? '',
+        password,
+      );
+      if (checkPass) {
+        getToken(activeChannel ?? '');
+        handleJoin(activeChannel ?? '', user?.name ?? '');
+        setPasswordModalVisible(false);
+      } else {
+        setPassword('');
+        // <AlertMessage
+        //   message="Senha incorreta."
+        //   description="Tente novamente."
+        // />;
+        alert('Senha incorreta. Tente novamente.');
+      }
+    }
   };
 
   const handleJoin = async (roomId: string, userName: string) => {
@@ -64,7 +81,7 @@ const Channels: React.FC = () => {
     try {
       const response = await channelApi.getToken(roomId);
       const { token } = response.data;
-      localStorage.setItem('channel-token', token);
+      sessionStorage.setItem('channel-token', token);
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +89,7 @@ const Channels: React.FC = () => {
 
   const handleChatClick = async (roomId: string, name: string) => {
     const channel = channels.find(item => item.id === roomId);
-    const token = localStorage.getItem('channel-token');
+    const token = sessionStorage.getItem('channel-token');
     setNameChannel(name);
     setActiveChannel(roomId);
     const userName = user?.name ?? '';
@@ -88,18 +105,6 @@ const Channels: React.FC = () => {
       case 'Protegido':
         if (!token) {
           handleOpenPasswordModal();
-          if (password) {
-            const checkPass = await channelApi.verifyChannelPassword(
-              roomId,
-              password,
-            );
-            if (checkPass) {
-              getToken(roomId);
-              handleJoin(roomId, userName);
-            } else {
-              alert('Senha incorreta. Tente novamente.');
-            }
-          }
         } else {
           setCurrentRoom(roomId);
           setComponent('conversation');

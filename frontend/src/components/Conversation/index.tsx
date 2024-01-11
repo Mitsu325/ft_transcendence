@@ -13,6 +13,7 @@ const { TextArea } = Input;
 interface Message {
   userName: string;
   message: string;
+  createdAt: string;
 }
 
 const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
@@ -22,6 +23,9 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState(false);
+  const [groupedMessages, setGroupedMessages] = useState<{
+    [date: string]: Message[];
+  }>({});
 
   const user = useAuth()?.user;
 
@@ -48,16 +52,37 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
   }, [user]);
 
   useEffect(() => {
-    socket.on('message', (data: { message: string; userName: string }) => {
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { userName: data.userName, message: data.message },
-      ]);
-    });
+    socket.on(
+      'message',
+      (data: { message: string; userName: string; createdAt: string }) => {
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            userName: data.userName,
+            message: data.message,
+            createdAt: data.createdAt,
+          },
+        ]);
+      },
+    );
     const getMessages = async () => {
       const msgData = await channelApi.getMessages(roomId);
       if (msgData) {
-        setMessages(msgData);
+        const grouped: { [date: string]: Message[] } = {};
+
+        for (const message of msgData) {
+          const messageDate = new Date(message.createdAt);
+          const formattedDate = messageDate.toLocaleDateString();
+          if (!grouped[formattedDate]) {
+            grouped[formattedDate] = [];
+          }
+          grouped[formattedDate].push({
+            userName: message.userName,
+            message: message.message,
+            createdAt: message.createdAt,
+          });
+        }
+        setGroupedMessages(grouped);
       }
     };
 
@@ -93,26 +118,46 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
       <div className="channel-card"></div>
       <Divider className="divider-ch" />
       <div className="chat-messages">
-        {messages.map((data, index) => (
-          <div className="message-container" key={index}>
-            <div className="avatar">
-              <Avatar
-                size={40}
-                icon={<UserOutlined />}
-                src={
-                  data.userName === userPlayer.name
-                    ? userPlayer.avatar
-                    : undefined
-                }
-                alt={data.userName}
-              />
-              <div className="username-container">
-                <p className="username">
-                  <strong>{data.userName}</strong>
-                </p>
-              </div>
-              <p className="msg">{data.message}</p>
-            </div>
+        {Object.keys(groupedMessages).map(formattedDate => (
+          <div key={formattedDate}>
+            <p className="date">{formattedDate}</p>
+            {groupedMessages[formattedDate].map((data, index) => {
+              const messageDate = new Date(data.createdAt);
+              messageDate.setMinutes(
+                messageDate.getMinutes() - messageDate.getTimezoneOffset(),
+              );
+
+              const formattedHour = messageDate.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              return (
+                <div className="message-container" key={index}>
+                  <div className="avatar">
+                    <Avatar
+                      size={40}
+                      icon={<UserOutlined />}
+                      src={
+                        data.userName === userPlayer.name
+                          ? userPlayer.avatar
+                          : undefined
+                      }
+                      alt={data.userName}
+                    />
+                    <div className="username-container">
+                      <p className="username">
+                        <strong>{data.userName}</strong>
+                      </p>
+                    </div>
+                    <p className="msg">{data.message}</p>
+                  </div>
+                  <div className="hour">
+                    <span>{formattedHour}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

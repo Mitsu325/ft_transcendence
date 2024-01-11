@@ -29,7 +29,6 @@ export class ChannelGateway
 
     handleDisconnect(client: Socket) {
         console.log(`Usuário desconectado: ${client.id}`);
-        this.leaveAllRooms(client);
     }
 
     @SubscribeMessage('joinRoom')
@@ -58,15 +57,6 @@ export class ChannelGateway
         },
     ) {
         this.sendMessageToRoom(data.roomId, data.message, data.userName);
-    }
-
-    private leaveAllRooms(client: Socket) {
-        this.rooms.forEach((clients, roomId) => {
-            if (clients.has(client.id)) {
-                clients.delete(client.id);
-                client.leave(roomId);
-            }
-        });
     }
 
     private sendMessageToRoom(

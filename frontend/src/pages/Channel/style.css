@@ -64,6 +64,18 @@
   box-shadow: 5px 5px 10px #001529;
 }
 
+.date {
+  text-align: center;
+  font-size: 0.9rem;
+  color: gray;
+}
+
+.hour {
+  text-align: right;
+  margin-right: 25px;
+  color: gray;
+}
+
 @media screen and (max-width: 768px) {
   .channel-grid {
     display: grid;
