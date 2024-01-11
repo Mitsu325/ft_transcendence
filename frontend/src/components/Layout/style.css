@@ -14,3 +14,26 @@
 .breadcrumb {
   margin: 16px 0;
 }
+
+.align-end {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
+.header-user-info {
+  color: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto 0;
+}
+
+.mr-8 {
+  margin-right: 8px;
+}

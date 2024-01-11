@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu } from 'antd';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Breadcrumb, Button, Layout, Menu, Tooltip } from 'antd';
 import getMenuBreadcrumb from 'pages/utils/GetMenu';
 import {
   BreadcrumbItem,
@@ -8,18 +8,21 @@ import {
   menuPaths,
 } from 'components/Layout/menuConfig';
 import 'components/Layout/style.css';
+import { useAuth } from 'hooks/useAuth';
+import AvatarCustom from 'components/Avatar';
+import { LogoutOutlined } from '@ant-design/icons';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 
 const { Header, Content, Sider } = Layout;
 
 const CommonLayout = () => {
+  const context = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
-
-  const handleMenuClick = ({ key }: { key: string }) => {
-    setSelectedMenuKey([key]);
-  };
 
   useEffect(() => {
     const path = location.pathname;
@@ -34,8 +37,28 @@ const CommonLayout = () => {
     }
   }, [location.pathname]);
 
+  const handleMenuClick = ({ key }: { key: string }) => {
+    setSelectedMenuKey([key]);
+  };
+
+  const onLogout = () => {
+    setLoading(true);
+    context.Logout();
+    SuccessNotification({
+      message: 'Sessão encerrada',
+      description: 'A sua sessão foi encerrada.',
+    });
+    navigate('/');
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
+      <Header className="header align-end">
+        <div className="header-user-info">
+          <p className="mr-8">{context.user?.name}</p>
+          <AvatarCustom src={context.user?.avatar || ''} size={40} />
+        </div>
+      </Header>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -49,9 +72,16 @@ const CommonLayout = () => {
           onClick={handleMenuClick}
           items={menuItems}
         />
+        <Tooltip title="Sair da conta" placement="right" color="blue">
+          <Button
+            aria-label="Sair da conta"
+            className="logout-btn"
+            icon={<LogoutOutlined />}
+            loading={loading}
+            onClick={() => onLogout()}
+          />
+        </Tooltip>
       </Sider>
-
-      <Header className="header"></Header>
       <Layout>
         <Content className="content">
           <Breadcrumb className="breadcrumb" items={breadcrumbItems} />

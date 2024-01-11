@@ -53,6 +53,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
+      <Header className="header" />
       <Sider
         collapsible
         collapsed={collapsed}
@@ -68,7 +69,6 @@ const Dashboard: React.FC = () => {
         />
       </Sider>
 
-      <Header className="header"></Header>
       <Layout>
         <Content className="content">
           <Breadcrumb className="breadcrumb" items={breadcrumbItems} />

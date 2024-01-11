@@ -28,7 +28,7 @@ export const menuItems = [
     label: 'Perfil do usuário',
     icon: <UserOutlined />,
     children: [
-      { key: '2', label: 'Dados de cadastro' },
+      { key: '2', label: <Link to="/profile">Dados de cadastro</Link> },
       { key: '3', label: 'Estatísticas' },
       { key: '4', label: 'Histórico de partidas' },
     ],
@@ -44,5 +44,6 @@ export const menuItems = [
 export const menuPaths: MenuPaths = {
   '/': '0',
   '/game-options': '1',
+  '/profile': '2',
   '/message': '6',
 };
