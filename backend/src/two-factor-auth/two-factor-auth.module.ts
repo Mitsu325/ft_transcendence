@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { TwoFactorAuthController } from './two-factor-auth.controller';
-import { UserService } from 'src/user/user.service';
-import { User } from '../user/entities/user.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
-  controllers: [TwoFactorAuthController],
-  providers: [UserService],
+    imports: [UserModule],
+    controllers: [TwoFactorAuthController],
 })
-export class TwoFactorAuthModule { }
+export class TwoFactorAuthModule {}
