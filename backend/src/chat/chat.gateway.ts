@@ -56,9 +56,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(`Connected socket ${socket.id}`);
 
         const jwt = socket.handshake.auth.token || null;
+        if (!jwt) {
+            this.handleDisconnect(socket);
+            return;
+        }
         const userId = await this.authService.getJwtUser(jwt);
         if (!userId) {
             this.handleDisconnect(socket);
+            return;
         }
         socket.data.userId = userId;
         socket.join(userId);

@@ -20,7 +20,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player }) => (
       style={{ backgroundColor: '#87d068' }}
       icon={<UserOutlined />}
     >
-      {player.name.substring(0, 1).toUpperCase()}
+      {player.name?.substring(0, 1).toUpperCase()}
     </Avatar>
     <div className="player-info">
       <p>{player.avatar}</p>

@@ -60,6 +60,7 @@ const Court: React.FC<CourtProps> = ({
 
   React.useEffect(() => {
     onSendLevel(levelMatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [levelMatch]);
 
   React.useEffect(() => {
@@ -88,6 +89,7 @@ const Court: React.FC<CourtProps> = ({
   }, [matchLevel]);
 
   React.useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sendKeyEvent = (e: any) => {
       const { key, type } = e;
 

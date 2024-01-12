@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from 'pages/Home/home';
-import GameOptions from 'pages/GameOptions';
 import CommonLayout from 'components/Layout';
 import Chat from 'pages/Chat';
+import { Game } from 'components/Game';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -11,9 +11,8 @@ const PrivateRoutes: React.FC = () => {
       <Routes>
         <Route element={<CommonLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/game-options" element={<GameOptions />} />
+          <Route path="/game-options" element={<Game />} />
           <Route path="/message" element={<Chat />} />
-          <Route path="/socket.io" element={<Game />} />
         </Route>
       </Routes>
     </BrowserRouter>
