@@ -8,7 +8,7 @@ import Conversation from '../../components/Conversation';
 import { channelApi } from '../../services/channel.api';
 import { joinRoom } from 'Socket/utilsSocket';
 import { useAuth } from 'hooks/useAuth';
-// import AlertMessage from 'components/AlertMessage';
+
 interface ChannelItemProps {
   id: string;
   name_channel: string;
@@ -25,6 +25,7 @@ const Channels: React.FC = () => {
   const [component, setComponent] = useState('create');
   const [currentRoom, setCurrentRoom] = useState<string>('');
   const [activeChannel, setActiveChannel] = useState<string | null>(null);
+  const [updateChannels, setUpdateChannels] = useState(false);
   const user = useAuth()?.user;
 
   useEffect(() => {
@@ -34,7 +35,11 @@ const Channels: React.FC = () => {
     };
 
     getChannels();
-  }, []);
+  }, [updateChannels]);
+
+  const newChannels = () => {
+    setUpdateChannels(prevState => !prevState);
+  };
 
   const handleMenuClick = (e: MenuInfo) => {
     setCurrent(e.key as string);
@@ -62,10 +67,6 @@ const Channels: React.FC = () => {
         setPasswordModalVisible(false);
       } else {
         setPassword('');
-        // <AlertMessage
-        //   message="Senha incorreta."
-        //   description="Tente novamente."
-        // />;
         alert('Senha incorreta. Tente novamente.');
       }
     }
@@ -181,6 +182,7 @@ const Channels: React.FC = () => {
               onChange={e => setPassword(e.target.value)}
             />
           </Modal>
+
           {current === 'chat' && (
             <div className="menu-chats">
               <p>Chat</p>
@@ -189,7 +191,9 @@ const Channels: React.FC = () => {
         </div>
 
         <div className="messages">
-          {component === 'create' && <CreateChannel />}
+          {component === 'create' && (
+            <CreateChannel newChannels={newChannels} />
+          )}
           {component === 'conversation' && (
             <>
               <Conversation roomId={currentRoom} nameChannel={nameChannel} />

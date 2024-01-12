@@ -28,6 +28,7 @@
     "react-modal": "^3.16.1",
     "react-qr-code": "^2.0.12",
     "react-qr-scanner": "^1.0.0-alpha.11",
+    "react-redux": "^9.0.4",
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
     "socket.io-client": "^4.7.2",

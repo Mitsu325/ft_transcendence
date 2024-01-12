@@ -5,7 +5,9 @@ import { Modal, Input, Button } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import './style.css';
 
-const CreateChannel: React.FC = () => {
+const CreateChannel: React.FC<{ newChannels: () => void }> = ({
+  newChannels,
+}) => {
   const [typeModalVisible, setTypeModalVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelName, setChannelName] = useState('');
@@ -25,17 +27,18 @@ const CreateChannel: React.FC = () => {
   const { user } = useAuth();
   const sendForm = async () => {
     if (user && user.id) {
-      const result = await channelApi.createChannel({
+      await channelApi.createChannel({
         name_channel: channelName,
         type: channelType,
         owner: user.id,
         password: channelPassword,
       });
-      console.log(result);
+      newChannels();
       setChannelName('');
       setChannelType('');
       setChannelPassword('');
     }
+
     setIsModalOpen(false);
   };
 
