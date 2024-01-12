@@ -198,26 +198,24 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('game', game);
   }
 
-  @SubscribeMessage('monitoringPlayers')
-  handleMonitoringPlayers(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
-    let loopMonitoring: NodeJS.Timeout;
+  @SubscribeMessage('matchSistem')
+  handleMatchSistem(@MessageBody() player: Player, @ConnectedSocket() client: Socket) {
 
-    loopMonitoring = setInterval(async () => {
-      try {
-        const playerAlreadyInRoom = Object.values(game.rooms).find(existingRoom => existingRoom.player1.id === player
-          || (existingRoom.player2 && existingRoom.player2.id === player));
-        const timestamp = Date.now();
-        const date = new Date(timestamp);
-
-        const formatoMinSeg = date.toLocaleTimeString('pt-BR', { minute: '2-digit', second: '2-digit' });
-
-        console.log(formatoMinSeg);
-        console.log('Player_____: ', player)
-        console.log('In Room?_____: ', playerAlreadyInRoom.room_id)
-        // console.log('MonitoringPlayers: ', game.rooms);
-        console.log('Game____: ', game);
+    if (Object.keys(game.rooms).length > 0) {
+      for (const room in game.rooms) {
+        if (game.rooms[room].player2 === null) {
+          client.join(room);
+          game.rooms[room].player2 = { ...player };
+          this.server.emit('game', game);
+          this.server.to(room).emit('players', game.rooms[room].player1, game.rooms[room].player2);
+          this.server.emit('play', room);
+          game.rooms[room].isRunning = true;
+          break;
+        }
       }
-      catch (error) { }
-    }, 30000);
+    } else {
+      console.log('No rooms available');
+    }
+    // console.log(game.rooms);
   }
 }

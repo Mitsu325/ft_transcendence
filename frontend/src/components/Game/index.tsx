@@ -55,6 +55,7 @@ export const Game = () => {
     player1: 'Anfitrião',
     player2: 'Convidado',
   });
+  const [play, setPlay] = React.useState<string>('');
   const [balls, setBalls] = React.useState<{ [roomId: string]: Ball }>({
     [socket.id]: initialBall,
   });
@@ -78,7 +79,7 @@ export const Game = () => {
   React.useEffect(() => {
     socket.on('connect', () => {
       socket.emit('playerConnected', user);
-      socket.emit('monitoringPlayers', user?.id);
+      socket.emit('monitoringPlayers', userPlayer);
       setGameData(prevGameData => ({
         ...prevGameData,
         connected: true,
@@ -133,6 +134,10 @@ export const Game = () => {
         player1: player1.name,
         player2: player2?.name ?? '',
       });
+    });
+
+    socket.on('play', room => {
+      setPlay(room);
     });
 
     socket.on('movePadles', (roomId, receivedPadles) => {
@@ -213,6 +218,10 @@ export const Game = () => {
     startMatch(room_id);
   };
 
+  const matchSistem = () => {
+    socket.emit('matchSistem', userPlayer);
+  };
+
   const leaveRoom = () => {
     const roomIndex = gameData.rooms.findIndex(
       room => room.room_id === userRoomId,
@@ -250,9 +259,13 @@ export const Game = () => {
     socket.emit('sendLevel', matchLevel);
   };
 
+  React.useEffect(() => {
+    startMatch(play);
+  }, [play]);
+
   // React.useEffect(() => {
-  //   console.log('level: ', level);
-  // }, [level]);
+  //   console.log('gameData: ', gameData);
+  // }, [gameData]);
 
   return (
     <>
@@ -294,6 +307,9 @@ export const Game = () => {
               {gameData.players.map(player => (
                 <PlayerCard key={player.id} player={player} />
               ))}
+            </div>
+            <div>
+              <Button onClick={matchSistem}>Encontrar um Adversário</Button>
             </div>
             <h2 style={{ padding: '20px' }}>*** SALAS ***</h2>
             <div>
