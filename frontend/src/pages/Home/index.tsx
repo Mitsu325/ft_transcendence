@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
 
   const items = [
     { key: '0', label: 'Home', icon: <HomeOutlined /> },
-    { key: '1', label: 'Opções de jogo', icon: <AppstoreOutlined /> },
+    { key: '1', label: 'Sala de Jogos', icon: <AppstoreOutlined /> },
     {
       key: 'sub1',
       label: 'Perfil do usuário',

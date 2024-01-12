@@ -17,6 +17,7 @@
     "@types/node": "^16.18.59",
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
+    "@types/socket.io-client": "^3.0.0",
     "antd": "^5.10.2",
     "axios": "^1.6.0",
     "class-validator": "^0.14.0",
@@ -30,6 +31,7 @@
     "react-qr-scanner": "^1.0.0-alpha.11",
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
+    "react-svg-draw": "^0.0.12",
     "socket.io-client": "^4.7.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
@@ -64,5 +66,11 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.0.3",
     "webpack": "^5.89.0"
+  },
+  "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   }
 }

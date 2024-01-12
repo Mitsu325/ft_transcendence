@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
+import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
@@ -13,7 +13,7 @@ import { ChatModule } from './chat/chat.module';
         TypeOrmModule.forRoot(typeOrmConfig),
         UserModule,
         AuthModule,
-        TwoFactorAuthModule,
+        GameModule,
         ChatModule,
     ],
     controllers: [AppController],

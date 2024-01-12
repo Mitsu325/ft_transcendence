@@ -11,6 +11,8 @@ import authConfig from 'src/configs/auth.config';
 import { UserService } from 'src/user/user.service';
 import { comparePass, hashPassword } from 'src/utils/hash.util';
 import { jwtConstants } from 'src/configs/jwt';
+import { twoFactorGenerator } from 'src/utils/twoFactor.util';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +36,20 @@ export class AuthService {
         };
     }
 
+    async verifyOTP(body: {
+        userId: string;
+        otp: string;
+    }): Promise<{ verified: boolean }> {
+        const user = await this.userService.findUser(body.userId);
+
+        const verified: boolean = speakeasy.totp.verify({
+            secret: user.twoFactorSecret,
+            encoding: 'base32',
+            token: body.otp,
+        });
+        return { verified };
+    }
+
     async signUp(name, email, username, password) {
         const hashPass = await hashPassword(password);
         password = hashPass;
@@ -43,12 +59,14 @@ export class AuthService {
             username = uuidv4();
         }
 
+        const twoFactorSecret = await twoFactorGenerator();
+
         const user = await this.userService.create({
             name,
             email,
             username,
             password,
-            twoFactorSecret: '',
+            twoFactorSecret,
         });
         const payload = { sub: user.id, username: user.username };
         return {

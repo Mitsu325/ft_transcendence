@@ -14,6 +14,7 @@ async function bootstrap() {
         .addTag('auth')
         .addTag('user')
         .addTag('chat')
+        .addTag('pong')
         .addBearerAuth(
             {
                 description: `Please enter token in following format: Bearer <JWT>`,
@@ -31,9 +32,13 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
 
     app.enableCors({
-        allowedHeaders: '*',
         origin: 'http://localhost:3000',
         credentials: true,
+    });
+
+    app.use(function (request, response, next) {
+        response.header('Access-Control-Allow-Origin', '*');
+        next();
     });
 
     await app.listen(3003);

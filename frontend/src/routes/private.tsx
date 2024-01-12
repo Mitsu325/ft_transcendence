@@ -13,6 +13,7 @@ const PrivateRoutes: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/game-options" element={<GameOptions />} />
           <Route path="/message" element={<Chat />} />
+          <Route path="/socket.io" element={<Game />} />
         </Route>
       </Routes>
     </BrowserRouter>

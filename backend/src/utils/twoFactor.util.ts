@@ -1,6 +1,6 @@
 import * as speakeasy from 'speakeasy';
 
-export async function TwoFactorGenerator(): Promise<string> {
+export async function twoFactorGenerator(): Promise<string> {
     const secret: speakeasy.GeneratedSecret = speakeasy.generateSecret({
         length: 20,
     });
