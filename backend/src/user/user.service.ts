@@ -47,7 +47,7 @@ export class UserService {
         return users.map(user => getNonSensitiveUserInfo(user));
     }
 
-    async findById(id: string) {
+    private async findById(id: string) {
         return await this.usersRepository.findOne({
             where: { id },
         });

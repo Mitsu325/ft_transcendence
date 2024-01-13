@@ -8,12 +8,14 @@ import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
 import { UploadFileModule } from './upload-file/upload-file.module';
+import { ChannelModule } from './channel/channel.module';
 
 @Module({
     imports: [
         TypeOrmModule.forRoot(typeOrmConfig),
         UserModule,
         AuthModule,
+        ChannelModule,
         GameModule,
         ChatModule,
         UploadFileModule,
