@@ -106,6 +106,21 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('requestRoomOpen')
+  handleRequestRoomOpen(@MessageBody() player: Player, @ConnectedSocket() client: Socket) {
+    if (Object.values(game.rooms).length > 0) {
+      for (const room in game.rooms) {
+        if (game.rooms[room].player2 === null) {
+          this.server.emit('game', game);
+          client.emit('roomOpen', room, game);
+          return;
+        }
+      }
+    } else {
+      client.emit('message', 'Não há salas disponíveis no momento!');
+    }
+  }
+
   @SubscribeMessage('startMatch')
   async handleStartMatch(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
 
