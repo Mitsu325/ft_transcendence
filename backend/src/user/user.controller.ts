@@ -1,4 +1,15 @@
-import { Controller, Get, Param, Query, Request } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    HttpStatus,
+    Param,
+    ParseFilePipeBuilder,
+    Post,
+    Query,
+    Request,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import {
     ApiOperation,
@@ -6,8 +17,16 @@ import {
     ApiBearerAuth,
     ApiQuery,
     ApiParam,
+    ApiConsumes,
+    ApiBody,
 } from '@nestjs/swagger';
 import { ParamExistValidationPipe } from 'src/common/code-validation.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CustomUploadFileTypeValidator } from 'src/common/validator/file.validator';
+import {
+    MAX_AVATAR_SIZE_IN_BYTES,
+    VALID_IMAGE_MIME_TYPES,
+} from 'src/common/constants';
 
 @ApiTags('user')
 @Controller('user')
@@ -46,5 +65,45 @@ export class UserController {
     @Get(':userId')
     findUserById(@Param() params: any) {
         return this.userService.getUserSensitiveDataById(params.userId);
+    }
+
+    @ApiOperation({
+        description:
+            'Upload user avatar. Only valid files with extension image/jpeg, image/png and less than 2 MB',
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    })
+    @ApiBearerAuth('access-token')
+    @Post('upload-avatar')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadAvatar(
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addValidator(
+                    new CustomUploadFileTypeValidator({
+                        fileType: VALID_IMAGE_MIME_TYPES,
+                    }),
+                )
+                .addMaxSizeValidator({
+                    maxSize: MAX_AVATAR_SIZE_IN_BYTES,
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        file: Express.Multer.File,
+        @Request() req,
+    ) {
+        return this.userService.uploadAvatar(req.user.sub, file);
     }
 }

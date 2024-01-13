@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { ChatModule } from './chat/chat.module';
         AuthModule,
         GameModule,
         ChatModule,
+        UploadFileModule,
     ],
     controllers: [AppController],
     providers: [AppService],

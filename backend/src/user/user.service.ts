@@ -5,12 +5,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
+import { UploadFileService } from 'src/upload-file/upload-file.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private readonly uploadFileService: UploadFileService,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -80,5 +82,24 @@ export class UserService {
     async getUserSensitiveDataById(userId: string) {
         const user = await this.findById(userId);
         return getNonSensitiveUserInfo(user);
+    }
+
+    async uploadAvatar(userId: string, file: Express.Multer.File) {
+        const { publicUrl } = await this.uploadFileService.uploadStorage(
+            'avatar',
+            userId,
+            file,
+        );
+        if (publicUrl) {
+            await this.usersRepository.update(
+                {
+                    id: userId,
+                },
+                {
+                    avatar: publicUrl,
+                },
+            );
+        }
+        return await this.getUserSensitiveDataById(userId);
     }
 }
