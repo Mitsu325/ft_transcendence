@@ -6,6 +6,9 @@ import WelcomeChat from './MessageCard/WelcomeChat';
 import MessageList from './MessageCard/MessageList';
 import 'pages/Chat/style.css';
 import { socket } from 'socket';
+import Channels from 'pages/Channel/channel';
+import CreateChannel from 'components/CreateChannel';
+import Conversation from 'components/Conversation';
 
 type ChattingUser = {
   id: string;
@@ -28,6 +31,10 @@ const menuItems = [
 export default function Chat() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [component, setComponent] = useState('create');
+  const [nameChannel, setNameChannel] = useState('');
+  const [currentRoom, setCurrentRoom] = useState<string>('');
+  const [updateChannels, setUpdateChannels] = useState(false);
   const queryParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search],
@@ -39,6 +46,7 @@ export default function Chat() {
 
   const handleMenuClick = (key: string) => {
     setSelectedMenuItem(key);
+    setComponent('create');
     queryParams.set('menu', key);
     navigate(`?${queryParams.toString()}`);
   };
@@ -53,6 +61,8 @@ export default function Chat() {
     if (storedMenuItem === 'chat') {
       socket.auth = { token: localStorage.getItem('token') };
       socket.connect();
+    } else {
+      setComponent('create');
     }
 
     return () => {
@@ -60,10 +70,21 @@ export default function Chat() {
     };
   }, [queryParams]);
 
+  const newChannels = () => {
+    setUpdateChannels(prevState => !prevState);
+  };
+
   const renderListComponent = () => {
     switch (selectedMenu) {
       case 'channel':
-        return <h1>Channel</h1>;
+        return (
+          <Channels
+            setComponent={setComponent}
+            setCurrentRoom={setCurrentRoom}
+            setNameChannel={setNameChannel}
+            updateChannels={updateChannels}
+          />
+        );
       case 'chat':
         return (
           <ChatList
@@ -78,7 +99,10 @@ export default function Chat() {
 
   const renderMessageComponent = () => {
     if (selectedMenu === 'channel') {
-      return <h1>Channel</h1>;
+      if (component == 'create') {
+        return <CreateChannel newChannels={newChannels} />;
+      }
+      return <Conversation roomId={currentRoom} nameChannel={nameChannel} />;
     } else {
       if (!selectedUser) {
         return <WelcomeChat />;

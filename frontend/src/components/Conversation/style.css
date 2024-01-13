@@ -16,6 +16,7 @@ p {
   margin-top: 14px;
   border-color: #001529;
 }
+
 .chat-messages {
   display: flex;
   flex-direction: column;

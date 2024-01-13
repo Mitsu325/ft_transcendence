@@ -76,6 +76,11 @@
   color: gray;
 }
 
+.channelList {
+  overflow-y: auto;
+  height: 100%;
+}
+
 @media screen and (max-width: 768px) {
   .channel-grid {
     display: grid;

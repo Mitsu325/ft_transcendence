@@ -54,18 +54,27 @@ export class ChannelGateway
             roomId: string;
             message: string;
             userName: string;
+            createdAt: string;
         },
     ) {
-        this.sendMessageToRoom(data.roomId, data.message, data.userName);
+        this.sendMessageToRoom(
+            data.roomId,
+            data.message,
+            data.userName,
+            data.createdAt,
+        );
     }
 
     private sendMessageToRoom(
         roomId: string,
         message: string,
         userName: string,
+        createdAt: string,
     ) {
-        this.server
-            .to(roomId)
-            .emit('message', { message: message, userName: userName });
+        this.server.to(roomId).emit('message', {
+            message: message,
+            userName: userName,
+            createdAt: createdAt,
+        });
     }
 }

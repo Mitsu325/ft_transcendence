@@ -16,12 +16,14 @@ export const sendMessage = (
   roomId: string | null,
   newMessage: string,
   userName: string,
+  createdAt: string,
 ) => {
   if (socket && roomId) {
     socket.emit('sendMessage', {
       roomId: roomId,
       message: newMessage,
       userName: userName,
+      createdAt: createdAt,
     });
   }
 };

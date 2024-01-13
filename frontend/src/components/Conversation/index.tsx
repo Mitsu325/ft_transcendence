@@ -65,32 +65,37 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
         ]);
       },
     );
-    const getMessages = async () => {
-      const msgData = await channelApi.getMessages(roomId);
-      if (msgData) {
-        const grouped: { [date: string]: Message[] } = {};
-
-        for (const message of msgData) {
-          const messageDate = new Date(message.createdAt);
-          const formattedDate = messageDate.toLocaleDateString();
-          if (!grouped[formattedDate]) {
-            grouped[formattedDate] = [];
-          }
-          grouped[formattedDate].push({
-            userName: message.userName,
-            message: message.message,
-            createdAt: message.createdAt,
-          });
-        }
-        setGroupedMessages(grouped);
-      }
-    };
-
-    getMessages();
     return () => {
       socket.off();
     };
-  }, [roomId, userPlayer.name, messages]);
+  }, []);
+
+  useEffect(() => {
+    const getMessages = async () => {
+      const msgData = await channelApi.getMessages(roomId);
+      setMessages(msgData);
+    };
+
+    getMessages();
+  }, [roomId, userPlayer.name]);
+
+  useEffect(() => {
+    const grouped: { [date: string]: Message[] } = {};
+
+    for (const message of messages) {
+      const messageDate = new Date(message.createdAt);
+      const formattedDate = messageDate.toLocaleDateString();
+      if (!grouped[formattedDate]) {
+        grouped[formattedDate] = [];
+      }
+      grouped[formattedDate].push({
+        userName: message.userName,
+        message: message.message,
+        createdAt: message.createdAt,
+      });
+    }
+    setGroupedMessages(grouped);
+  }, [messages]);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -99,13 +104,12 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
   };
 
   const handleSendMessage = async () => {
-    sendMessage(roomId, newMessage, userPlayer.name);
-
-    await channelApi.createMessage({
+    const msg = await channelApi.createMessage({
       channel_id: String(roomId),
       sender_id: userPlayer.id,
       message: newMessage,
     });
+    sendMessage(roomId, newMessage, userPlayer.name, msg.createdAt);
     setNewMessage('');
   };
 
