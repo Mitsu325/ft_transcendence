@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
 import RoomCard from 'components/RoomCard';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
 import Court from 'components/Court';
 import {
@@ -51,6 +51,7 @@ export const Game = () => {
   }, []);
 
   const [userRoomId, setUserRoomId] = React.useState<string>(socket.id);
+  const [roomOpen, setRoomOpen] = React.useState<string>('');
   const [players, setPlayers] = React.useState<Players>({
     player1: 'Anfitrião',
     player2: 'Convidado',
@@ -70,6 +71,8 @@ export const Game = () => {
 
   const [newMessage, setNewMessage] = React.useState('');
   const [visible, setVisible] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [messageOpen, setMessageOpen] = React.useState(visible);
 
   React.useEffect(() => {
     setVisible(true);
@@ -120,6 +123,10 @@ export const Game = () => {
       setPadles({ [receivedRoom.room_id]: receivedRoom.padles });
     });
 
+    socket.on('roomOpen', roomId => {
+      setRoomOpen(roomId);
+    });
+
     socket.on('matchStarted', (roomId, recevedBall) => {
       setBalls(prevBalls => ({
         ...prevBalls,
@@ -168,6 +175,11 @@ export const Game = () => {
       console.log('ping');
     });
 
+    socket.on('message', message => {
+      setMessageOpen(true);
+      setMessage(message);
+    });
+
     return () => {
       socket.disconnect();
       setNewMessage('Seu adversário se desconectou');
@@ -211,6 +223,22 @@ export const Game = () => {
     setUserRoomId(room_id);
     startMatch(room_id);
   };
+
+  const matchMakerRequest = () => {
+    socket.emit('requestRoomOpen', userPlayer);
+  };
+
+  React.useEffect(() => {
+    if (roomOpen !== '') {
+      const room = gameData.rooms.find(
+        room => room.room_id === roomOpen && room.player2 === null,
+      );
+      if (room) {
+        getInRoom(room);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomOpen]);
 
   const leaveRoom = () => {
     const roomIndex = gameData.rooms.findIndex(
@@ -290,6 +318,9 @@ export const Game = () => {
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>
+            <div>
+              <Button onClick={matchMakerRequest}>Encontrar Adversário</Button>
+            </div>
             <h2 style={{ padding: '20px' }}>*** SALAS ***</h2>
             <div>
               <Button onClick={createRoom}>Criar sala</Button>
@@ -306,6 +337,16 @@ export const Game = () => {
           </div>
           <div>
             <LeaveRoomModal visible={visible} message={newMessage} />
+          </div>
+          <div>
+            <Modal
+              title="Aviso!"
+              open={messageOpen}
+              onOk={() => setMessageOpen(false)}
+              onCancel={() => setMessageOpen(false)}
+            >
+              <p>{message}</p>
+            </Modal>
           </div>
         </div>
       )}
