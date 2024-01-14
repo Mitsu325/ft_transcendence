@@ -11,17 +11,17 @@ import {
 import { User } from '../../user/entities/user.entity';
 
 @Entity('battles')
-export class Battles extends BaseEntity {
+export class Battle extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'host_id' })
-  host: User;
+  host: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'guest_id' })
-  guest: User;
+  guest: string;
 
   @Column({ nullable: true })
   winner_score: number;
@@ -31,7 +31,7 @@ export class Battles extends BaseEntity {
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'winner' })
-  winner: User;
+  winner: string;
 
   @Column()
   status: string;

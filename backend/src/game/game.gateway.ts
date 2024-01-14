@@ -189,6 +189,21 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(@MessageBody() room: { userPlayer: Player, userRoomId: string }, @ConnectedSocket() client: Socket) {
     if (game.rooms[room.userRoomId]) {
+      const p1score = game.rooms[room.userRoomId].scores.score1;
+      const p2score = game.rooms[room.userRoomId].scores.score2;
+
+      const host = game.rooms[room.userRoomId].player1.id;
+      const guest = game.rooms[room.userRoomId].player2.id;
+      const winner_score = p1score > p2score ? p1score : p2score;
+      const loser_score = p1score < p2score ? p1score : p2score;
+      let winner = p1score > p2score ? host : guest;
+      winner = p1score === p2score ? null : winner;
+      const status = winner === null ? 'empate' : 'finalizado';
+
+      const battle = { host, guest, winner_score, loser_score, winner, status };
+
+      this.gameService.create(battle);
+
       game.rooms[room.userRoomId].isRunning = false;
       try {
         this.server.to(room.userRoomId).emit('playerLeftRoom', 'GameOver: Player left the room!');

@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateBattleDto } from './dto/game.dto';
+import { Battle } from './entities/game.entity';
 import { Server } from 'socket.io';
 
 export interface Player {
@@ -152,6 +156,21 @@ export class ScoresService {
 
 @Injectable()
 export class GameService {
+  constructor(
+    @InjectRepository(Battle)
+    private battlesRepository: Repository<Battle>,
+  ) { }
+
+  async create(createBattleDto: CreateBattleDto) {
+    try {
+      const battle = this.battlesRepository.create(createBattleDto);
+      const savedBattle = await this.battlesRepository.save(battle);
+      return savedBattle;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   findRoomByPlayerId(playerId: string, game: Game): string | null {
     for (const roomId in game.rooms) {
       const room = game.rooms[roomId];

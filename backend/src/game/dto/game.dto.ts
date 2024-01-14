@@ -6,7 +6,17 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GameDto {
+export class CreateBattleDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  host: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  guest: string;
+
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
@@ -19,7 +29,11 @@ export class GameDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(200)
+  @ApiProperty()
+  winner: string;
+
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty()
   status: string;
 }
