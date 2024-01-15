@@ -1,31 +1,6 @@
-.channel-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-  width: 100%;
-}
-
-.menu {
-  background-color: #f5f5f5;
-  color: #001529;
-  font-family: Roboto Condensed;
-  font-size: 1.2rem;
-  width: 200px;
-  height: 33px;
-  margin-top: 12px;
-}
-
-.divider {
-  margin-bottom: 1px;
-}
-
-.channel {
-  flex: 1;
-  max-width: 450px;
-  border: 2px solid #001529;
-  text-align: center;
-  box-shadow: 5px 5px 10px #001529;
+.channelList {
+  overflow-y: auto;
+  height: 100%;
 }
 
 .channel-item {
@@ -51,44 +26,4 @@
 
 .channel-name {
   margin-left: 10px;
-}
-
-.messages {
-  flex: 1;
-  max-width: 1200px;
-  min-width: 300px;
-  height: 75vh;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid #001529;
-  box-shadow: 5px 5px 10px #001529;
-}
-
-.date {
-  text-align: center;
-  font-size: 0.9rem;
-  color: gray;
-}
-
-.hour {
-  text-align: right;
-  margin-right: 25px;
-  color: gray;
-}
-
-.channelList {
-  overflow-y: auto;
-  height: 100%;
-}
-
-@media screen and (max-width: 768px) {
-  .channel-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .channel,
-  .messages {
-    max-width: 100%;
-  }
 }

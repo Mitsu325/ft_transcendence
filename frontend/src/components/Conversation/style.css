@@ -56,6 +56,18 @@ p {
   font-size: 1rem;
 }
 
+.hour {
+  text-align: right;
+  margin-right: 25px;
+  color: gray;
+}
+
+.date {
+  text-align: center;
+  font-size: 0.9rem;
+  color: gray;
+}
+
 .send-button {
   position: absolute;
   bottom: 0.75rem;
