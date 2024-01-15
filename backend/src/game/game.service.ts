@@ -161,7 +161,7 @@ export class GameService {
     private battlesRepository: Repository<Battle>,
   ) { }
 
-  async create(createBattleDto: CreateBattleDto) {
+  async saveBattle(createBattleDto: CreateBattleDto) {
     try {
       const battle = this.battlesRepository.create(createBattleDto);
       const savedBattle = await this.battlesRepository.save(battle);
@@ -169,6 +169,22 @@ export class GameService {
     } catch (error) {
       throw error;
     }
+  }
+
+  getDataBattle(room: string, game: Game) {
+    const p1score = game.rooms[room].scores.score1;
+    const p2score = game.rooms[room].scores.score2;
+
+    const host = game.rooms[room].player1.id;
+    const guest = game.rooms[room].player2.id;
+    const winner_score = p1score > p2score ? p1score : p2score;
+    const loser_score = p1score < p2score ? p1score : p2score;
+    let winner = p1score > p2score ? host : guest;
+    winner = p1score === p2score ? null : winner;
+    const status = winner === null ? 'empate' : 'finalizado';
+    const battle = { host, guest, winner_score, loser_score, winner, status };
+
+    return (battle);
   }
 
   findRoomByPlayerId(playerId: string, game: Game): string | null {
