@@ -30,7 +30,6 @@ export default function Channels({
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [password, setPassword] = useState('');
   const [channels, setChannels] = useState<ChannelItemProps[]>([]);
-
   const [activeChannel, setActiveChannel] = useState<string | null>(null);
   const user = useAuth()?.user;
 
@@ -132,13 +131,15 @@ export default function Channels({
               activeChannel === item.id ? 'active' : ''
             }`}
             key={item.id}
-            onClick={() => handleChatClick(item.id, item.name_channel)}
             style={{
               borderLeft:
                 activeChannel === item.id ? '5px solid #1677FF' : 'none',
             }}
           >
-            <div className="icon-channel">
+            <div
+              className="icon-channel"
+              onClick={() => handleChatClick(item.id, item.name_channel)}
+            >
               <WechatOutlined className="chat-icon" />
             </div>
             <div className="channel-name">

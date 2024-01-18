@@ -36,15 +36,21 @@ export class ChannelGateway
         @ConnectedSocket() client: Socket,
         @MessageBody() data: { userName: string; roomId: string },
     ) {
-        client.join(data.roomId);
+        if (
+            !usersInRooms[client.id] ||
+            !usersInRooms[client.id].includes(data.roomId)
+        ) {
+            client.join(data.roomId);
 
-        if (!usersInRooms[client.id]) {
-            usersInRooms[client.id] = [];
+            if (!usersInRooms[client.id]) {
+                usersInRooms[client.id] = [];
+            }
+            usersInRooms[client.id].push(data.roomId);
+
+            this.server
+                .to(data.roomId)
+                .emit('joinedRoom', data.roomId, data.userName);
         }
-        usersInRooms[client.id].push(data.roomId);
-        this.server
-            .to(data.roomId)
-            .emit('joinedRoom', data.roomId, data.userName);
     }
 
     @SubscribeMessage('sendMessage')

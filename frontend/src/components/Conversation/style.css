@@ -11,6 +11,11 @@ p {
   margin: 0;
 }
 
+.btn {
+  margin-left: auto;
+  margin-right: 20px;
+}
+
 .divider-ch {
   margin-bottom: 1px;
   margin-top: 14px;
