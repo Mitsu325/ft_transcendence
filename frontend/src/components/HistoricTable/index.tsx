@@ -18,9 +18,15 @@ interface DataType {
 
 const columns: TableProps<DataType>['columns'] = [
   {
+    title: 'Anfitrião',
+    dataIndex: 'battle_host',
+    key: 'host',
+    render: text => <a>{text}</a>,
+  },
+  {
     title: 'Adversário',
     dataIndex: 'battle_guest',
-    key: 'adversary',
+    key: 'guest',
     render: text => <a>{text}</a>,
   },
   {
@@ -51,8 +57,7 @@ const getHistoric = async (userId: string) => {
     const response = await api.post('/battles/historic_battles', {
       userId: userId,
     });
-    if (response.data.verified) {
-      console.log(response.data);
+    if (response.data) {
       return response.data;
     } else {
       return null;
@@ -82,6 +87,7 @@ const HistoricTable: React.FC = () => {
     const fetchData = async () => {
       try {
         const resp = await getHistoric(userPlayer.id);
+        console.log('resp:', resp);
         setData(resp);
       } catch (error) {
         console.error('Error data:', error);
@@ -92,6 +98,11 @@ const HistoricTable: React.FC = () => {
 
     fetchData();
   }, [userPlayer.id]);
+
+  React.useEffect(() => {
+    // console.log('loading');
+    setLoading(true);
+  }, []);
 
   return (
     <Table
