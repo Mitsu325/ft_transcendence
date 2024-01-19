@@ -68,7 +68,86 @@ export interface Ball {
   yspeed: number
 };
 
+interface Battle_ {
+  id: number;
+  winner: User;
+  host: User;
+  guest: User;
+  winner_score: number;
+  loser_score: number;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface User {
+  id: string;
+  name: string;
+}
+
 const courtDimensions = { width: 580, height: 320 };
+
+@Injectable()
+export class BattlesService {
+  constructor(
+    @InjectRepository(Battle)
+    private battlesRepository: Repository<Battle_>,
+  ) { }
+
+  async historicBattlesByPlayer(playerId: string): Promise<any> {
+    return this.battlesRepository
+      .createQueryBuilder('battle')
+      .where('battle.host_id = :playerId', { playerId })
+      .getMany();
+  }
+
+  async countHostsByPlayer(playerId: string): Promise<number> {
+    return this.battlesRepository
+      .createQueryBuilder('battle')
+      .where('battle.host_id = :playerId', { playerId })
+      .getCount();
+  }
+
+  async countGuestsByPlayer(playerId: string): Promise<number> {
+    return this.battlesRepository
+      .createQueryBuilder('battle')
+      .where('battle.guest_id = :playerId', { playerId })
+      .getCount();
+  }
+
+  async getUserBattleDetails(userId: string): Promise<any> {
+    try {
+      const battles = await this.battlesRepository
+        .createQueryBuilder('battle')
+        .where('battle.host_id = :userId OR battle.guest_id = :userId', { userId })
+        .leftJoinAndSelect('battle.host', 'host')
+        .leftJoinAndSelect('battle.guest', 'guest')
+        .leftJoinAndSelect('battle.winner', 'winner')
+        .orderBy('battle.updated_at', 'DESC')
+        .getMany();
+
+      if (!battles || battles.length === 0) {
+        return null;
+      }
+
+      const battleDetails = battles.map(battle => {
+        return {
+          battle_id: battle.id,
+          battle_status: battle.status,
+          battle_winner: battle.winner ? battle.winner.name : null,
+          battle_host: battle.host.name,
+          battle_guest: battle.guest.name,
+          battle_score_winner: battle.winner_score,
+          battle_score_loser: battle.loser_score,
+          battle_created_date: battle.created_at,
+        };
+      });
+      return battleDetails;
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
 @Injectable()
 export class BallMoverService {
@@ -159,7 +238,23 @@ export class GameService {
   constructor(
     @InjectRepository(Battle)
     private battlesRepository: Repository<Battle>,
+    private batService: BattlesService,
   ) { }
+
+  async statisticsBattles(playerId: string) {
+    const count = await this.batService.countHostsByPlayer(playerId);
+    console.log('Player: ', playerId, count, ' vezes');
+  }
+
+  async historicBattles(playerId: string) {
+    const historic = await this.batService.historicBattlesByPlayer(playerId);
+    console.log('Historic Player: ', playerId, historic);
+  }
+
+  async getBattlesByPlayer(userId: string) {
+    const battles = await this.batService.getUserBattleDetails(userId);
+    console.log('Battles: ', battles);
+  };
 
   async saveBattle(createBattleDto: CreateBattleDto) {
     try {

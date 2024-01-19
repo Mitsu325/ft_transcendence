@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Historic } from '../../components/Historic';
 
-export default function HistoricBattles() {
+export default function HistoricPage() {
   return (
     <div>
       <Historic />

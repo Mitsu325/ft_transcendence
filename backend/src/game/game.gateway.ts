@@ -60,8 +60,10 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (roomId) {
       game.rooms[roomId].isRunning = false;
-      const battle = this.gameService.getDataBattle(roomId, game);
-      this.gameService.saveBattle(battle);
+      if (game.rooms[roomId].player2) {
+        const battle = this.gameService.getDataBattle(roomId, game);
+        this.gameService.saveBattle(battle);
+      }
       this.gameService.removeRoomAndNotify(roomId, playerId, game, this.server);
       client.leave(roomId);
     }
