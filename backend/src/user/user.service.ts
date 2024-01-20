@@ -85,6 +85,11 @@ export class UserService {
         return getNonSensitiveUserInfo(user);
     }
 
+    async getSensitiveDataByUsername(username: string) {
+        const user = await this.findByUsername(username);
+        return getNonSensitiveUserInfo(user);
+    }
+
     async uploadAvatar(userId: string, file: Express.Multer.File) {
         const { avatar: oldAvatar } = await this.findById(userId);
         const { publicUrl } = await this.uploadFileService.uploadStorage(

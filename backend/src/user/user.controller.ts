@@ -64,9 +64,21 @@ export class UserController {
         description: 'user ID',
     })
     @ApiBearerAuth('access-token')
-    @Get(':userId')
+    @Get('/id/:userId')
     findUserById(@Param() params: any) {
         return this.userService.getSensitiveDataById(params.userId);
+    }
+
+    @ApiOperation({ description: 'Find a user by username' })
+    @ApiParam({
+        name: 'username',
+        type: 'string',
+        description: 'username',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('/username/:username')
+    findUserByUsername(@Param() params: any) {
+        return this.userService.getSensitiveDataByUsername(params.username);
     }
 
     @ApiOperation({

@@ -61,7 +61,6 @@ export class ChatService {
                 id == lastMessage.sender.id
                     ? getNonSensitiveUserInfo(lastMessage.sender)
                     : getNonSensitiveUserInfo(lastMessage.recipient);
-            delete chatUser.username;
 
             interactedUsers.push({
                 chatUser,
@@ -130,7 +129,6 @@ export class ChatService {
                 });
             }
             const senderUser = getNonSensitiveUserInfo(item.sender);
-            delete senderUser.username;
             formattedMessages.push({
                 id: item.id,
                 type: 'text',
