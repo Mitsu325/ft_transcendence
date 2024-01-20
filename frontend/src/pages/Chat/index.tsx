@@ -9,13 +9,7 @@ import { socket } from 'socket';
 import Channels from 'pages/Channel/channel';
 import CreateChannel from 'components/CreateChannel';
 import Conversation from 'components/Conversation';
-
-type ChattingUser = {
-  id: string;
-  avatar: string;
-  name: string;
-  username?: string;
-};
+import { ChattingUser } from 'interfaces/chat.interface';
 
 const menuItems = [
   {

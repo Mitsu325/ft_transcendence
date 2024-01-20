@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Breadcrumb, Button, Layout, Menu, Tooltip } from 'antd';
-import getMenuBreadcrumb from 'pages/utils/GetMenu';
 import {
-  BreadcrumbItem,
-  menuItems,
-  menuPaths,
-} from 'components/Layout/menuConfig';
-import 'components/Layout/style.css';
-import { useAuth } from 'hooks/useAuth';
+  AppstoreOutlined,
+  HomeOutlined,
+  LogoutOutlined,
+  MessageOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import getMenuBreadcrumb from 'pages/utils/GetMenu';
+import { BreadcrumbItem, menuPaths } from 'components/Layout/menuConfig';
 import AvatarCustom from 'components/Avatar';
-import { LogoutOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
-import { isTokenExpired } from 'utils/jwt-decode';
 import FailureNotification from 'components/Notification/FailureNotification';
+import { useAuth } from 'hooks/useAuth';
+import { isTokenExpired } from 'utils/jwt-decode';
+import 'components/Layout/style.css';
 
 const { Header, Content, Sider } = Layout;
 
@@ -24,6 +27,36 @@ const CommonLayout = () => {
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
+
+  const menuItems = [
+    { key: '0', icon: <HomeOutlined />, label: <Link to="/">Home</Link> },
+    {
+      key: '1',
+      icon: <AppstoreOutlined />,
+      label: <Link to="/game-options">Opções de jogo</Link>,
+    },
+    {
+      key: 'sub1',
+      label: 'Perfil do usuário',
+      icon: <UserOutlined />,
+      children: [
+        {
+          key: '2',
+          label: (
+            <Link to={'/profile/' + user?.username}>Dados de cadastro</Link>
+          ),
+        },
+        { key: '3', label: 'Estatísticas' },
+        { key: '4', label: 'Histórico de partidas' },
+      ],
+    },
+    { key: '5', label: 'Amigos', icon: <TeamOutlined /> },
+    {
+      key: '6',
+      icon: <MessageOutlined />,
+      label: <Link to="/message">Chat</Link>,
+    },
+  ];
 
   useEffect(() => {
     if (!loading && isTokenExpired()) {
@@ -38,7 +71,7 @@ const CommonLayout = () => {
 
   useEffect(() => {
     const path = location.pathname;
-    const key = menuPaths[path];
+    const key = menuPaths[path.split('/').slice(0, 2).join('/')];
 
     if (key) {
       setSelectedMenuKey([key]);
@@ -47,6 +80,7 @@ const CommonLayout = () => {
     } else {
       setSelectedMenuKey(['0']);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const handleMenuClick = ({ key }: { key: string }) => {

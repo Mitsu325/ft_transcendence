@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { useAuth } from 'hooks/useAuth';
 import { Divider, QRCode, Switch } from 'antd';
 import { MobileOutlined } from '@ant-design/icons';
-import './style.css';
-import { userService } from 'services/user.api';
-import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import FailureNotification from 'components/Notification/FailureNotification';
+import { useAuth } from 'hooks/useAuth';
+import { userService } from 'services/user.api';
 
-export default function UserSecurity() {
+export default function AppAuthenticator() {
   const { user, UpdateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState('');
@@ -55,7 +54,6 @@ export default function UserSecurity() {
 
   return (
     <>
-      <h1 className="profile-title">{user?.name}</h1>
       <h2 className="profile-sub-title">Autenticação de dois fatores</h2>
       <Divider />
       <p className="profile-text mb-24">

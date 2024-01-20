@@ -8,35 +8,7 @@ import FailureNotification from 'components/Notification/FailureNotification';
 import { socket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
 import InfiniteScroll from 'components/InfiniteScroll';
-
-type ChattingUser = {
-  id: string;
-  avatar: string;
-  name: string;
-  username?: string;
-};
-
-type DividerMessage = {
-  type: 'divider';
-  text: string;
-};
-
-type TextMessage = {
-  id: string;
-  type: 'text';
-  text: string;
-  senderUser: {
-    id: string;
-    avatar: string;
-    name: string;
-    username?: string;
-  };
-  hour: string;
-};
-
-type Message = DividerMessage | TextMessage;
-
-// TODO: iniciar scroll de baixo para cima
+import { ChattingUser, Message } from 'interfaces/chat.interface';
 
 export default function MessageList(selectedUser: ChattingUser) {
   const { user } = useAuth();
