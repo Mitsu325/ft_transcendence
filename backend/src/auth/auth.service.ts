@@ -22,7 +22,7 @@ export class AuthService {
     ) {}
 
     async signIn(username, password) {
-        const user = await this.userService.findUsername(username);
+        const user = await this.userService.findByEmailOrUsername(username);
         if (!user) {
             throw new UnauthorizedException();
         }
@@ -40,7 +40,7 @@ export class AuthService {
         userId: string;
         otp: string;
     }): Promise<{ verified: boolean }> {
-        const user = await this.userService.findUser(body.userId);
+        const user = await this.userService.findById(body.userId);
 
         const verified: boolean = speakeasy.totp.verify({
             secret: user.twoFactorSecret,

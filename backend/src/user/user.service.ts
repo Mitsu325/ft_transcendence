@@ -35,19 +35,7 @@ export class UserService {
         }
     }
 
-    async findUser(id: string) {
-        const user = await this.findById(id);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...data } = user;
-        return data;
-    }
-
-    async findAll() {
-        const users = await this.usersRepository.find();
-        return users.map(user => getNonSensitiveUserInfo(user));
-    }
-
-    private async findById(id: string) {
+    async findById(id: string) {
         return await this.usersRepository.findOne({
             where: { id },
         });
@@ -59,8 +47,8 @@ export class UserService {
         });
     }
 
-    findUsername(username: string) {
-        return this.usersRepository.findOne({
+    async findByEmailOrUsername(username: string) {
+        return await this.usersRepository.findOne({
             where: [{ username: username }, { email: username }],
         });
     }
@@ -79,7 +67,19 @@ export class UserService {
         return users.map(user => getNonSensitiveUserInfo(user));
     }
 
-    async getUserSensitiveDataById(userId: string) {
+    async findAll() {
+        const users = await this.usersRepository.find();
+        return users.map(user => getNonSensitiveUserInfo(user));
+    }
+
+    async getNoSecrets(id: string) {
+        const user = await this.findById(id);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, twoFactorSecret, ...data } = user;
+        return data;
+    }
+
+    async getSensitiveDataById(userId: string) {
         const user = await this.findById(userId);
         return getNonSensitiveUserInfo(user);
     }
@@ -107,6 +107,6 @@ export class UserService {
                 );
             }
         }
-        return await this.findUser(userId);
+        return await this.getNoSecrets(userId);
     }
 }

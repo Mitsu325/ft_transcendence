@@ -44,7 +44,7 @@ export class UserController {
     @ApiBearerAuth('access-token')
     @Get('me')
     find(@Request() req) {
-        return this.userService.findUser(req.user.sub);
+        return this.userService.getNoSecrets(req.user.sub);
     }
 
     @ApiOperation({ description: 'Find a user by name' })
@@ -64,7 +64,7 @@ export class UserController {
     @ApiBearerAuth('access-token')
     @Get(':userId')
     findUserById(@Param() params: any) {
-        return this.userService.getUserSensitiveDataById(params.userId);
+        return this.userService.getSensitiveDataById(params.userId);
     }
 
     @ApiOperation({
