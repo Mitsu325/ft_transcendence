@@ -109,6 +109,7 @@ const Court: React.FC<CourtProps> = ({
       document.removeEventListener('keydown', sendKeyEvent);
       document.removeEventListener('keyup', sendKeyEvent);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

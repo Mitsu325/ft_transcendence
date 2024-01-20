@@ -55,7 +55,9 @@ export default function TwoFactorAuthPage() {
           marginTop: '100px',
         }}
         value={otp}
-        onChange={(e: any) => setOtp(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setOtp(e.target.value)
+        }
         placeholder="Enter OTP"
       />
       <Button
