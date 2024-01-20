@@ -3,7 +3,6 @@ import { GamePong } from './game.gateway';
 import { GameService } from './game.service';
 
 @Module({
-  providers: [GamePong, GameService],
+    providers: [GamePong, GameService],
 })
-
-export class GameModule { }
+export class GameModule {}
