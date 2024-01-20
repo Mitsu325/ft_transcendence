@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { EditOutlined, KeyOutlined } from '@ant-design/icons';
+import { EditOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'hooks/useAuth';
 import AvatarCustom from 'components/Avatar';
+import UserProfileData from './Content/profileData';
+import UserSecurity from './Content/security';
+import UserEditProfile from './Content/Edit/editProfile';
 import 'pages/Register/style.css';
-import { Link } from 'react-router-dom';
 
 const menuItems = [
+  {
+    key: 'profile-data',
+    path: '/profile',
+    icon: <UserOutlined />,
+    label: 'Perfil',
+  },
   {
     key: 'profile-edit',
     path: '/profile/edit',
@@ -23,8 +32,10 @@ const menuItems = [
 export default function Register({ content }: { content: string }) {
   const { user } = useAuth();
   const [mdScreenBreakpoint, setMdScreenBreakpoint] = useState(
-    window.innerWidth > 1450,
+    window.innerWidth > 768,
   );
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const { pathname } = useLocation();
 
   const updateMedia = () => {
     setMdScreenBreakpoint(window.innerWidth > 768);
@@ -35,41 +46,35 @@ export default function Register({ content }: { content: string }) {
     return () => window.removeEventListener('resize', updateMedia);
   }, []);
 
-  const listItems = menuItems.map(item => (
-    <dt key={item.key} className="profile-menu-list-item">
-      <Link to={item.path}>
-        {item.icon}
-        <span className="ml-8">{item.label}</span>
-      </Link>
-    </dt>
-  ));
+  useEffect(() => {
+    setActiveIndex(menuItems.findIndex(item => item.path === pathname));
+  }, [pathname]);
+
+  const listItems = menuItems.map((item, index) => {
+    return (
+      <dt
+        key={item.key}
+        className={
+          'profile-menu-list-item' +
+          (activeIndex === index ? ' list-item-active' : '')
+        }
+      >
+        <Link to={item.path}>
+          {item.icon}
+          <span className="ml-8">{item.label}</span>
+        </Link>
+      </dt>
+    );
+  });
 
   const renderContent = () => {
     switch (content) {
       case 'profile-data':
-        return (
-          <>
-            <h1 className="profile-title">{user?.name}</h1>
-            <p className="profile-text">
-              Username: {user?.username || 'Não definido'}
-            </p>
-            <p className="profile-text">E-mail: {user?.email}</p>
-          </>
-        );
+        return <UserProfileData />;
       case 'profile-edit':
-        return (
-          <>
-            <h1 className="profile-title">{user?.name}</h1>
-            <h2>Editar perfil...</h2>
-          </>
-        );
+        return <UserEditProfile />;
       case 'security':
-        return (
-          <>
-            <h1 className="profile-title">{user?.name}</h1>
-            <h2>Configuração de senha, 2FA...</h2>
-          </>
-        );
+        return <UserSecurity />;
       default:
         break;
     }

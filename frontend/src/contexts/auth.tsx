@@ -4,15 +4,14 @@ import {
   clearAuthorizationHeader,
   setAuthorizationHeader,
 } from 'services/auth.service';
-import { jwtDecode } from 'jwt-decode';
 import { Spin } from 'antd';
-import FailureNotification from 'components/Notification/FailureNotification';
 
 interface AuthContextData {
   signed: boolean;
   user: UserModel | null;
   Login(token: string, user: UserModel): void;
   Logout(): void;
+  UpdateUser(user: UserModel): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -30,19 +29,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     if (storedUser && storedToken) {
-      const decodedToken = jwtDecode(storedToken);
-      if (decodedToken && decodedToken.exp) {
-        if (decodedToken && decodedToken.exp < Math.floor(Date.now() / 1000)) {
-          Logout();
-          FailureNotification({
-            message: 'Sessão encerrada',
-            description: 'Por favor, faça login novamente.',
-          });
-          finishLoading();
-          return;
-        }
-      }
-
       setAuthorizationHeader(storedToken);
       setUser(JSON.parse(storedUser));
     }
@@ -62,13 +48,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     clearAuthorizationHeader();
   };
 
+  const UpdateUser = (newUserData: UserModel) => {
+    localStorage.setItem('user', JSON.stringify(newUserData));
+    setUser(newUserData);
+  };
+
   if (loading) {
-    return <Spin size="large" />;
+    return <Spin size="large" fullscreen />;
   }
 
   return (
     <AuthContext.Provider
-      value={{ signed: Boolean(user), user, Login, Logout }}
+      value={{ signed: Boolean(user), user, Login, Logout, UpdateUser }}
     >
       {children}
     </AuthContext.Provider>
