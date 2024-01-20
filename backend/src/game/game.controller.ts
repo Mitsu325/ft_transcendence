@@ -29,11 +29,6 @@ class PlayerRequest {
 export class GameController {
   constructor(private readonly battlesService: BattlesService) { }
 
-  // @Get('/count_hosts/:playerId')
-  // async countHostsByPlayer(@Param('playerId') playerId: string): Promise<number> {
-  //   return this.battlesService.countHostsByPlayer(playerId);
-  // }
-
   @ApiOperation({ description: 'Historic Battles' })
   @ApiBody({ type: PlayerRequest, description: 'Request body.' })
   @Public()

@@ -119,46 +119,6 @@ export class BattlesService {
     });
   }
 
-  async historicBattlesByPlayer(playerId: string): Promise<any> {
-    return this.battlesRepository
-      .createQueryBuilder('battle')
-      .where('battle.host_id = :playerId', { playerId })
-      .getMany();
-  }
-
-  async getUserBattleDetails(userId: string): Promise<any> {
-    try {
-      const battles = await this.battlesRepository
-        .createQueryBuilder('battle')
-        .where('battle.host_id = :userId OR battle.guest_id = :userId', { userId })
-        .leftJoinAndSelect('battle.host', 'host')
-        .leftJoinAndSelect('battle.guest', 'guest')
-        .leftJoinAndSelect('battle.winner', 'winner')
-        .orderBy('battle.updated_at', 'DESC')
-        .getMany();
-
-      if (!battles || battles.length === 0) {
-        return null;
-      }
-
-      const battleDetails = battles.map(battle => {
-        return {
-          battle_id: battle.id,
-          battle_status: battle.status,
-          battle_winner: battle.winner ? battle.winner : null,
-          battle_host: battle.host,
-          battle_guest: battle.guest,
-          battle_score_winner: battle.winner_score,
-          battle_score_loser: battle.loser_score,
-          battle_created_date: battle.created_at,
-        };
-      });
-      return battleDetails;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getPlayersBattleDetails(userId: string): Promise<any> {
     try {
       const battles = await this.battlesRepository
@@ -237,27 +197,6 @@ export class BattlesService {
       };
 
       return playerPerformance;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getBattlesDetails(): Promise<any> {
-    try {
-      const battles = await this.battlesRepository
-        .createQueryBuilder('battle')
-        .leftJoinAndSelect('battle.host', 'host')
-        .leftJoinAndSelect('battle.guest', 'guest')
-        .leftJoinAndSelect('battle.winner', 'winner')
-        .orderBy('battle.updated_at', 'DESC')
-        .getMany();
-      if (!battles || battles.length === 0) {
-        return null;
-      }
-
-      const battleDetails = await this.mapBattles(battles);
-
-      return battleDetails;
     } catch (error) {
       throw error;
     }
@@ -353,33 +292,7 @@ export class GameService {
   constructor(
     @InjectRepository(Battle)
     private battlesRepository: Repository<Battle>,
-    private batService: BattlesService,
   ) { }
-
-  // async statisticsBattles(playerId: string) {
-  //   const count = await this.batService.countHostsByPlayer(playerId);
-  //   console.log('Player: ', playerId, count, ' vezes');
-  // }
-
-  async historicBattles(playerId: string) {
-    const historic = await this.batService.historicBattlesByPlayer(playerId);
-    console.log('Historic Player: ', playerId, historic);
-  }
-
-  async getBattlesByPlayer(userId: string) {
-    const battles = await this.batService.getUserBattleDetails(userId);
-    console.log('Battles: ', battles);
-  };
-
-  async getPlayersBattles(userId: string) {
-    const battles = await this.batService.getPlayersBattleDetails(userId);
-    console.log('Battles: ', battles);
-  };
-
-  async getBattles(): Promise<any> {
-    const battles = await this.batService.getBattlesDetails();
-    return battles;
-  };
 
   async saveBattle(createBattleDto: CreateBattleDto) {
     try {
@@ -425,7 +338,6 @@ export class GameService {
 
     const getLatency = async () => {
       // server.to(room.room_id).emit('ping');
-
       const currentTime = new Date().getTime();
       const latency = currentTime - startTime;
       server.to(room.room_id).emit('ping', latency);

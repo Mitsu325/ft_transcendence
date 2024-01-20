@@ -2,7 +2,6 @@ import * as React from 'react';
 import Home from '../Home/home';
 import GameOptions from '../GameOptions';
 import Register from '../Register';
-import HistoricPage from '../HistoricPage';
 
 type MenuItem = {
   key: string;
@@ -38,8 +37,6 @@ const renderContent = (items: MenuItem[], key: string) => {
         return <GameOptions />;
       case '2':
         return <Register />;
-      case '4':
-        return <HistoricPage />;
       // TO DO fazer página para cada opção do menu
       default:
         return null;

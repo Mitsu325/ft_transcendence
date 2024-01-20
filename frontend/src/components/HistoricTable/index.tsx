@@ -40,8 +40,6 @@ const HistoricTable: React.FC = () => {
   const userPlayer = React.useMemo(() => {
     const newPlayer = {
       id: user?.id ?? '',
-      name: user?.name ?? '',
-      avatar: user?.avatar ?? null,
     };
     return newPlayer;
   }, [user]);
