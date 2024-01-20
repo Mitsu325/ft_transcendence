@@ -33,4 +33,12 @@ export class UploadFileService {
             .getPublicUrl(uploadData.path);
         return { ...data };
     }
+
+    async deleteFileStorage(bucket: string, filePath: string) {
+        const { data, error }: any = await this.supabase.storage
+            .from(bucket)
+            .remove([filePath]);
+        if (error) throw error;
+        return data;
+    }
 }

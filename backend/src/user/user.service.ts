@@ -85,9 +85,10 @@ export class UserService {
     }
 
     async uploadAvatar(userId: string, file: Express.Multer.File) {
+        const { avatar: oldAvatar } = await this.findById(userId);
         const { publicUrl } = await this.uploadFileService.uploadStorage(
             'avatar',
-            userId,
+            userId + '_' + Date.now().toString(),
             file,
         );
         if (publicUrl) {
@@ -99,7 +100,13 @@ export class UserService {
                     avatar: publicUrl,
                 },
             );
+            if (oldAvatar) {
+                await this.uploadFileService.deleteFileStorage(
+                    'avatar',
+                    oldAvatar.split('/').pop(),
+                );
+            }
         }
-        return await this.getUserSensitiveDataById(userId);
+        return await this.findUser(userId);
     }
 }
