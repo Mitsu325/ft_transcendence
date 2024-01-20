@@ -23,7 +23,7 @@ const SignUpPage: React.FC = () => {
           Bem vindo ao Portal de Jogos do 42 JMP Team
         </h1>
         <SignUpForm />
-        <Link to="/login" className="link-pos-center mt-40 mb-24">
+        <Link to="/" className="link-pos-center mt-40 mb-24">
           Voltar para a página de login
         </Link>
       </Content>
