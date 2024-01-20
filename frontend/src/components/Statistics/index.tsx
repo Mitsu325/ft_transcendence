@@ -84,7 +84,7 @@ const Statistics: React.FC = () => {
             <Col span={4}>
               <Statistic
                 title="Total"
-                value={playerPerformance.total_battles}
+                value={playerPerformance?.total_battles}
                 valueStyle={{
                   color: '#000000',
                   fontWeight: 'bold',
@@ -98,7 +98,7 @@ const Statistics: React.FC = () => {
             <Col span={4}>
               <Statistic
                 title="Vitórias"
-                value={playerPerformance.total_wins}
+                value={playerPerformance?.total_wins}
                 valueStyle={{
                   color: 'rgb(0, 106, 255)',
                   fontWeight: 'bold',
@@ -110,7 +110,7 @@ const Statistics: React.FC = () => {
             <Col span={4}>
               <Statistic
                 title="Derrotas"
-                value={playerPerformance.total_loses}
+                value={playerPerformance?.total_loses}
                 valueStyle={{
                   color: 'red',
                   fontWeight: 'bold',
@@ -122,7 +122,7 @@ const Statistics: React.FC = () => {
             <Col span={4}>
               <Statistic
                 title="Empates"
-                value={playerPerformance.total_draws}
+                value={playerPerformance?.total_draws}
                 valueStyle={{
                   color: 'grey',
                   fontWeight: 'bold',
@@ -145,32 +145,35 @@ const Statistics: React.FC = () => {
             <Progress
               type="circle"
               percent={
-                (
-                  (playerPerformance.total_wins /
-                    playerPerformance.total_battles) *
+                playerPerformance &&
+                ((
+                  (playerPerformance?.total_wins /
+                    playerPerformance?.total_battles) *
                   100
-                ).toFixed(2) as unknown as number
+                ).toFixed(2) as unknown as number)
               }
             />
             <Progress
               type="circle"
               percent={
-                (
-                  (playerPerformance.total_loses /
-                    playerPerformance.total_battles) *
+                playerPerformance &&
+                ((
+                  (playerPerformance?.total_loses /
+                    playerPerformance?.total_battles) *
                   100
-                ).toFixed(2) as unknown as number
+                ).toFixed(2) as unknown as number)
               }
               strokeColor="red"
             />
             <Progress
               type="circle"
               percent={
-                (
-                  (playerPerformance.total_draws /
-                    playerPerformance.total_battles) *
+                playerPerformance &&
+                ((
+                  (playerPerformance?.total_draws /
+                    playerPerformance?.total_battles) *
                   100
-                ).toFixed(2) as unknown as number
+                ).toFixed(2) as unknown as number)
               }
               strokeColor="gray"
             />

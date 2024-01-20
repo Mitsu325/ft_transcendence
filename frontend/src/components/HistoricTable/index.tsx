@@ -136,11 +136,6 @@ const HistoricTable: React.FC = () => {
             title: 'Vencedor',
             dataIndex: 'battle_winner',
             key: 'winner',
-            render: (text, record) => (
-              <a onClick={() => getPerformancePlayer(record.battle_guest_id)}>
-                {text}
-              </a>
-            ),
           },
           {
             title: 'Vencedor Score',
