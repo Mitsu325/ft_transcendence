@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Breadcrumb, Button, Layout, Menu, Tooltip } from 'antd';
 import getMenuBreadcrumb from 'pages/utils/GetMenu';
 import {
@@ -12,17 +12,29 @@ import { useAuth } from 'hooks/useAuth';
 import AvatarCustom from 'components/Avatar';
 import { LogoutOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import { isTokenExpired } from 'utils/jwt-decode';
+import FailureNotification from 'components/Notification/FailureNotification';
 
 const { Header, Content, Sider } = Layout;
 
 const CommonLayout = () => {
-  const context = useAuth();
-  const navigate = useNavigate();
+  const { user, Logout } = useAuth();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
+
+  useEffect(() => {
+    if (!loading && isTokenExpired()) {
+      FailureNotification({
+        message: 'Sessão encerrada',
+        description: 'Por favor, faça login novamente.',
+      });
+      Logout();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const path = location.pathname;
@@ -43,20 +55,19 @@ const CommonLayout = () => {
 
   const onLogout = () => {
     setLoading(true);
-    context.Logout();
     SuccessNotification({
       message: 'Sessão encerrada',
       description: 'A sua sessão foi encerrada.',
     });
-    navigate('/');
+    Logout();
   };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="header align-end">
         <div className="header-user-info">
-          <p className="mr-8">{context.user?.name}</p>
-          <AvatarCustom src={context.user?.avatar || ''} size={40} />
+          <p className="mr-8">{user?.name}</p>
+          <AvatarCustom src={user?.avatar || ''} size={40} />
         </div>
       </Header>
       <Sider

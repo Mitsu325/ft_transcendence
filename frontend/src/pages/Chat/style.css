@@ -54,7 +54,7 @@
 }
 
 .chat-list {
-  height: 54vh;
+  height: 100%;
   overflow-y: auto;
 }
 

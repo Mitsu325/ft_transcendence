@@ -45,5 +45,7 @@ export const menuPaths: MenuPaths = {
   '/': '0',
   '/game-options': '1',
   '/profile': '2',
+  '/profile/edit': '2',
+  '/profile/security': '2',
   '/message': '6',
 };

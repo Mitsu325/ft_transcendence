@@ -19,8 +19,14 @@ async function searchUserByName(name: string) {
   return result.data || null;
 }
 
+async function uploadAvatar(file: File) {
+  const result = await api.post('/user/sign-up', file);
+  return result.data || null;
+}
+
 export const userService = {
   getUser,
   searchUserByName,
   getUserById,
+  uploadAvatar,
 };
