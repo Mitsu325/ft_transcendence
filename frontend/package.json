@@ -28,7 +28,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",
-    "react-qr-code": "^2.0.12",
     "react-qr-scanner": "^1.0.0-alpha.11",
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.17.0",

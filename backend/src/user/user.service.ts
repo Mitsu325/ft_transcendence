@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { UploadFileService } from 'src/upload-file/upload-file.service';
+import { twoFactorGenerator } from 'src/utils/twoFactor.util';
 
 @Injectable()
 export class UserService {
@@ -108,5 +109,29 @@ export class UserService {
             }
         }
         return await this.getNoSecrets(userId);
+    }
+
+    async update2fa(userId: string, status: boolean) {
+        await this.usersRepository.update(
+            { id: userId },
+            { twoFactorAuth: status },
+        );
+        const user = await this.getNoSecrets(userId);
+        const res = {
+            user,
+        };
+        if (status) {
+            const newTwoFactorSecret = await twoFactorGenerator();
+            await this.usersRepository.update(
+                { id: userId },
+                { twoFactorSecret: newTwoFactorSecret },
+            );
+            const { twoFactorSecret, name } = await this.findById(userId);
+            res['secret'] = twoFactorSecret;
+            res['url'] = `otpauth://totp/${encodeURIComponent(
+                name,
+            )}?secret=${twoFactorSecret}&issuer=pong`;
+        }
+        return res;
     }
 }
