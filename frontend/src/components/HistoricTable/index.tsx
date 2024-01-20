@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import api from 'services/api';
 import { Table, Modal } from 'antd';
-// import type { TableProps } from 'antd';
 
 interface DataType {
   battle_id: number;
