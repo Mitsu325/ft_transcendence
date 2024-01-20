@@ -13,7 +13,7 @@ const AvatarCustom = ({ src, size, className }: AvatarProps) => {
   return src ? (
     <Avatar src={src} alt="" size={size} className={className} />
   ) : (
-    <Avatar icon={<UserOutlined />} alt="" size={size} />
+    <Avatar icon={<UserOutlined />} alt="" size={size} className={className} />
   );
 };
 
