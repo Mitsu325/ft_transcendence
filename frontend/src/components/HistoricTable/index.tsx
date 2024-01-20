@@ -171,17 +171,35 @@ const HistoricTable: React.FC = () => {
         onOk={() => setShowModal(false)}
         onCancel={() => setShowModal(false)}
       >
-        <h2>{playerPerformance.name}</h2>
-        <p>Total de Jogos: {playerPerformance.total_battles}</p>
-        <p>Vitórias: {playerPerformance.total_wins}</p>
-        <p>Derrotas: {playerPerformance.total_loses}</p>
-        <p>Empates: {playerPerformance.total_draws}</p>
+        <h3>
+          {'*** '}
+          {playerPerformance?.name && playerPerformance.name.toUpperCase()}
+          {' ***'}
+        </h3>
+        <p>
+          Total de Jogos:
+          <b>{playerPerformance.total_battles}</b>
+        </p>
+        <p>
+          Vitórias:
+          <b>{playerPerformance.total_wins}</b>
+        </p>
+        <p>
+          Derrotas:
+          <b>{playerPerformance.total_loses}</b>
+        </p>
+        <p>
+          Empates:
+          <b>{playerPerformance.total_draws}</b>
+        </p>
         <p>
           Aproveitamento:{' '}
-          {(
-            (playerPerformance.total_wins / playerPerformance.total_battles) *
-            100
-          ).toFixed(2)}
+          <b>
+            {(
+              (playerPerformance.total_wins / playerPerformance.total_battles) *
+              100
+            ).toFixed(2)}
+          </b>
           %
         </p>
       </Modal>
