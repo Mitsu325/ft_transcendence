@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from 'hooks/useAuth';
-import UploadAvatar from './uploadAvatar';
 import UserModel from 'interfaces/userModel';
+import AppAuthenticator from './appAuthenticator';
 
-export default function UserEditProfile({
+export default function UserSecurity({
   userProfile,
 }: {
   userProfile: UserModel | null;
@@ -12,7 +12,7 @@ export default function UserEditProfile({
 
   const renderContent = () => {
     if (user?.username === userProfile?.username) {
-      return <UploadAvatar />;
+      return <AppAuthenticator />;
     }
     return (
       <p>

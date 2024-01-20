@@ -7,7 +7,12 @@ async function getUser() {
 }
 
 async function getUserById(userId: string) {
-  const result = await api.get(`/user/${userId}`);
+  const result = await api.get(`/user/id/${userId}`);
+  return result.data || null;
+}
+
+async function getUserByUsername(username: string) {
+  const result = await api.get(`/user/username/${username}`);
   return result.data || null;
 }
 
@@ -33,6 +38,7 @@ export const userService = {
   getUser,
   searchUserByName,
   getUserById,
+  getUserByUsername,
   uploadAvatar,
   update2fa,
 };
