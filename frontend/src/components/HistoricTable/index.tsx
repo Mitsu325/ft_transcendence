@@ -10,30 +10,54 @@ interface DataType {
   battle_status: string;
   battle_winner: string | null;
   battle_host: string;
+  battle_host_id: string;
   battle_guest: string;
+  battle_guest_id: string;
   battle_score_winner: number;
   battle_score_loser: number;
-  battle_created_date: string;
+  battle_created_date: Date;
 }
 
+const handleLinkClick = (playerId: string) => {
+  // Implemente a lógica para enviar a request ao servidor
+  // Exemplo: api.post('/sua-rota', { playerId });
+  // Adicione a lógica específica da sua aplicação aqui
+  console.log(`Link clicado para o jogador com ID ${playerId}`);
+};
+
 const columns: TableProps<DataType>['columns'] = [
+  {
+    title: 'Data',
+    dataIndex: 'battle_created_date',
+    key: 'date',
+    render: (text, record) => {
+      const date = new Date(text);
+      return date.toLocaleDateString('pt-BR');
+    },
+  },
   {
     title: 'Anfitrião',
     dataIndex: 'battle_host',
     key: 'host',
-    render: text => <a>{text}</a>,
+    render: (text, record) => (
+      <a onClick={() => handleLinkClick(record.battle_host_id)}>{text}</a>
+    ),
   },
   {
     title: 'Adversário',
     dataIndex: 'battle_guest',
     key: 'guest',
-    render: text => <a>{text}</a>,
+    render: (text, record) => (
+      <a onClick={() => handleLinkClick(record.battle_guest_id)}>{text}</a>
+    ),
   },
   {
     title: 'Vencedor',
     dataIndex: 'battle_winner',
     key: 'winner',
-    render: text => <a>{text}</a>,
+    render: (text, record) => (
+      <a onClick={() => handleLinkClick(record.battle_guest_id)}>{text}</a>
+    ),
   },
   {
     title: 'Vencedor Score',
@@ -46,7 +70,7 @@ const columns: TableProps<DataType>['columns'] = [
     key: 'loser_score',
   },
   {
-    title: 'Status',
+    title: 'Resultado',
     dataIndex: 'battle_status',
     key: 'status',
   },
@@ -100,7 +124,6 @@ const HistoricTable: React.FC = () => {
   }, [userPlayer.id]);
 
   React.useEffect(() => {
-    // console.log('loading');
     setLoading(true);
   }, []);
 

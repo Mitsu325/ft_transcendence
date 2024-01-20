@@ -29,10 +29,10 @@ class PlayerHistoricRequest {
 export class GameController {
   constructor(private readonly battlesService: BattlesService) { }
 
-  @Get('/count_hosts/:playerId')
-  async countHostsByPlayer(@Param('playerId') playerId: string): Promise<number> {
-    return this.battlesService.countHostsByPlayer(playerId);
-  }
+  // @Get('/count_hosts/:playerId')
+  // async countHostsByPlayer(@Param('playerId') playerId: string): Promise<number> {
+  //   return this.battlesService.countHostsByPlayer(playerId);
+  // }
 
   @ApiOperation({ description: 'Historic Battles' })
   @ApiBody({ type: PlayerHistoricRequest, description: 'Request body.' })
@@ -41,6 +41,6 @@ export class GameController {
   @Post('historic_battles')
   async playerHistoric(@Body() body: PlayerHistoricRequest) {
     const { userId } = body;
-    return await this.battlesService.getUserBattleDetails(userId);
+    return await this.battlesService.getPlayersBattleDetails(userId);
   }
 }
