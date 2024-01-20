@@ -16,11 +16,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { BattlesService } from './game.service';
+import { BattlesService, PerformancePlayer } from './game.service';
 import { CreateBattleDto } from './dto/game.dto';
 import { Public } from 'src/common/constants';
 
-class PlayerHistoricRequest {
+class PlayerRequest {
   userId: string;
 }
 
@@ -35,12 +35,22 @@ export class GameController {
   // }
 
   @ApiOperation({ description: 'Historic Battles' })
-  @ApiBody({ type: PlayerHistoricRequest, description: 'Request body.' })
+  @ApiBody({ type: PlayerRequest, description: 'Request body.' })
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('historic_battles')
-  async playerHistoric(@Body() body: PlayerHistoricRequest) {
+  async playerHistoric(@Body() body: PlayerRequest) {
     const { userId } = body;
     return await this.battlesService.getPlayersBattleDetails(userId);
+  }
+
+  @ApiOperation({ description: 'Performance Player' })
+  @ApiBody({ type: PlayerRequest, description: 'Request body.' })
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('performance_player')
+  async playerStats(@Body() body: PerformancePlayer) {
+    const { userId } = body;
+    return await this.battlesService.getPerformancePlayers(userId);
   }
 }

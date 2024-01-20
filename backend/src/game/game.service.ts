@@ -85,7 +85,7 @@ interface User {
   name: string;
 }
 
-interface PerformancePlayer {
+export interface PerformancePlayer {
   userId: string;
   name: string;
   total_battles: number;
