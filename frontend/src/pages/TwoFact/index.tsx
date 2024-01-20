@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-// import QRCode from 'react-qr-code';
 import { Input, Button } from 'antd';
 import { useLocation } from 'react-router-dom';
 
@@ -36,14 +35,6 @@ export default function TwoFactorAuthPage() {
         marginTop: '100px',
       }}
     >
-      {/* Exibição do código QR e entrada do OTP */}
-      {/* <QRCode
-        value={secret}
-        style={{
-          marginBottom: '10px',
-          padding: '30px',
-        }}
-      /> */}
       <Input
         type="text"
         style={{

@@ -6,10 +6,10 @@ export default function UserProfileData() {
   return (
     <>
       <h1 className="profile-title">{user?.name}</h1>
-      <p className="profile-text">
+      <p className="profile-text mb-12">
         Username: {user?.username || 'Não definido'}
       </p>
-      <p className="profile-text">E-mail: {user?.email}</p>
+      <p className="profile-text mb-12">E-mail: {user?.email}</p>
     </>
   );
 }

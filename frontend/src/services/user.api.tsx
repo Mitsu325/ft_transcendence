@@ -24,9 +24,15 @@ async function uploadAvatar(file: File) {
   return result.data || null;
 }
 
+async function update2fa(twoFactorAuth: boolean) {
+  const result = await api.post('/user/set/two-factor-auth', { twoFactorAuth });
+  return result.data || null;
+}
+
 export const userService = {
   getUser,
   searchUserByName,
   getUserById,
   uploadAvatar,
+  update2fa,
 };
