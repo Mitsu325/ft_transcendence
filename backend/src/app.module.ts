@@ -9,6 +9,7 @@ import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
 import { UploadFileModule } from './upload-file/upload-file.module';
 import { ChannelModule } from './channel/channel.module';
+import { FriendModule } from './friend/friend.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { ChannelModule } from './channel/channel.module';
         GameModule,
         ChatModule,
         UploadFileModule,
+        FriendModule,
     ],
     controllers: [AppController],
     providers: [AppService],

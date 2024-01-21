@@ -33,7 +33,9 @@ export class ChatController {
         return await this.chatService.findAllMessages();
     }
 
-    @ApiOperation({ description: 'Get all messages' })
+    @ApiOperation({
+        description: 'Get all messages that I chatted with a person',
+    })
     @ApiParam({
         name: 'chattingUserId',
         type: 'string',
