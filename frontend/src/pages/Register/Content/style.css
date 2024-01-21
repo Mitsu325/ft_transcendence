@@ -1,0 +1,40 @@
+.security-group {
+  display: flex;
+  align-items: flex-start;
+}
+
+.security-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.security-text {
+  font-size: 1rem;
+}
+
+.secret-text {
+  color: #1677ff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.1rem;
+  display: block;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.qr-code {
+  margin: 20px auto;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}

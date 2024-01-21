@@ -10,5 +10,4 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   controllers: [GameController],
   providers: [GamePong, GameService, BattlesService],
 })
-
 export class GameModule { }

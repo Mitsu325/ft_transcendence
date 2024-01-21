@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { UploadFileService } from 'src/upload-file/upload-file.service';
+import { twoFactorGenerator } from 'src/utils/twoFactor.util';
 
 @Injectable()
 export class UserService {
@@ -35,18 +36,6 @@ export class UserService {
         }
     }
 
-    async findUser(id: string) {
-        const user = await this.findById(id);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...data } = user;
-        return data;
-    }
-
-    async findAll() {
-        const users = await this.usersRepository.find();
-        return users.map(user => getNonSensitiveUserInfo(user));
-    }
-
     async findById(id: string) {
         return await this.usersRepository.findOne({
             where: { id },
@@ -59,8 +48,8 @@ export class UserService {
         });
     }
 
-    findUsername(username: string) {
-        return this.usersRepository.findOne({
+    async findByEmailOrUsername(username: string) {
+        return await this.usersRepository.findOne({
             where: [{ username: username }, { email: username }],
         });
     }
@@ -79,15 +68,33 @@ export class UserService {
         return users.map(user => getNonSensitiveUserInfo(user));
     }
 
-    async getUserSensitiveDataById(userId: string) {
+    async findAll() {
+        const users = await this.usersRepository.find();
+        return users.map(user => getNonSensitiveUserInfo(user));
+    }
+
+    async getNoSecrets(id: string) {
+        const user = await this.findById(id);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, twoFactorSecret, ...data } = user;
+        return data;
+    }
+
+    async getSensitiveDataById(userId: string) {
         const user = await this.findById(userId);
         return getNonSensitiveUserInfo(user);
     }
 
+    async getSensitiveDataByUsername(username: string) {
+        const user = await this.findByUsername(username);
+        return getNonSensitiveUserInfo(user);
+    }
+
     async uploadAvatar(userId: string, file: Express.Multer.File) {
+        const { avatar: oldAvatar } = await this.findById(userId);
         const { publicUrl } = await this.uploadFileService.uploadStorage(
             'avatar',
-            userId,
+            userId + '_' + Date.now().toString(),
             file,
         );
         if (publicUrl) {
@@ -99,7 +106,37 @@ export class UserService {
                     avatar: publicUrl,
                 },
             );
+            if (oldAvatar) {
+                await this.uploadFileService.deleteFileStorage(
+                    'avatar',
+                    oldAvatar.split('/').pop(),
+                );
+            }
         }
-        return await this.getUserSensitiveDataById(userId);
+        return await this.getNoSecrets(userId);
+    }
+
+    async update2fa(userId: string, status: boolean) {
+        await this.usersRepository.update(
+            { id: userId },
+            { twoFactorAuth: status },
+        );
+        const user = await this.getNoSecrets(userId);
+        const res = {
+            user,
+        };
+        if (status) {
+            const newTwoFactorSecret = await twoFactorGenerator();
+            await this.usersRepository.update(
+                { id: userId },
+                { twoFactorSecret: newTwoFactorSecret },
+            );
+            const { twoFactorSecret, name } = await this.findById(userId);
+            res['secret'] = twoFactorSecret;
+            res['url'] = `otpauth://totp/${encodeURIComponent(
+                name,
+            )}?secret=${twoFactorSecret}&issuer=pong`;
+        }
+        return res;
     }
 }

@@ -10,7 +10,16 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, BallMoverService, PadlesMoverService, ScoresService, Player, Room, Game, MatchPadle, FinalMatch } from './game.service';
+import {
+  GameService,
+  BallMoverService,
+  PadlesMoverService,
+  ScoresService,
+  Player,
+  Room,
+  Game,
+  MatchPadle,
+} from './game.service';
 
 interface Padle {
   type: string;
@@ -38,10 +47,8 @@ const initialBall = {
   xdirection: 1,
   ydirection: 1,
   xspeed: 2.8,
-  yspeed: 2.2
+  yspeed: 2.2,
 };
-
-let matchStatus: FinalMatch;
 
 @ApiTags('pong')
 @Controller('pong')
@@ -52,7 +59,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly gameService: GameService) { }
 
-  handleConnection(client: Socket, ...args: any[]) { }
+  handleConnection() { }
 
   handleDisconnect(client: Socket) {
     const playerId = game.players[client.id]?.id;
@@ -74,8 +81,10 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('CreateRoom')
-  handleCreateRoom(@MessageBody() user: Player, @ConnectedSocket() client: Socket) {
-
+  handleCreateRoom(
+    @MessageBody() user: Player,
+    @ConnectedSocket() client: Socket,
+  ) {
     if (!game.rooms[client.id]) {
       client.join(client.id);
       game.rooms[client.id] = {
@@ -97,14 +106,28 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('GetInRoom')
-  handleGetInRoom(@MessageBody() room: Room, @ConnectedSocket() client: Socket) {
-    const playerAlreadyInRoom = Object.values(game.rooms).find(existingRoom => existingRoom.player1.id === room.player2.id || (existingRoom.player2 && existingRoom.player2.id === room.player2.id));
+  handleGetInRoom(
+    @MessageBody() room: Room,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const playerAlreadyInRoom = Object.values(game.rooms).find(
+      existingRoom =>
+        existingRoom.player1.id === room.player2.id ||
+        (existingRoom.player2 &&
+          existingRoom.player2.id === room.player2.id),
+    );
 
     if (!playerAlreadyInRoom && game.rooms[room.room_id].player2 === null) {
       client.join(room.room_id);
       game.rooms[room.room_id].player2 = { ...room.player2 };
       this.server.emit('game', game);
-      this.server.to(room.room_id).emit('players', game.rooms[room.room_id].player1, game.rooms[room.room_id].player2);
+      this.server
+        .to(room.room_id)
+        .emit(
+          'players',
+          game.rooms[room.room_id].player1,
+          game.rooms[room.room_id].player2,
+        );
       game.rooms[room.room_id].isRunning = true;
     } else {
       console.log('The Player is already in the room:', client.id);
@@ -112,7 +135,10 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('requestRoomOpen')
-  handleRequestRoomOpen(@MessageBody() player: Player, @ConnectedSocket() client: Socket) {
+  handleRequestRoomOpen(
+    @MessageBody() player: Player,
+    @ConnectedSocket() client: Socket,
+  ) {
     if (Object.values(game.rooms).length > 0) {
       for (const room in game.rooms) {
         if (game.rooms[room].player2 === null) {
@@ -127,8 +153,10 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('startMatch')
-  async handleStartMatch(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
-
+  async handleStartMatch(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     let loopGame: NodeJS.Timeout;
 
     if (!game.rooms[room]) {
@@ -140,20 +168,29 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
       game.rooms[room].ballService = new BallMoverService();
       game.rooms[room].scoresService = new ScoresService();
       const initD = Date.now() / 2 === 0 ? 1 : -1;
-      game.rooms[room].ball = { ...initialBall, xdirection: initD, ydirection: initD };
+      game.rooms[room].ball = {
+        ...initialBall,
+        xdirection: initD,
+        ydirection: initD,
+      };
       game.rooms[room].scores = initialScores;
       game.rooms[room].padles = initialPadles;
       loopGame = setInterval(async () => {
         if (!game.rooms[room]?.isRunning) {
           clearInterval(loopGame);
           return;
-        };
-        try {
-          await game.rooms[room].ballService.moveBall(game.rooms[room]);
-          this.server.to(room).emit('matchStarted', room, game.rooms[room].ball);
-          this.server.to(room).emit('matchScores', room, game.rooms[room].scores);
         }
-        catch (error) { }
+        try {
+          await game.rooms[room].ballService.moveBall(
+            game.rooms[room],
+          );
+          this.server
+            .to(room)
+            .emit('matchStarted', room, game.rooms[room].ball);
+          this.server
+            .to(room)
+            .emit('matchScores', room, game.rooms[room].scores);
+        } catch (error) { }
       }, 1000 / 60);
     } else {
       clearInterval(loopGame);
@@ -161,8 +198,12 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendKey')
-  async handleSendKey(@MessageBody() padle: Padle, @ConnectedSocket() client: Socket) {
-    const player = game.rooms[padle.room].player1.id === padle.player ? '1' : '2';
+  async handleSendKey(
+    @MessageBody() padle: Padle,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const player =
+      game.rooms[padle.room].player1.id === padle.player ? '1' : '2';
     const direction = padle.type === 'keyup' ? 'STOP' : 'GO';
 
     // if (padle.type === 'keyup') {
@@ -174,20 +215,27 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (game.rooms[padle.room] && direction === 'GO') {
-      game.rooms[padle.room].padles = await game.rooms[padle.room].padlesService.movePadle(
-        padle,
-        initialPadles,
-        player,
-      );
-      this.server.to(padle.room).emit('movePadles', padle.room, game.rooms[padle.room].padles);
+      game.rooms[padle.room].padles = await game.rooms[
+        padle.room
+      ].padlesService.movePadle(padle, initialPadles, player);
+      this.server
+        .to(padle.room)
+        .emit('movePadles', padle.room, game.rooms[padle.room].padles);
     }
   }
 
   @SubscribeMessage('sendLevel')
-  async handleSendLevel(@MessageBody() matchLevel: any, @ConnectedSocket() client: Socket) {
+  async handleSendLevel(
+    @MessageBody() matchLevel: any,
+    @ConnectedSocket() client: Socket,
+  ) {
     if (game.rooms[matchLevel.room]) {
       game.rooms[matchLevel.room].level = matchLevel.level;
-      this.server.to(matchLevel.room).emit('matchLevel', matchLevel.room, { level: matchLevel.level });
+      this.server
+        .to(matchLevel.room)
+        .emit('matchLevel', matchLevel.room, {
+          level: matchLevel.level,
+        });
     }
   }
 
@@ -209,12 +257,21 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('PlayerConnected')
-  handlePlayerConnected(@MessageBody() player: any, @ConnectedSocket() client: Socket) {
+  handlePlayerConnected(
+    @MessageBody() player: any,
+    @ConnectedSocket() client: Socket,
+  ) {
     const existingPlayer = game.players[client.id];
-    const playerAlreadyInGame = Object.values(game.players).find(existingPlayer => existingPlayer.id === player.id);
+    const playerAlreadyInGame = Object.values(game.players).find(
+      existingPlayer => existingPlayer.id === player.id,
+    );
 
     if (!existingPlayer && !playerAlreadyInGame) {
-      game.players[client.id] = { id: player.id, name: player.username, avatar: player.avatar };
+      game.players[client.id] = {
+        id: player.id,
+        name: player.username,
+        avatar: player.avatar,
+      };
     } else {
       console.log('Player with the same ID already exists:', player.id);
     }

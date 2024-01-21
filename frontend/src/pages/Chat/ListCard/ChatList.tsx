@@ -5,29 +5,12 @@ import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import { socket } from 'socket';
 import { userService } from 'services/user.api';
-
-type ChattingUser = {
-  id: string;
-  avatar: string;
-  name: string;
-  username?: string;
-};
+import { Chat, ChattingUser } from 'interfaces/chat.interface';
 
 interface ChatListProps {
   selectedUser: ChattingUser | undefined;
   handleUserClick: (chattingUser?: ChattingUser) => void;
 }
-
-type Chat = {
-  chatUser: {
-    id: string;
-    avatar: string;
-    name: string;
-    username?: string;
-  };
-  text: string;
-  date: string;
-};
 
 export default function ChatList({
   selectedUser,
@@ -148,6 +131,7 @@ export default function ChatList({
             title={item.chatUser.name}
             description={item.text}
             date={item.date}
+            username={item.chatUser.username}
             onUserClick={() => handleUserClick(item.chatUser)}
           />
         )}

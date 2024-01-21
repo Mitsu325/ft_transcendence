@@ -43,8 +43,8 @@ export interface FinalMatch {
 }
 
 export interface MatchPadle {
-  player1: { y: number, playerSpeed: number };
-  player2: { y: number, playerSpeed: number }
+  player1: { y: number; playerSpeed: number };
+  player2: { y: number; playerSpeed: number };
 }
 
 export interface MatchScore {
@@ -206,8 +206,10 @@ export class BattlesService {
 @Injectable()
 export class BallMoverService {
   async moveBall(room: Room): Promise<void> {
-    const xpos = room.ball.x + room.ball.xspeed * room.ball.xdirection * room.level;
-    const ypos = room.ball.y + room.ball.yspeed * room.ball.ydirection * room.level;
+    const xpos =
+      room.ball.x + room.ball.xspeed * room.ball.xdirection * room.level;
+    const ypos =
+      room.ball.y + room.ball.yspeed * room.ball.ydirection * room.level;
 
     room.ball.x = xpos;
     room.ball.y = ypos;
@@ -217,22 +219,34 @@ export class BallMoverService {
     }
 
     if (room.ball.x < 15) {
-      if (room.ball.y > room.padles.player1.y - 5 && room.ball.y < room.padles.player1.y + 55) {
+      if (
+        room.ball.y > room.padles.player1.y - 5 &&
+        room.ball.y < room.padles.player1.y + 55
+      ) {
         room.ball.xdirection *= -1;
       }
     }
 
     if (room.ball.x > courtDimensions.width - 15) {
-      if (room.ball.y > room.padles.player2.y - 5 && room.ball.y < room.padles.player2.y + 55) {
+      if (
+        room.ball.y > room.padles.player2.y - 5 &&
+        room.ball.y < room.padles.player2.y + 55
+      ) {
         room.ball.xdirection *= -1;
       }
     }
 
-    if (xpos > courtDimensions.width - room.ball.width || xpos < room.ball.width) {
+    if (
+      xpos > courtDimensions.width - room.ball.width ||
+      xpos < room.ball.width
+    ) {
       room.ball.xdirection *= -1;
     }
 
-    if (ypos > courtDimensions.height - room.ball.width || ypos < room.ball.width) {
+    if (
+      ypos > courtDimensions.height - room.ball.width ||
+      ypos < room.ball.width
+    ) {
       room.ball.ydirection *= -1;
     }
     return void 0;
@@ -241,7 +255,11 @@ export class BallMoverService {
 
 @Injectable()
 export class PadlesMoverService {
-  async movePadle(padle: Padle, matchPadles: MatchPadle, player: string): Promise<MatchPadle> {
+  async movePadle(
+    padle: Padle,
+    matchPadles: MatchPadle,
+    player: string,
+  ): Promise<MatchPadle> {
     const updatedPadles: MatchPadle = { ...matchPadles };
 
     if (padle.key === 'ArrowUp') {
@@ -258,10 +276,20 @@ export class PadlesMoverService {
       }
     }
 
-    if (player === '1' && updatedPadles.player1.y < 5) updatedPadles.player1.y = 2;
-    if (player === '2' && updatedPadles.player2.y < 5) updatedPadles.player2.y = 2;
-    if (player === '1' && updatedPadles.player1.y > courtDimensions.height - 50) updatedPadles.player1.y = courtDimensions.height - 50;
-    if (player === '2' && updatedPadles.player2.y > courtDimensions.height - 50) updatedPadles.player2.y = courtDimensions.height - 50;
+    if (player === '1' && updatedPadles.player1.y < 5)
+      updatedPadles.player1.y = 2;
+    if (player === '2' && updatedPadles.player2.y < 5)
+      updatedPadles.player2.y = 2;
+    if (
+      player === '1' &&
+      updatedPadles.player1.y > courtDimensions.height - 50
+    )
+      updatedPadles.player1.y = courtDimensions.height - 50;
+    if (
+      player === '2' &&
+      updatedPadles.player2.y > courtDimensions.height - 50
+    )
+      updatedPadles.player2.y = courtDimensions.height - 50;
 
     return updatedPadles;
   }
@@ -331,15 +359,22 @@ export class GameService {
     for (const roomId in game.rooms) {
       const room = game.rooms[roomId];
 
-      if (room.player1.id === playerId || (room.player2 && room.player2.id === playerId)) {
+      if (
+        room.player1.id === playerId ||
+        (room.player2 && room.player2.id === playerId)
+      ) {
         return roomId;
       }
     }
     return null;
   }
 
-  async latencyGame(roomId: string, player: string, game: Game, server: Server): Promise<void> {
-
+  async latencyGame(
+    roomId: string,
+    player: string,
+    game: Game,
+    server: Server,
+  ): Promise<void> {
     const room = game.rooms[roomId];
     const startTime = new Date().getTime();
 
@@ -357,13 +392,22 @@ export class GameService {
     await getLatency();
   }
 
-  removeRoomAndNotify(roomId: string, player: string, game: Game, server: Server): void {
+  removeRoomAndNotify(
+    roomId: string,
+    player: string,
+    game: Game,
+    server: Server,
+  ): void {
     if (game.rooms[roomId]) {
       const room = game.rooms[roomId];
       if (player === room.player1.id) {
-        server.to(room.room_id).emit('playerLeftRoom', { message: `${room.player1.name} saiu da sala.` });
+        server.to(room.room_id).emit('playerLeftRoom', {
+          message: `${room.player1.name} saiu da sala.`,
+        });
       } else if (room.player2 && player === room.player2.id) {
-        server.to(room.room_id).emit('playerLeftRoom', { message: `${room.player2.name} saiu da sala.` });
+        server.to(room.room_id).emit('playerLeftRoom', {
+          message: `${room.player2.name} saiu da sala.`,
+        });
       }
       delete game.rooms[roomId];
     }

@@ -10,6 +10,11 @@
   font-size: 2rem;
 }
 
+.divider {
+  border-color: #001529;
+  margin-bottom: 60px;
+}
+
 .pong-container {
   display: flex;
   flex-direction: column;

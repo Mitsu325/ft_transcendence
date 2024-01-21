@@ -16,7 +16,18 @@ const PrivateRoutes: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/game-options" element={<Game />} />
           <Route path="/message" element={<Chat />} />
-          <Route path="/profile" element={<Register />} />
+          <Route
+            path="/profile/:username"
+            element={<Register content="profile-data" />}
+          />
+          <Route
+            path="/profile/:username/edit"
+            element={<Register content="profile-edit" />}
+          />
+          <Route
+            path="/profile/:username/security"
+            element={<Register content="security" />}
+          />
           <Route path="/historic" element={<HistoricTable />} />
           <Route path="/statistics" element={<Statistics />} />
         </Route>

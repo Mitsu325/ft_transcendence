@@ -1,0 +1,29 @@
+.channelList {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  color: #001529;
+  border-bottom: 1px solid #001529;
+  cursor: pointer;
+}
+
+.channel-item:hover {
+  background-color: #dcdcdc;
+}
+
+.icon-channel {
+  margin: 10px;
+}
+
+.chat-icon {
+  font-size: 40px;
+  color: #001529;
+}
+
+.channel-name {
+  margin-left: 10px;
+}

@@ -6,13 +6,14 @@ import { AvatarSize } from 'antd/es/avatar/AvatarContext';
 type AvatarProps = {
   src?: string;
   size: AvatarSize;
+  className?: string;
 };
 
-const AvatarCustom = ({ src, size }: AvatarProps) => {
+const AvatarCustom = ({ src, size, className }: AvatarProps) => {
   return src ? (
-    <Avatar src={src} alt="" size={size} />
+    <Avatar src={src} alt="" size={size} className={className} />
   ) : (
-    <Avatar icon={<UserOutlined />} alt="" size={size} />
+    <Avatar icon={<UserOutlined />} alt="" size={size} className={className} />
   );
 };
 

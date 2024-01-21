@@ -9,16 +9,17 @@ type UserListProps = {
   description?: string;
   date?: string;
   active: boolean;
+  username?: string;
   onUserClick?: () => void;
 };
 
-// TODO: title seguir para detalhes do perfil ao clicar
 const UserListItem = ({
   avatar,
   title,
   description,
   date,
   active,
+  username,
   onUserClick,
 }: UserListProps) => {
   return (
@@ -30,7 +31,7 @@ const UserListItem = ({
         avatar={<AvatarCustom src={avatar} size={48} />}
         title={
           <a
-            href="#"
+            href={'/profile/' + username}
             style={{ color: '#001529', transition: 'color 0.5s' }}
             onMouseEnter={e =>
               ((e.target as HTMLElement).style.color = '#1677ff')

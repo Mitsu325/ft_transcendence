@@ -13,14 +13,13 @@ type MessageBoxProps = {
   hour: string;
 };
 
-// TODO: title seguir para detalhes do perfil ao clicar
 const MessageBox = ({ senderUser, text, hour }: MessageBoxProps) => {
   return (
     <List.Item style={{ borderBlock: 'none' }}>
       <List.Item.Meta
         title={
           <a
-            href="#"
+            href={'/profile/' + senderUser.username}
             style={{ color: '#001529', transition: 'color 0.5s' }}
             onMouseEnter={e =>
               ((e.target as HTMLElement).style.color = '#1677ff')

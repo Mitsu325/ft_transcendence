@@ -1,4 +1,5 @@
 import {
+    Body,
     Controller,
     Get,
     HttpStatus,
@@ -27,6 +28,7 @@ import {
     MAX_AVATAR_SIZE_IN_BYTES,
     VALID_IMAGE_MIME_TYPES,
 } from 'src/common/constants';
+import { Update2faDto } from './dto/update-2fa.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -44,7 +46,7 @@ export class UserController {
     @ApiBearerAuth('access-token')
     @Get('me')
     find(@Request() req) {
-        return this.userService.findUser(req.user.sub);
+        return this.userService.getNoSecrets(req.user.sub);
     }
 
     @ApiOperation({ description: 'Find a user by name' })
@@ -62,9 +64,21 @@ export class UserController {
         description: 'user ID',
     })
     @ApiBearerAuth('access-token')
-    @Get(':userId')
+    @Get('/id/:userId')
     findUserById(@Param() params: any) {
-        return this.userService.getUserSensitiveDataById(params.userId);
+        return this.userService.getSensitiveDataById(params.userId);
+    }
+
+    @ApiOperation({ description: 'Find a user by username' })
+    @ApiParam({
+        name: 'username',
+        type: 'string',
+        description: 'username',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('/username/:username')
+    findUserByUsername(@Param() params: any) {
+        return this.userService.getSensitiveDataByUsername(params.username);
     }
 
     @ApiOperation({
@@ -105,5 +119,16 @@ export class UserController {
         @Request() req,
     ) {
         return this.userService.uploadAvatar(req.user.sub, file);
+    }
+
+    @ApiOperation({ description: 'Update twoFactorAuth' })
+    @ApiBody({ type: Update2faDto, description: 'Request body.' })
+    @ApiBearerAuth('access-token')
+    @Post('set/two-factor-auth')
+    update2fa(@Body() update2faDto: Update2faDto, @Request() req) {
+        return this.userService.update2fa(
+            req.user.sub,
+            update2faDto.twoFactorAuth,
+        );
     }
 }
