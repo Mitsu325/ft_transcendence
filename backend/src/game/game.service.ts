@@ -307,6 +307,13 @@ export class GameService {
   getDataBattle(room: string, game: Game) {
     const p1score = game.rooms[room].scores.score1;
     const p2score = game.rooms[room].scores.score2;
+    let result = 'Empate';
+
+    if (p1score > p2score) {
+      result = 'Vitória do Anfitrião';
+    } else if (p1score < p2score) {
+      result = 'Vitória do Adversário';
+    }
 
     const host = game.rooms[room].player1.id;
     const guest = game.rooms[room].player2.id;
@@ -314,7 +321,7 @@ export class GameService {
     const loser_score = p1score < p2score ? p1score : p2score;
     let winner = p1score > p2score ? host : guest;
     winner = p1score === p2score ? null : winner;
-    const status = winner === null ? 'empate' : 'finalizado';
+    const status = winner === null ? 'Empate' : result;
     const battle = { host, guest, winner_score, loser_score, winner, status };
 
     return (battle);

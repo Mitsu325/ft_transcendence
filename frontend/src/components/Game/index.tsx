@@ -291,7 +291,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
           <h2>
-            {players.player1} X {players.player2}
+            {players.player1.toUpperCase()} X {players.player2.toUpperCase()}
           </h2>
           <div>
             <Court
