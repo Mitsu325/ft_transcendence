@@ -46,8 +46,8 @@ const CommonLayout = () => {
             <Link to={'/profile/' + user?.username}>Dados de cadastro</Link>
           ),
         },
-        { key: '3', label: 'Estatísticas' },
-        { key: '4', label: 'Histórico de partidas' },
+        { key: '3', label: <Link to="/statistics">Estatísticas</Link> },
+        { key: '4', label: <Link to="/historic">Histórico de partidas</Link> },
       ],
     },
     { key: '5', label: 'Amigos', icon: <TeamOutlined /> },

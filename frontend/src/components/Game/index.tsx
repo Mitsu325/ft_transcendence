@@ -291,7 +291,7 @@ export const Game = () => {
         >
           <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
           <h2>
-            {players.player1} X {players.player2}
+            {players.player1.toUpperCase()} X {players.player2.toUpperCase()}
           </h2>
           <div>
             <Court
@@ -312,6 +312,9 @@ export const Game = () => {
         <div style={{ display: 'flex', width: '100%' }}>
           <div style={{ flex: '70%', marginRight: '30px' }}>
             <h1 style={{ padding: '20px' }}>LOUNGE</h1>
+            <h2 style={{ padding: '10px' }}>
+              {user?.name && user.name.toUpperCase()}
+            </h2>
             <h2 style={{ padding: '20px' }}>*** JOGADORES ***</h2>
             <div className="players-container">
               {gameData.players.map(player => (

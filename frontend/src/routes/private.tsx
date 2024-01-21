@@ -5,6 +5,8 @@ import CommonLayout from 'components/Layout';
 import Chat from 'pages/Chat';
 import { Game } from 'components/Game';
 import Register from 'pages/Register';
+import HistoricTable from 'components/HistoricTable';
+import Statistics from 'components/Statistics';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -26,6 +28,8 @@ const PrivateRoutes: React.FC = () => {
             path="/profile/:username/security"
             element={<Register content="security" />}
           />
+          <Route path="/historic" element={<HistoricTable />} />
+          <Route path="/statistics" element={<Statistics />} />
         </Route>
       </Routes>
     </BrowserRouter>
