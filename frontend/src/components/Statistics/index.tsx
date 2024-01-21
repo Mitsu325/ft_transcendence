@@ -2,7 +2,13 @@ import * as React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import api from 'services/api';
 import { Progress, Space } from 'antd';
-import { LikeOutlined } from '@ant-design/icons';
+import {
+  RightOutlined,
+  LeftOutlined,
+  SmileOutlined,
+  FrownOutlined,
+  MehOutlined,
+} from '@ant-design/icons';
 import { Col, Row, Statistic } from 'antd';
 
 interface PerformancePlayer {
@@ -66,25 +72,30 @@ const Statistics: React.FC = () => {
 
   React.useEffect(() => {
     getPerformancePlayer(userPlayer.id);
+    // eslint-disable-next-line
   }, []);
 
   return (
     <>
       <div
         style={{
+          width: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '50vh',
+          height: '60vh',
         }}
       >
-        <div style={{ width: '50%', alignItems: 'center', padding: 40 }}>
-          <Row gutter={20} justify="center">
-            <Col span={4}>
+        <div style={{ width: '50%', alignItems: 'center', padding: 10 }}>
+          <h2>Total de Batalhas</h2>
+          <Row gutter={20} justify="center" style={{ padding: 10 }}>
+            <Col span={6}>
               <Statistic
-                title="Total"
+                // title="Total"
                 value={playerPerformance?.total_battles}
+                prefix={<RightOutlined />}
+                suffix={<LeftOutlined />}
                 valueStyle={{
                   color: '#000000',
                   fontWeight: 'bold',
@@ -94,11 +105,12 @@ const Statistics: React.FC = () => {
               />
             </Col>
           </Row>
-          <Row gutter={20} justify="center">
-            <Col span={4}>
+          <Row gutter={50} justify="center">
+            <Col span={5}>
               <Statistic
                 title="Vitórias"
                 value={playerPerformance?.total_wins}
+                prefix={<SmileOutlined />}
                 valueStyle={{
                   color: 'rgb(0, 106, 255)',
                   fontWeight: 'bold',
@@ -107,10 +119,11 @@ const Statistics: React.FC = () => {
                 }}
               />
             </Col>
-            <Col span={4}>
+            <Col span={5}>
               <Statistic
                 title="Derrotas"
                 value={playerPerformance?.total_loses}
+                prefix={<FrownOutlined />}
                 valueStyle={{
                   color: 'red',
                   fontWeight: 'bold',
@@ -119,10 +132,11 @@ const Statistics: React.FC = () => {
                 }}
               />
             </Col>
-            <Col span={4}>
+            <Col span={5}>
               <Statistic
                 title="Empates"
                 value={playerPerformance?.total_draws}
+                prefix={<MehOutlined />}
                 valueStyle={{
                   color: 'grey',
                   fontWeight: 'bold',
@@ -136,12 +150,12 @@ const Statistics: React.FC = () => {
         <div
           style={{
             display: 'flex',
-            width: '40%',
+            width: '50%',
             padding: 40,
             justifyContent: 'center',
           }}
         >
-          <Space wrap>
+          <Space wrap size={30}>
             <Progress
               type="circle"
               percent={
