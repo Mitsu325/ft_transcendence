@@ -8,7 +8,9 @@
 }
 
 .content {
-  margin: 30px;
+  color: #001529;
+  font-family: Roboto Condensed;
+  margin: 60px 30px 30px;
 }
 
 .breadcrumb {

@@ -14,5 +14,6 @@ export const menuPaths: MenuPaths = {
   '/profile': '2',
   '/statistics': '3',
   '/historic': '4',
+  '/friend': '5',
   '/message': '6',
 };

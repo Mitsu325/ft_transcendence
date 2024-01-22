@@ -1,6 +1,7 @@
 import React from 'react';
 import UserModel from 'interfaces/userModel';
 import { useAuth } from 'hooks/useAuth';
+import 'pages/Register/Content/style.css';
 
 export default function UserProfileData({
   userProfile,
