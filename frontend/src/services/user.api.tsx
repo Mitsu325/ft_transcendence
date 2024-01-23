@@ -6,6 +6,11 @@ async function getUser() {
   return result.data || null;
 }
 
+async function getAllUsers() {
+  const result = await api.get('user/all');
+  return result.data || null;
+}
+
 async function getUserById(userId: string) {
   const result = await api.get(`/user/${userId}`);
   return result.data || null;
@@ -21,6 +26,7 @@ async function searchUserByName(name: string) {
 
 export const userService = {
   getUser,
+  getAllUsers,
   searchUserByName,
   getUserById,
 };

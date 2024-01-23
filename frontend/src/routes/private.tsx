@@ -5,6 +5,7 @@ import CommonLayout from 'components/Layout';
 import Chat from 'pages/Chat';
 import { Game } from 'components/Game';
 import Register from 'pages/Register';
+import Manager from 'components/Management';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const PrivateRoutes: React.FC = () => {
           <Route path="/game-options" element={<Game />} />
           <Route path="/message" element={<Chat />} />
           <Route path="/profile" element={<Register />} />
+          <Route path="/manager" element={<Manager />} />
         </Route>
       </Routes>
     </BrowserRouter>

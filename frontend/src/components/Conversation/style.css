@@ -22,6 +22,12 @@ p {
   border-color: #001529;
 }
 
+.management-container {
+  flex: 1;
+  margin-left: 20px;
+  display: flex;
+}
+
 .chat-messages {
   display: flex;
   flex-direction: column;
@@ -45,7 +51,6 @@ p {
   display: inline-block;
   vertical-align: top;
   margin-left: 10px;
-  flex-grow:;
 }
 
 .username {

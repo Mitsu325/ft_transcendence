@@ -7,7 +7,6 @@ import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
 import { channelApi } from '../../services/channel.api';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
-import Management from 'components/Management';
 import './style.css';
 
 const { TextArea } = Input;
@@ -17,14 +16,13 @@ interface Message {
   createdAt: string;
 }
 
-const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
-  roomId,
-  nameChannel,
-}) => {
+const Conversation: React.FC<{
+  roomId: string;
+  nameChannel: string;
+}> = ({ roomId, nameChannel }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState(false);
-  const [componentType, setComponentType] = useState('msg');
   const [groupedMessages, setGroupedMessages] = useState<{
     [date: string]: Message[];
   }>({});
@@ -115,100 +113,75 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
     setNewMessage('');
   };
 
-  const handleManager = async () => {
-    setComponentType('manager');
-  };
-
-  const handleBackToMessages = () => {
-    setComponentType('msg');
-  };
-
   return (
     <>
       <div className="icon">
         <WechatOutlined style={{ marginRight: '15px' }} />
         <p>{nameChannel}</p>
-        <Button
-          className="btn"
-          type="primary"
-          size="small"
-          onClick={handleManager}
-        >
-          Gerenciar
-        </Button>
       </div>
       <Divider className="divider-ch" />
-      {componentType === 'msg' && (
-        <>
-          <div className="chat-messages">
-            {Object.keys(groupedMessages).map(formattedDate => (
-              <div key={formattedDate}>
-                <p className="date">{formattedDate}</p>
-                {groupedMessages[formattedDate].map((data, index) => {
-                  const messageDate = new Date(data.createdAt);
-                  messageDate.setMinutes(
-                    messageDate.getMinutes() - messageDate.getTimezoneOffset(),
-                  );
 
-                  const formattedHour = messageDate.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  });
+      <div className="chat-messages">
+        {Object.keys(groupedMessages).map(formattedDate => (
+          <div key={formattedDate}>
+            <p className="date">{formattedDate}</p>
+            {groupedMessages[formattedDate].map((data, index) => {
+              const messageDate = new Date(data.createdAt);
+              messageDate.setMinutes(
+                messageDate.getMinutes() - messageDate.getTimezoneOffset(),
+              );
 
-                  return (
-                    <div className="message-container" key={index}>
-                      <div className="avatar">
-                        <Avatar
-                          size={40}
-                          icon={<UserOutlined />}
-                          src={
-                            data.userName === userPlayer.name
-                              ? userPlayer.avatar
-                              : undefined
-                          }
-                          alt={data.userName}
-                        />
-                        <div className="username-container">
-                          <p className="username">
-                            <strong>{data.userName}</strong>
-                          </p>
-                        </div>
-                        <p className="msg">{data.message}</p>
-                      </div>
-                      <div className="hour">
-                        <span>{formattedHour}</span>
-                      </div>
+              const formattedHour = messageDate.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              return (
+                <div className="message-container" key={index}>
+                  <div className="avatar">
+                    <Avatar
+                      size={40}
+                      icon={<UserOutlined />}
+                      src={
+                        data.userName === userPlayer.name
+                          ? userPlayer.avatar
+                          : undefined
+                      }
+                      alt={data.userName}
+                    />
+                    <div className="username-container">
+                      <p className="username">
+                        <strong>{data.userName}</strong>
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                    <p className="msg">{data.message}</p>
+                  </div>
+                  <div className="hour">
+                    <span>{formattedHour}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div style={{ position: 'relative' }}>
-            <TextArea
-              style={{ borderRadius: '0', paddingRight: '2.8rem' }}
-              autoSize={{ minRows: 2, maxRows: 6 }}
-              placeholder="Escreva uma mensagem"
-              value={newMessage}
-              onChange={handleInputChange}
-            />
-            <Button
-              className="send-button"
-              type="primary"
-              icon={<SendOutlined />}
-              size={'middle'}
-              onClick={handleSendMessage}
-              disabled={!newMessage}
-            />
-          </div>
-        </>
-      )}
-      {componentType === 'manager' && (
-        <>
-          <Management />
-          <Button onClick={handleBackToMessages}>Mensagens</Button>
-        </>
-      )}
+        ))}
+      </div>
+      <div style={{ position: 'relative' }}>
+        <TextArea
+          style={{ borderRadius: '0', paddingRight: '2.8rem' }}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+          placeholder="Escreva uma mensagem"
+          value={newMessage}
+          onChange={handleInputChange}
+        />
+        <Button
+          className="send-button"
+          type="primary"
+          icon={<SendOutlined />}
+          size={'middle'}
+          onClick={handleSendMessage}
+          disabled={!newMessage}
+        />
+      </div>
     </>
   );
 };

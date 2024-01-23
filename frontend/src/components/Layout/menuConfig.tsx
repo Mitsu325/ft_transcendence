@@ -35,9 +35,13 @@ export const menuItems = [
   },
   { key: '5', label: 'Amigos', icon: <TeamOutlined /> },
   {
-    key: '6',
+    key: 'sub2',
+    label: 'Canais e chat',
     icon: <MessageOutlined />,
-    label: <Link to="/message">Chat</Link>,
+    children: [
+      { key: '6', label: <Link to="/message">Chat</Link> },
+      { key: '7', label: <Link to="/manager">Gerenciamento</Link> },
+    ],
   },
 ];
 
@@ -46,4 +50,5 @@ export const menuPaths: MenuPaths = {
   '/game-options': '1',
   '/profile': '2',
   '/message': '6',
+  '/manager': '7',
 };

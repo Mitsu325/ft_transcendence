@@ -22,12 +22,17 @@ export class ChannelService {
 
     async findAll(): Promise<ChannelDto[]> {
         const channels = await this.channelsRepository.find();
-        return channels.map(channel => ({
-            id: channel.id,
-            name_channel: channel.name_channel,
-            type: channel.type,
-            owner: channel.owner ? channel.owner.name : null,
-        }));
+
+        const channelDtos = await Promise.all(
+            channels.map(async channel => ({
+                id: channel.id,
+                name_channel: channel.name_channel,
+                type: channel.type,
+                owner: channel.owner ? channel.owner.name : null,
+            })),
+        );
+
+        return channelDtos;
     }
 
     async create(createChannelDto: CreateChannelDto) {
