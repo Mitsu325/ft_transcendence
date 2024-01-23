@@ -16,10 +16,13 @@ export class ChannelAdminService {
     async create(createAdminDto: CreateAdminDto) {
         try {
             const admin = this.ChannelAdminRepository.create(createAdminDto);
-            return this.ChannelAdminRepository.save(admin);
+            if (admin) {
+                this.ChannelAdminRepository.save(admin);
+                return true;
+            }
         } catch (error) {
             console.log(error);
-            return null;
+            return false;
         }
     }
 

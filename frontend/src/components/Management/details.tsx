@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, List, Avatar, Modal, Button } from 'antd';
+import {
+  Card,
+  Row,
+  Col,
+  List,
+  Avatar,
+  //   Modal,
+  Button,
+  Drawer,
+} from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined } from '@ant-design/icons';
@@ -32,6 +41,18 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  //   const { token } = theme.useToken();
+  const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const showDrawer = (user: User) => {
+    setSelectedUser(user);
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     const getUsers = async () => {
@@ -55,11 +76,13 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const addAdmin = async () => {
     try {
       if (selectedUser) {
-        await adminService.addAdmin({
-          channel_id: channel.id,
-          admin_id: selectedUser.id,
-          active: true,
-        });
+        setIsAdmin(
+          await adminService.addAdmin({
+            channel_id: channel.id,
+            admin_id: selectedUser.id,
+            active: true,
+          }),
+        );
 
         console.log(
           `Usuário ${selectedUser.name} adicionado como administrador.`,
@@ -72,6 +95,21 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
       console.log(
         'Erro ao adicionar administrador. Tente novamente mais tarde.',
       );
+    }
+  };
+
+  const removeAdmin = async () => {
+    try {
+      //   if (selectedUser) {
+      //     await adminService.addAdmin({
+      //       channel_id: channel.id,
+      //       admin_id: selectedUser.id,
+      //       active: true,
+      //     });
+      //   }
+    } catch (error) {
+      console.error('Erro ao remover administrador:', error);
+      console.log('Erro ao remover administrador. Tente novamente mais tarde.');
     }
   };
 
@@ -105,7 +143,9 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
             dataSource={users}
             renderItem={user => (
               <List.Item
-                onClick={() => setSelectedUser(user)}
+                onClick={() => {
+                  showDrawer(user);
+                }}
                 style={{ cursor: 'pointer' }}
               >
                 <List.Item.Meta
@@ -118,7 +158,34 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           />
         </Col>
       </Row>
-      <Modal
+
+      <Drawer
+        title="Gerenciar"
+        placement="right"
+        closable={false}
+        onClose={onClose}
+        open={open}
+        getContainer={false}
+      >
+        <Button
+          key="addAdmin"
+          type="primary"
+          onClick={addAdmin}
+          disabled={isAdmin}
+        >
+          Adicionar como administrador
+        </Button>
+        <Button
+          key="removeAdmin"
+          type="primary"
+          onClick={removeAdmin}
+          disabled={isAdmin}
+        >
+          Remover administrador
+        </Button>
+      </Drawer>
+
+      {/* <Modal
         open={selectedUser !== null}
         title={`Adicionar ${
           selectedUser ? selectedUser.name : ''
@@ -132,7 +199,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
             Adicionar Administrador
           </Button>,
         ]}
-      ></Modal>
+      ></Modal> */}
     </Card>
   );
 };

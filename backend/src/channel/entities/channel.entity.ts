@@ -23,7 +23,7 @@ export class Channel {
     @Column({ type: 'varchar', nullable: true })
     password?: string;
 
-    @ManyToOne(() => User, user => user.id)
+    @ManyToOne(() => User, { eager: true })
     @JoinColumn({ name: 'owner', referencedColumnName: 'id' })
     owner: User;
 
