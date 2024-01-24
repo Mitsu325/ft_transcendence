@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
-import { Button, Modal } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { useLocation } from 'react-router-dom';
 
 let socket: Socket;
 
@@ -10,8 +9,9 @@ interface UserStatusProps {
   status: string;
 }
 
-export const UserStatus = () => {
+export const UserStatusSocket = () => {
   const user = useAuth()?.user;
+  const location = useLocation();
 
   const userPlayer = React.useMemo(() => {
     const newPlayer = {
@@ -26,15 +26,30 @@ export const UserStatus = () => {
     status: 'offline',
   });
 
+  const [userLoc, setUserLoc] = React.useState<any>();
+
+  React.useEffect(() => {
+    const handleRotaChange = () => {
+      console.log('Usuário entrou em uma nova rota:', location.pathname);
+    };
+
+    const unlisten = () => {
+      handleRotaChange();
+    };
+
+    handleRotaChange();
+
+    return () => {
+      unlisten();
+    };
+  }, [location.pathname]);
+
   socket = React.useMemo(() => {
     const newSocket = io('http://localhost:3003', {
       reconnectionDelay: 10000,
     });
     return newSocket;
   }, []);
-
-  // React.useEffect(() => {
-  // }, [userStatus]);
 
   React.useEffect(() => {
     socket.on('connect', () => {
@@ -49,9 +64,6 @@ export const UserStatus = () => {
       }
     });
 
-    // socket.on('get_status', status => {
-    // });
-
     socket.on('ping', () => {
       console.log('ping');
     });
@@ -63,11 +75,14 @@ export const UserStatus = () => {
 
   React.useEffect(() => {
     function handleWindowBlur() {
-      console.log('blur');
+      setUserLoc(location.pathname);
+      console.log('out: ', new Date().toLocaleTimeString());
+      console.log('rota: ', userLoc);
     }
 
     function handleMouseOut() {
-      console.log('blur');
+      console.log('mouse: ', new Date().toLocaleTimeString());
+      console.log('rota: ', location.pathname);
     }
 
     window.addEventListener('blur', handleWindowBlur);
@@ -78,10 +93,4 @@ export const UserStatus = () => {
       window.addEventListener('mouseout', handleMouseOut);
     };
   }, []);
-
-  return (
-    <>
-      <UserOutlined />
-    </>
-  );
 };
