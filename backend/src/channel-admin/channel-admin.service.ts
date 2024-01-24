@@ -25,10 +25,7 @@ export class ChannelAdminService {
             });
 
             if (activeAdmin) {
-                return {
-                    success: false,
-                    message: 'Admin already exists and is active.',
-                };
+                return { success: false };
             }
 
             const existingAdmin = await this.ChannelAdminRepository.findOne({
@@ -42,7 +39,7 @@ export class ChannelAdminService {
             if (existingAdmin) {
                 existingAdmin.active = true;
                 await this.ChannelAdminRepository.save(existingAdmin);
-                return { success: true, message: 'Inactive admin activated.' };
+                return { success: true };
             } else {
                 const newAdmin = this.ChannelAdminRepository.create({
                     channel: createAdminDto.channel_id,
@@ -50,20 +47,14 @@ export class ChannelAdminService {
                     active: createAdminDto.active,
                 });
                 await this.ChannelAdminRepository.save(newAdmin);
-                return {
-                    success: true,
-                    message: 'Admin created successfully.',
-                };
+                return { success: true };
             }
         } catch (error) {
             console.error(
                 'Error creating or activating channel administrator:',
                 error,
             );
-            return {
-                success: false,
-                message: 'Error processing the request.',
-            };
+            return { success: false };
         }
     }
 
@@ -102,14 +93,11 @@ export class ChannelAdminService {
             if (channelAdmin) {
                 channelAdmin.active = false;
                 await this.ChannelAdminRepository.save(channelAdmin);
-                return { success: true, message: 'Administrator removed.' };
+                return { success: true };
             }
         } catch (error) {
             console.error('Error in removing channel administrator:', error);
-            return {
-                success: false,
-                message: 'Error in removing channel administrator.',
-            };
+            return { success: false };
         }
     }
 }

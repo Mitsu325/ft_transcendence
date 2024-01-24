@@ -3,6 +3,8 @@ import { Card, Row, Col, List, Avatar, Button, Drawer } from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined } from '@ant-design/icons';
+import FailureNotification from 'components/Notification/FailureNotification';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 
 interface ChannelAdminProps {
   id: string;
@@ -33,7 +35,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
-  // const [isAdmin, setIsAdmin] = useState(false);
 
   const showDrawer = (user: User) => {
     setSelectedUser(user);
@@ -67,32 +68,47 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const addAdmin = async () => {
     try {
       if (selectedUser) {
-        console.log(selectedUser);
-        console.log(channel.id);
-        await adminService.addAdmin({
+        const ret = await adminService.addAdmin({
           channel_id: channel.id,
           admin_id: selectedUser.id,
           active: true,
-        }),
-          console.log(
-            `Usuário ${selectedUser.name} adicionado como administrador.`,
-          );
+        });
+        if (ret.success) {
+          SuccessNotification({
+            message: 'Ok',
+            description: 'Adminstrador adicionado com sucesso',
+          });
+        } else {
+          FailureNotification({
+            message: 'Erro',
+            description:
+              'Erro ao adicionar administrador. Já adicionado e ativo.',
+          });
+        }
       }
     } catch (error) {
-      console.error('Erro ao adicionar administrador:', error);
-      console.log(
-        'Erro ao adicionar administrador. Tente novamente mais tarde.',
-      );
+      console.log(error);
     }
   };
 
   const removeAdmin = async () => {
     try {
       if (selectedUser) {
-        await adminService.removeAdmin({
+        const ret = await adminService.removeAdmin({
           channel_id: channel.id,
           admin_id: selectedUser.id,
         });
+        if (ret.success) {
+          SuccessNotification({
+            message: 'Ok',
+            description: 'Adminstrador removido com sucesso',
+          });
+        } else {
+          FailureNotification({
+            message: 'Erro',
+            description: 'Administrador já removido ou inativo',
+          });
+        }
       }
     } catch (error) {
       console.error('Erro ao remover administrador:', error);
