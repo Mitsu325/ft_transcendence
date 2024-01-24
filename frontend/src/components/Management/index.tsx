@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu } from 'antd';
-// import {
-//   UserOutlined,
-//   TeamOutlined,
-//   PlusOutlined,
-//   DeleteOutlined,
-// } from '@ant-design/icons';
-import ChannelAdmin from './details';
+import ChannelAdmin from './channelAdmin';
 import { channelApi } from '../../services/channel.api';
-
+import './style.css';
 const { Content, Sider } = Layout;
 
 interface ChannelProps {
@@ -21,6 +15,7 @@ interface ChannelProps {
 const ChannelManagement: React.FC = () => {
   const [channels, setChannels] = useState<ChannelProps[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<ChannelProps>();
+  const [hoveredChannel, setHoveredChannel] = useState<string | undefined>();
 
   const handleChannelClick = (channel: ChannelProps) => {
     setSelectedChannel(channel);
@@ -38,11 +33,14 @@ const ChannelManagement: React.FC = () => {
     };
     fetchChannels();
   }, []);
+  const handleChannelHover = (channel: ChannelProps) => {
+    setHoveredChannel(channel.id);
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider width={200} theme="dark">
-        <div className="hd" style={{ textAlign: 'center', padding: '10px' }}>
+        <div style={{ textAlign: 'center', padding: '10px' }}>
           <span style={{ color: 'white', fontSize: '1.2rem' }}>Canais</span>
           <div
             style={{ borderBottom: '1px solid white', marginTop: '5px' }}
@@ -58,12 +56,28 @@ const ChannelManagement: React.FC = () => {
                 ({} as ChannelProps),
             )
           }
-          items={channels.map(channel => ({
-            key: channel.id,
-            label: channel.name_channel,
-          }))}
           style={{ color: 'white' }}
-        />
+        >
+          {channels.map(channel => (
+            <Menu.Item
+              key={channel.id}
+              onClick={() => handleChannelClick(channel)}
+              onMouseEnter={() => handleChannelHover(channel)}
+              style={{
+                color: 'white',
+                backgroundColor:
+                  selectedChannel?.id === channel.id
+                    ? '#1677FE'
+                    : hoveredChannel === channel.id
+                    ? '#1677FE'
+                    : 'transparent',
+              }}
+              className="channel-menu-item"
+            >
+              {channel.name_channel}
+            </Menu.Item>
+          ))}
+        </Menu>
       </Sider>
       <Layout>
         <Content style={{ marginLeft: '15px' }}>

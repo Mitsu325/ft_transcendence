@@ -63,7 +63,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
     };
 
     getAdmins();
-  }, [channel.id]);
+  }, [channel.id, admins]);
 
   const addAdmin = async () => {
     try {
@@ -173,7 +173,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           key="addAdmin"
           type="primary"
           onClick={addAdmin}
-          // disabled={isAdmin}
+          style={{ marginBottom: '10px' }}
         >
           Adicionar como administrador
         </Button>
@@ -181,7 +181,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           key="removeAdmin"
           type="primary"
           onClick={removeAdmin}
-          // disabled={isAdmin}
+          style={{ marginBottom: '10px' }}
         >
           Remover administrador
         </Button>
