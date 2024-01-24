@@ -26,4 +26,21 @@ export class ChannelAdminController {
     async removeAdmin(@Param() params: RemoveAdminDto) {
         return this.channelAdminService.removeAdmin(params);
     }
+
+    @ApiOperation({ description: 'Get admins of channelId' })
+    @ApiBearerAuth('access-token')
+    @Get('all/:channelId')
+    async getAdmins(@Param('channelId') channelId: string) {
+        try {
+            const admins = await this.channelAdminService.findAdmins(channelId);
+            if (admins) {
+                return { admins };
+            } else {
+                return { error: 'Channel not found or has no admins.' };
+            }
+        } catch (error) {
+            console.error(error);
+            return { error: 'Error getting admins.' };
+        }
+    }
 }

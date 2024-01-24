@@ -96,4 +96,22 @@ export class ChannelController {
             console.error('Error generating token:', error);
         }
     }
+
+    @ApiOperation({ description: 'Get owner of channelId' })
+    @ApiBearerAuth('access-token')
+    @Get(':channelId')
+    async findOwner(@Param('channelId') channelId: string) {
+        try {
+            const owner = await this.channelService.findOwner(channelId);
+
+            if (owner) {
+                return owner.id;
+            } else {
+                return { error: 'Owner not found for the given channelId' };
+            }
+        } catch (error) {
+            console.error(error);
+            return { error: 'Error finding owner.' };
+        }
+    }
 }

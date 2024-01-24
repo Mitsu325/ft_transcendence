@@ -109,7 +109,7 @@ const Court: React.FC<CourtProps> = ({
       document.removeEventListener('keydown', sendKeyEvent);
       document.removeEventListener('keyup', sendKeyEvent);
     };
-  }, []);
+  }, [onSendKey]);
 
   return (
     <div

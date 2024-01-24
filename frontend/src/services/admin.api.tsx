@@ -17,8 +17,14 @@ async function removeAdmin(params: removeAdmInterface) {
   return result.data;
 }
 
+async function getAdminsId(channel_id: string) {
+  const result = await api.get(`channel-admin/all/${channel_id}`);
+  return result.data;
+}
+
 export const adminService = {
   getAdmins,
   addAdmin,
   removeAdmin,
+  getAdminsId,
 };

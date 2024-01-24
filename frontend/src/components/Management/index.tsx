@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import ChannelAdmin from './channelAdmin';
 import { channelApi } from '../../services/channel.api';
+import { adminService } from 'services/admin.api';
 import './style.css';
 const { Content, Sider } = Layout;
+import { useAuth } from '../../hooks/useAuth';
 
 interface ChannelProps {
   id: string;
@@ -12,27 +15,49 @@ interface ChannelProps {
   owner: string;
 }
 
+interface typeAdmin {
+  admin_id: string;
+}
+
 const ChannelManagement: React.FC = () => {
   const [channels, setChannels] = useState<ChannelProps[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<ChannelProps>();
   const [hoveredChannel, setHoveredChannel] = useState<string | undefined>();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
-  const handleChannelClick = (channel: ChannelProps) => {
+  const user = useAuth()?.user;
+
+  const handleChannelClick = async (channel: ChannelProps) => {
+    setIsAdmin(false);
+    setIsAdmin(false);
     setSelectedChannel(channel);
+    const userId = user?.id ?? '';
+    const ownerRes = await channelApi.getOwner(channel.id);
+    const adminRes = await adminService.getAdminsId(channel.id);
+    if (ownerRes.data === userId) {
+      setIsOwner(true);
+    }
+    const isAdminUser = adminRes.admins.some(
+      (admins: typeAdmin) => admins.admin_id === userId,
+    );
+    if (isAdminUser) {
+      setIsAdmin(true);
+    }
   };
 
   useEffect(() => {
-    const fetchChannels = async () => {
+    const getChannels = async () => {
       try {
         const channelsData = await channelApi.getChannel();
-        console.log('Channels Data:', channelsData);
         setChannels(channelsData);
       } catch (error) {
         console.error('Erro ao obter canais:', error);
       }
     };
-    fetchChannels();
+    getChannels();
   }, []);
+
   const handleChannelHover = (channel: ChannelProps) => {
     setHoveredChannel(channel.id);
   };
@@ -40,11 +65,9 @@ const ChannelManagement: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider width={200} theme="dark">
-        <div style={{ textAlign: 'center', padding: '10px' }}>
-          <span style={{ color: 'white', fontSize: '1.2rem' }}>Canais</span>
-          <div
-            style={{ borderBottom: '1px solid white', marginTop: '5px' }}
-          ></div>
+        <div className="sider">
+          <span className="title">Canais</span>
+          <div className="line"></div>
         </div>
         <Menu
           mode="inline"
@@ -81,7 +104,16 @@ const ChannelManagement: React.FC = () => {
       </Sider>
       <Layout>
         <Content style={{ marginLeft: '15px' }}>
-          {selectedChannel && <ChannelAdmin channel={selectedChannel} />}
+          {selectedChannel && (isAdmin || isOwner) ? (
+            <ChannelAdmin channel={selectedChannel} />
+          ) : (
+            <>
+              <div className="msgContainer">
+                <ExclamationCircleOutlined className="exclamation" />
+                <p>Você não é administrador ou dono deste canal.</p>
+              </div>
+            </>
+          )}
         </Content>
       </Layout>
     </Layout>

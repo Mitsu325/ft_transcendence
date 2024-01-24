@@ -97,4 +97,16 @@ export class ChannelService {
             throw error;
         }
     }
+
+    async findOwner(channelId: string) {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+                relations: ['owner'],
+            });
+            return channel ? channel.owner : null;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

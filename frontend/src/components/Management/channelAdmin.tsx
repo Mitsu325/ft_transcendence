@@ -59,7 +59,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
     const getAdmins = async () => {
       const data = await adminService.getAdmins(channel.id);
       setAdmins(data);
-      console.log(data);
     };
 
     getAdmins();

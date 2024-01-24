@@ -41,6 +41,11 @@ async function getToken(roomId: string) {
   return result;
 }
 
+async function getOwner(channelId: string) {
+  const result = await api.get(`/channel/${channelId}`);
+  return result;
+}
+
 export const channelApi = {
   createChannel,
   getChannel,
@@ -48,4 +53,5 @@ export const channelApi = {
   createMessage,
   verifyChannelPassword,
   getToken,
+  getOwner,
 };

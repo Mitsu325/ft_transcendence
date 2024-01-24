@@ -100,4 +100,20 @@ export class ChannelAdminService {
             return { success: false };
         }
     }
+
+    async findAdmins(channelId: string) {
+        try {
+            const channel = await this.ChannelAdminRepository.find({
+                where: {
+                    channel: Equal(channelId),
+                    active: true,
+                },
+            });
+            return channel.map(admin => ({
+                admin_id: admin.admin.id,
+            }));
+        } catch (error) {
+            throw error;
+        }
+    }
 }
