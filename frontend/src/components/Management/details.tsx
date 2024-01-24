@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  Row,
-  Col,
-  List,
-  Avatar,
-  //   Modal,
-  Button,
-  Drawer,
-} from 'antd';
+import { Card, Row, Col, List, Avatar, Button, Drawer } from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined } from '@ant-design/icons';
@@ -41,7 +32,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  //   const { token } = theme.useToken();
   const [open, setOpen] = useState(false);
   // const [isAdmin, setIsAdmin] = useState(false);
 
@@ -98,13 +88,12 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
 
   const removeAdmin = async () => {
     try {
-      //   if (selectedUser) {
-      //     await adminService.addAdmin({
-      //       channel_id: channel.id,
-      //       admin_id: selectedUser.id,
-      //       active: true,
-      //     });
-      //   }
+      if (selectedUser) {
+        await adminService.removeAdmin({
+          channel_id: channel.id,
+          admin_id: selectedUser.id,
+        });
+      }
     } catch (error) {
       console.error('Erro ao remover administrador:', error);
       console.log('Erro ao remover administrador. Tente novamente mais tarde.');
@@ -160,7 +149,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
       <Drawer
         title="Gerenciar"
         placement="right"
-        // closable={false}
         onClose={onClose}
         open={open}
         getContainer={false}
@@ -182,22 +170,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           Remover administrador
         </Button>
       </Drawer>
-
-      {/* <Modal
-        open={selectedUser !== null}
-        title={`Adicionar ${
-          selectedUser ? selectedUser.name : ''
-        } como administrador`}
-        onCancel={() => setSelectedUser(null)}
-        footer={[
-          <Button key="cancel" onClick={() => setSelectedUser(null)}>
-            Cancelar
-          </Button>,
-          <Button key="addAdmin" type="primary" onClick={addAdmin}>
-            Adicionar Administrador
-          </Button>,
-        ]}
-      ></Modal> */}
     </Card>
   );
 };
