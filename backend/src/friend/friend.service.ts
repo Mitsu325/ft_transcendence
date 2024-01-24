@@ -9,11 +9,7 @@ import { Friend } from './entities/friend.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
-import {
-    CreateInvite,
-    Invite,
-    InviteAnswered,
-} from './interfaces/friend.interface';
+import { CreateInvite, Invite, InviteRes } from './interfaces/friend.interface';
 import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
 import { UpdateInviteDto } from './dto/updateInvite.dto';
 
@@ -28,9 +24,16 @@ export class FriendService {
     async findFriends(
         userId: string,
         pagination: PaginationOptions,
-    ): Promise<InviteAnswered[]> {
+    ): Promise<InviteRes> {
         const { page, limit } = pagination;
         const skip = (page - 1) * limit;
+
+        const total = await this.friendRepository.count({
+            where: [
+                { sender: { id: userId }, status: 'active' },
+                { recipient: { id: userId }, status: 'active' },
+            ],
+        });
 
         const friends = await this.friendRepository.find({
             where: [
@@ -44,10 +47,10 @@ export class FriendService {
         });
 
         if (!friends.length) {
-            return [];
+            return { data: [], pagination: { total: 0, page, limit } };
         }
 
-        return friends.map(friend => ({
+        const data = friends.map(friend => ({
             id: friend.id,
             friend:
                 friend.sender.id === userId
@@ -55,14 +58,20 @@ export class FriendService {
                     : getNonSensitiveUserInfo(friend.sender),
             invitedAt: friend.createdAt,
         }));
+
+        return { data, pagination: { total, page, limit } };
     }
 
     async findInviteReceived(
         userId: string,
         pagination: PaginationOptions,
-    ): Promise<InviteAnswered[]> {
+    ): Promise<InviteRes> {
         const { page, limit } = pagination;
         const skip = (page - 1) * limit;
+
+        const total = await this.friendRepository.count({
+            where: { recipient: { id: userId }, status: 'pending' },
+        });
 
         const friends = await this.friendRepository.find({
             where: { recipient: { id: userId }, status: 'pending' },
@@ -73,22 +82,28 @@ export class FriendService {
         });
 
         if (!friends.length) {
-            return [];
+            return { data: [], pagination: { total: 0, page, limit } };
         }
 
-        return friends.map(friend => ({
+        const data = friends.map(friend => ({
             id: friend.id,
             friend: getNonSensitiveUserInfo(friend.sender),
             invitedAt: friend.createdAt,
         }));
+
+        return { data, pagination: { total, page, limit } };
     }
 
     async findInviteSent(
         userId: string,
         pagination: PaginationOptions,
-    ): Promise<InviteAnswered[]> {
+    ): Promise<InviteRes> {
         const { page, limit } = pagination;
         const skip = (page - 1) * limit;
+
+        const total = await this.friendRepository.count({
+            where: { sender: { id: userId }, status: 'pending' },
+        });
 
         const friends = await this.friendRepository.find({
             where: { sender: { id: userId }, status: 'pending' },
@@ -99,14 +114,16 @@ export class FriendService {
         });
 
         if (!friends.length) {
-            return [];
+            return { data: [], pagination: { total: 0, page, limit } };
         }
 
-        return friends.map(friend => ({
+        const data = friends.map(friend => ({
             id: friend.id,
             friend: getNonSensitiveUserInfo(friend.recipient),
             invitedAt: friend.createdAt,
         }));
+
+        return { data, pagination: { total, page, limit } };
     }
 
     async invite(inviteDto: InviteDto, userId: string): Promise<CreateInvite> {
@@ -176,13 +193,27 @@ export class FriendService {
     ): Promise<Invite> {
         const { id, status } = updateInviteDto;
 
+        if (status === 'pending') {
+            throw new BadRequestException('Cannot change to this status');
+        }
+
         const invite = await this.friendRepository.findOne({
-            where: { id },
+            where: [
+                { id, recipient: { id: userId } },
+                { id, sender: { id: userId } },
+            ],
             relations: ['sender', 'recipient'],
         });
 
         if (!invite) {
             throw new NotFoundException('Invite not found');
+        }
+
+        if (
+            (status === 'active' || status === 'rejected') &&
+            invite.recipient.id !== userId
+        ) {
+            throw new BadRequestException('Cannot change to this status');
         }
 
         await this.friendRepository.update({ id }, { status });

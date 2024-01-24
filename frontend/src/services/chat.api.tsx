@@ -1,11 +1,7 @@
 import api from 'services/api';
 import { SendMessageBody } from 'interfaces/reqBody/send-message.interface';
 import { createSearchParams } from 'react-router-dom';
-
-interface Pagination {
-  page: number;
-  limit: number;
-}
+import { Pagination } from 'interfaces/reqBody/pagination.interface';
 
 async function getRecipients() {
   const result = await api.get('/chat/recipients');

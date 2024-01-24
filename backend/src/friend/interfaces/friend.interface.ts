@@ -9,12 +9,15 @@ export interface CreateInvite {
 export interface Invite {
     id: string;
     friend: userNonSensitiveInfo;
-    status: FriendStatusType;
+    status?: FriendStatusType;
     invitedAt: Date;
 }
 
-export interface InviteAnswered {
-    id: string;
-    friend: userNonSensitiveInfo;
-    invitedAt: Date;
+export interface InviteRes {
+    data: Invite[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+    };
 }

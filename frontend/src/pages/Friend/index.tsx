@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import 'pages/Friend/style.css';
 import { Menu, MenuProps } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
+import FriendList from './Content/FriendList';
 
 const menuItems: MenuProps['items'] = [
   {
-    label: <Link to="/friend">Amigos</Link>,
+    label: <Link to="/friend">Todos</Link>,
     key: 'friend',
   },
   {
@@ -25,7 +26,7 @@ export default function Friend({ content }: { content: string }) {
   const renderContent = () => {
     switch (content) {
       case 'friend':
-        return <h1>Amigos</h1>;
+        return <FriendList />;
       case 'invite':
         return <h1>Convites pendentes</h1>;
       case 'invite-sent':
@@ -53,13 +54,16 @@ export default function Friend({ content }: { content: string }) {
 
   return (
     <>
-      <Menu
-        className="friend-menu"
-        items={menuItems}
-        mode="horizontal"
-        selectedKeys={[selectedMenu]}
-      />
-      {renderContent()}
+      <h1 className="friend-title">Amigos</h1>
+      <div className="friend-content">
+        <Menu
+          className="friend-menu"
+          items={menuItems}
+          mode="horizontal"
+          selectedKeys={[selectedMenu]}
+        />
+        {renderContent()}
+      </div>
     </>
   );
 }

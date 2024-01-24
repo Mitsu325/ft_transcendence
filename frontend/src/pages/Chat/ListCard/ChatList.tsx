@@ -126,6 +126,7 @@ export default function ChatList({
         dataSource={chats}
         renderItem={item => (
           <UserListItem
+            itemClassName="user-item"
             active={selectedUser?.id === item.chatUser.id}
             avatar={item.chatUser.avatar}
             title={item.chatUser.name}

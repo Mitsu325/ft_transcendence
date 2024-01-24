@@ -39,3 +39,7 @@
 .mr-8 {
   margin-right: 8px;
 }
+
+a:focus {
+  outline: auto;
+}
