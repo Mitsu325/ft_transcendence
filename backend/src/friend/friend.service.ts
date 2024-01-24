@@ -129,6 +129,10 @@ export class FriendService {
     async invite(inviteDto: InviteDto, userId: string): Promise<CreateInvite> {
         const { recipientId } = inviteDto;
 
+        if (userId === recipientId) {
+            throw new BadRequestException('Recipient is the same as sender');
+        }
+
         const recipientUser = await this.userService.findById(recipientId);
         if (!recipientUser) {
             throw new NotFoundException('Recipient not found');
@@ -152,7 +156,11 @@ export class FriendService {
             if (['unfriended', 'rejected'].includes(invite.status)) {
                 await this.friendRepository.update(
                     { id: invite.id },
-                    { status: 'pending' },
+                    {
+                        status: 'pending',
+                        sender: senderUser,
+                        recipient: recipientUser,
+                    },
                 );
                 invite.status = 'pending';
                 friend = invite;

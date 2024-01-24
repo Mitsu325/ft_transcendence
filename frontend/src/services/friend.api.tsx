@@ -1,17 +1,22 @@
 import { InviteStatusBody } from 'interfaces/reqBody/invite-status.interface';
 import { Pagination } from 'interfaces/reqBody/pagination.interface';
-import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
+import { buildPaginationUrl } from 'utils/build-pagination-url';
 
 async function getFriends(pagination?: Pagination) {
-  let url = '/friend';
-  if (pagination) {
-    const params = {
-      page: pagination.page.toString(),
-      limit: pagination.limit.toString(),
-    };
-    url += '?' + createSearchParams(params).toString();
-  }
+  const url = buildPaginationUrl('/friend', pagination);
+  const result = await api.get(url);
+  return result.data || null;
+}
+
+async function getInviteReceived(pagination?: Pagination) {
+  const url = buildPaginationUrl('/friend/invite-received', pagination);
+  const result = await api.get(url);
+  return result.data || null;
+}
+
+async function getInviteSent(pagination?: Pagination) {
+  const url = buildPaginationUrl('/friend/invite-sent', pagination);
   const result = await api.get(url);
   return result.data || null;
 }
@@ -21,7 +26,15 @@ async function updateInviteStatus(params: InviteStatusBody) {
   return result.data || null;
 }
 
+async function deleteInvite(inviteId: string) {
+  const result = await api.delete(`/friend/${inviteId}`);
+  return result.data || null;
+}
+
 export const friendService = {
   getFriends,
+  getInviteReceived,
+  getInviteSent,
   updateInviteStatus,
+  deleteInvite,
 };

@@ -3,6 +3,8 @@ import 'pages/Friend/style.css';
 import { Menu, MenuProps } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import FriendList from './Content/FriendList';
+import InviteReceivedList from './Content/InviteReceivedList';
+import InviteSentList from './Content/InviteSentList';
 
 const menuItems: MenuProps['items'] = [
   {
@@ -28,9 +30,9 @@ export default function Friend({ content }: { content: string }) {
       case 'friend':
         return <FriendList />;
       case 'invite':
-        return <h1>Convites pendentes</h1>;
+        return <InviteReceivedList />;
       case 'invite-sent':
-        return <h1>Convites enviados</h1>;
+        return <InviteSentList />;
       default:
         break;
     }

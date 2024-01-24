@@ -15,3 +15,7 @@
   font-size: 2rem;
   margin-bottom: 12px;
 }
+
+.ant-list .ant-list-empty-text {
+  color: #8c8c8c;
+}
