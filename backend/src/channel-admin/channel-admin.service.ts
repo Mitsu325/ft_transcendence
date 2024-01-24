@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelAdmin } from './entities/admin.entity';
@@ -16,6 +16,21 @@ export class ChannelAdminService {
 
     async create(createAdminDto: CreateAdminDto) {
         try {
+            const activeAdmin = await this.ChannelAdminRepository.findOne({
+                where: {
+                    channel: Equal(createAdminDto.channel_id),
+                    admin: Equal(createAdminDto.admin_id),
+                    active: true,
+                },
+            });
+
+            if (activeAdmin) {
+                return {
+                    success: false,
+                    message: 'Admin already exists and is active.',
+                };
+            }
+
             const existingAdmin = await this.ChannelAdminRepository.findOne({
                 where: {
                     channel: Equal(createAdminDto.channel_id),
@@ -27,6 +42,7 @@ export class ChannelAdminService {
             if (existingAdmin) {
                 existingAdmin.active = true;
                 await this.ChannelAdminRepository.save(existingAdmin);
+                return { success: true, message: 'Inactive admin activated.' };
             } else {
                 const newAdmin = this.ChannelAdminRepository.create({
                     channel: createAdminDto.channel_id,
@@ -34,29 +50,41 @@ export class ChannelAdminService {
                     active: createAdminDto.active,
                 });
                 await this.ChannelAdminRepository.save(newAdmin);
+                return {
+                    success: true,
+                    message: 'Admin created successfully.',
+                };
             }
-
-            return true;
         } catch (error) {
-            console.log(error);
-            return false;
+            console.error(
+                'Error creating or activating channel administrator:',
+                error,
+            );
+            return {
+                success: false,
+                message: 'Error processing the request.',
+            };
         }
     }
 
     async findAll(channel_id: string): Promise<ChannelAdminDto[]> {
-        const admins = await this.ChannelAdminRepository.find({
-            where: {
-                channel: Equal(channel_id),
-                active: true,
-            },
-        });
-
-        return admins.map(admin => ({
-            id: admin.id,
-            channel_id: admin.channel.name_channel,
-            admin_id: admin.admin.name,
-            active: admin.active,
-        }));
+        try {
+            const admins = await this.ChannelAdminRepository.find({
+                where: {
+                    channel: Equal(channel_id),
+                    active: true,
+                },
+            });
+            return admins.map(admin => ({
+                id: admin.id,
+                channel_id: admin.channel.name_channel,
+                admin_id: admin.admin.name,
+                active: admin.active,
+            }));
+        } catch (error) {
+            console.error('Error to find channel administrators:', error);
+            throw error;
+        }
     }
 
     async removeAdmin(
@@ -74,15 +102,14 @@ export class ChannelAdminService {
             if (channelAdmin) {
                 channelAdmin.active = false;
                 await this.ChannelAdminRepository.save(channelAdmin);
-                return { success: true };
-            } else {
-                throw new NotFoundException(
-                    'Registro não encontrado ou já está inativo.',
-                );
+                return { success: true, message: 'Administrator removed.' };
             }
         } catch (error) {
-            console.error('Erro na remoção do administrador do canal:', error);
-            throw error;
+            console.error('Error in removing channel administrator:', error);
+            return {
+                success: false,
+                message: 'Error in removing channel administrator.',
+            };
         }
     }
 }
