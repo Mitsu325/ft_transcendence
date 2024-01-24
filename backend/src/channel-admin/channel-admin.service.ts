@@ -10,12 +10,16 @@ import { Equal } from 'typeorm';
 export class ChannelAdminService {
     constructor(
         @InjectRepository(ChannelAdmin)
-        private ChannelAdminRepository: Repository<ChannelAdmin>,
+        private readonly ChannelAdminRepository: Repository<ChannelAdmin>,
     ) {}
 
     async create(createAdminDto: CreateAdminDto) {
         try {
-            const admin = this.ChannelAdminRepository.create(createAdminDto);
+            const admin = this.ChannelAdminRepository.create({
+                channel: createAdminDto.channel_id,
+                admin: createAdminDto.admin_id,
+                active: createAdminDto.active,
+            });
             if (admin) {
                 this.ChannelAdminRepository.save(admin);
                 return true;

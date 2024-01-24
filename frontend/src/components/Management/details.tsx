@@ -43,7 +43,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   //   const { token } = theme.useToken();
   const [open, setOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // const [isAdmin, setIsAdmin] = useState(false);
 
   const showDrawer = (user: User) => {
     setSelectedUser(user);
@@ -51,6 +51,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   };
 
   const onClose = () => {
+    setSelectedUser(null);
     setOpen(false);
   };
 
@@ -76,19 +77,16 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const addAdmin = async () => {
     try {
       if (selectedUser) {
-        setIsAdmin(
-          await adminService.addAdmin({
-            channel_id: channel.id,
-            admin_id: selectedUser.id,
-            active: true,
-          }),
-        );
-
-        console.log(
-          `Usuário ${selectedUser.name} adicionado como administrador.`,
-        );
-
-        setSelectedUser(null);
+        console.log(selectedUser);
+        console.log(channel.id);
+        await adminService.addAdmin({
+          channel_id: channel.id,
+          admin_id: selectedUser.id,
+          active: true,
+        }),
+          console.log(
+            `Usuário ${selectedUser.name} adicionado como administrador.`,
+          );
       }
     } catch (error) {
       console.error('Erro ao adicionar administrador:', error);
@@ -162,7 +160,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
       <Drawer
         title="Gerenciar"
         placement="right"
-        closable={false}
+        // closable={false}
         onClose={onClose}
         open={open}
         getContainer={false}
@@ -171,7 +169,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           key="addAdmin"
           type="primary"
           onClick={addAdmin}
-          disabled={isAdmin}
+          // disabled={isAdmin}
         >
           Adicionar como administrador
         </Button>
@@ -179,7 +177,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
           key="removeAdmin"
           type="primary"
           onClick={removeAdmin}
-          disabled={isAdmin}
+          // disabled={isAdmin}
         >
           Remover administrador
         </Button>
