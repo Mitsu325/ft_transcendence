@@ -15,7 +15,8 @@ async function bootstrap() {
         .addTag('auth')
         .addTag('user')
         .addTag('chat')
-        .addTag('pong')
+        .addTag('battles')
+        .addTag('friend')
         .addBearerAuth(
             {
                 description: `Please enter token in following format: Bearer <JWT>`,

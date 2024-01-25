@@ -1,0 +1,17 @@
+.friend-pagination {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.friend-search-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.friend-search {
+  width: 80%;
+  max-width: 400px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}

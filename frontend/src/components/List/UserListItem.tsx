@@ -10,7 +10,9 @@ type UserListProps = {
   date?: string;
   active: boolean;
   username?: string;
+  itemClassName?: string;
   onUserClick?: () => void;
+  children?: React.ReactNode;
 };
 
 const UserListItem = ({
@@ -20,11 +22,15 @@ const UserListItem = ({
   date,
   active,
   username,
+  itemClassName,
   onUserClick,
+  children,
 }: UserListProps) => {
   return (
     <List.Item
-      className={['px-10 user-item', active && 'user-item-active'].join(' ')}
+      className={['px-10', itemClassName, active && 'user-item-active'].join(
+        ' ',
+      )}
       onClick={onUserClick}
     >
       <List.Item.Meta
@@ -46,6 +52,7 @@ const UserListItem = ({
         description={<p className="text-description">{description}</p>}
       />
       <span className="text-details">{date}</span>
+      {children}
     </List.Item>
   );
 };

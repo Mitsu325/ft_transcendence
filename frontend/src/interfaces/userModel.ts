@@ -1,3 +1,10 @@
+export interface userNonSensitiveInfo {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+}
+
 interface UserModel {
   id: string;
   name: string;

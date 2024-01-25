@@ -7,6 +7,7 @@ import { Game } from 'components/Game';
 import Register from 'pages/Register';
 import HistoricTable from 'components/HistoricTable';
 import Statistics from 'components/Statistics';
+import Friend from 'pages/Friend';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -30,6 +31,16 @@ const PrivateRoutes: React.FC = () => {
           />
           <Route path="/historic" element={<HistoricTable />} />
           <Route path="/statistics" element={<Statistics />} />
+          <Route path="/friend" element={<Friend content="friend" />} />
+          <Route path="/friend/invite" element={<Friend content="invite" />} />
+          <Route
+            path="/friend/invite/received"
+            element={<Friend content="invite-received" />}
+          />
+          <Route
+            path="/friend/invite/sent"
+            element={<Friend content="invite-sent" />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Breadcrumb, Button, Layout, Menu, Tooltip } from 'antd';
+import { Button, Layout, Menu, Tooltip } from 'antd';
 import {
   AppstoreOutlined,
   HomeOutlined,
@@ -9,8 +9,7 @@ import {
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import getMenuBreadcrumb from 'pages/utils/GetMenu';
-import { BreadcrumbItem, menuPaths } from 'components/Layout/menuConfig';
+import { menuPaths } from 'components/Layout/menuConfig';
 import AvatarCustom from 'components/Avatar';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import FailureNotification from 'components/Notification/FailureNotification';
@@ -26,7 +25,6 @@ const CommonLayout = () => {
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
-  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
 
   const menuItems = [
     { key: '0', icon: <HomeOutlined />, label: <Link to="/">Home</Link> },
@@ -50,7 +48,11 @@ const CommonLayout = () => {
         { key: '4', label: <Link to="/historic">Histórico de partidas</Link> },
       ],
     },
-    { key: '5', label: 'Amigos', icon: <TeamOutlined /> },
+    {
+      key: '5',
+      label: <Link to="/friend">Amigos</Link>,
+      icon: <TeamOutlined />,
+    },
     {
       key: '6',
       icon: <MessageOutlined />,
@@ -75,8 +77,6 @@ const CommonLayout = () => {
 
     if (key) {
       setSelectedMenuKey([key]);
-      const updatedBreadcrumbItems = getMenuBreadcrumb(key, menuItems);
-      setBreadcrumbItems(updatedBreadcrumbItems);
     } else {
       setSelectedMenuKey(['0']);
     }
@@ -129,7 +129,6 @@ const CommonLayout = () => {
       </Sider>
       <Layout>
         <Content className="content">
-          <Breadcrumb className="breadcrumb" items={breadcrumbItems} />
           <Outlet />
         </Content>
       </Layout>
