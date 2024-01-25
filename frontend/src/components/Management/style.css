@@ -14,8 +14,7 @@
 }
 
 .msgContainer {
-  background-color: #001529;
-  color: white;
+  color: #001529;
   font-size: 2rem;
   display: flex;
   align-items: center;
@@ -26,4 +25,11 @@
 .exclamation {
   font-size: 45px;
   margin-right: 15px;
+}
+
+.leave-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto 0;
 }

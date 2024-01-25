@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, List, Avatar, Button, Drawer } from 'antd';
+import { Card, Row, Col, List, Avatar, Button, Drawer, Tooltip } from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 
@@ -10,7 +10,7 @@ interface ChannelAdminProps {
   id: string;
   name_channel: string;
   type: string;
-  owner: string;
+  owner: string | null;
 }
 
 interface Channel {
@@ -36,16 +36,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
 
-  const showDrawer = (user: User) => {
-    setSelectedUser(user);
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setSelectedUser(null);
-    setOpen(false);
-  };
-
   useEffect(() => {
     const getUsers = async () => {
       const data = await userService.getAllUsers();
@@ -63,6 +53,16 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
 
     getAdmins();
   }, [channel.id, admins]);
+
+  const showDrawer = (user: User) => {
+    setSelectedUser(user);
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setSelectedUser(null);
+    setOpen(false);
+  };
 
   const addAdmin = async () => {
     try {
@@ -115,8 +115,28 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
     }
   };
 
+  const handleLeave = () => {
+    console.log('teste');
+  };
+
   return (
-    <Card title={`Dono do Canal: ${channel.owner}`}>
+    <Card
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span
+            style={{ marginRight: '18px' }}
+          >{`Dono do Canal: ${channel.owner}`}</span>
+          <Tooltip title="Sair do canal" placement="right" color="blue">
+            <Button
+              aria-label="Sair do canal"
+              className="leaveChnBtn"
+              icon={<LogoutOutlined />}
+              onClick={() => handleLeave()}
+            />
+          </Tooltip>
+        </div>
+      }
+    >
       <Row gutter={16}>
         <Col span={12}>
           <List

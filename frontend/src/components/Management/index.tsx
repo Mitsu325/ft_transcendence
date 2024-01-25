@@ -29,7 +29,7 @@ const ChannelManagement: React.FC = () => {
   const user = useAuth()?.user;
 
   const handleChannelClick = async (channel: ChannelProps) => {
-    setIsAdmin(false);
+    setIsOwner(false);
     setIsAdmin(false);
     setSelectedChannel(channel);
     const userId = user?.id ?? '';
@@ -62,6 +62,10 @@ const ChannelManagement: React.FC = () => {
     setHoveredChannel(channel.id);
   };
 
+  const handleMouseLeave = () => {
+    setHoveredChannel(undefined);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider width={200} theme="dark">
@@ -86,6 +90,7 @@ const ChannelManagement: React.FC = () => {
               key={channel.id}
               onClick={() => handleChannelClick(channel)}
               onMouseEnter={() => handleChannelHover(channel)}
+              onMouseLeave={() => handleMouseLeave()}
               style={{
                 color: 'white',
                 backgroundColor:

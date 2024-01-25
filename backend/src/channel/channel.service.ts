@@ -93,7 +93,7 @@ export class ChannelService {
             const token = jwt.sign({ roomId }, key, { expiresIn: '24h' });
             return token;
         } catch (error) {
-            console.error('Erro ao gerar token:', error);
+            console.error('Error generating token:', error);
             throw error;
         }
     }
@@ -105,6 +105,18 @@ export class ChannelService {
                 relations: ['owner'],
             });
             return channel ? channel.owner : null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateOwner(channelId: string): Promise<Channel> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+            });
+            channel.owner = null;
+            return this.channelsRepository.save(channel);
         } catch (error) {
             throw error;
         }
