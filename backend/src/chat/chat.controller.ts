@@ -5,6 +5,7 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    Patch,
     Post,
     Request,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ import {
 import { SendMessageDto } from './dto/send-message.dto';
 import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
 import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { BlockedDto } from './dto/blocked.dto';
+import { ChangeBlockedDto } from './dto/change-blocked.dto';
 
 @ApiTags('chat')
 @Controller('chat')
@@ -71,5 +74,34 @@ export class ChatController {
     @Post('send-message')
     async sendMessage(@Body() sendMessageDto: SendMessageDto, @Request() req) {
         return await this.chatService.saveMessage(sendMessageDto, req.user.sub);
+    }
+
+    @ApiOperation({ description: 'Get all blocked users' })
+    @ApiBearerAuth('access-token')
+    @Get('blocked-users')
+    async findAllBlockedUsers(@Request() req) {
+        return await this.chatService.findAllBlockedUsers(req.user.sub);
+    }
+
+    @ApiOperation({ description: 'Block a user' })
+    @ApiBody({ type: BlockedDto, description: 'Request body.' })
+    @ApiBearerAuth('access-token')
+    @Post('block-user')
+    async blockUser(@Body() blockedDto: BlockedDto, @Request() req) {
+        return await this.chatService.blockUser(blockedDto, req.user.sub);
+    }
+
+    @ApiOperation({ description: 'Update blocked a user' })
+    @ApiBody({ type: ChangeBlockedDto, description: 'Request body.' })
+    @ApiBearerAuth('access-token')
+    @Patch('block-user')
+    async updateBlockUser(
+        @Body() changeBlockedDto: ChangeBlockedDto,
+        @Request() req,
+    ) {
+        return await this.chatService.updateBlockUser(
+            changeBlockedDto,
+            req.user.sub,
+        );
     }
 }

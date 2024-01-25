@@ -1,37 +1,64 @@
+/* eslint-disable no-useless-catch */
 import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
 
 async function getUser() {
-  const result = await api.get('/user/me');
-  return result?.data || null;
+  try {
+    const result = await api.get('/user/me');
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getUserById(userId: string) {
-  const result = await api.get(`/user/id/${userId}`);
-  return result?.data || null;
+  try {
+    const result = await api.get(`/user/id/${userId}`);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getUserByUsername(username: string) {
-  const result = await api.get(`/user/username/${username}`);
-  return result?.data || null;
+  try {
+    const result = await api.get(`/user/username/${username}`);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function searchUserByName(name: string) {
   const params = { name };
-  const result = await api.get(
-    '/user/search?' + createSearchParams(params).toString(),
-  );
-  return result?.data || null;
+  try {
+    const result = await api.get(
+      '/user/search?' + createSearchParams(params).toString(),
+    );
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function uploadAvatar(file: File) {
-  const result = await api.post('/user/sign-up', file);
-  return result?.data || null;
+  try {
+    const result = await api.post('/user/sign-up', file);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function update2fa(twoFactorAuth: boolean) {
-  const result = await api.post('/user/set/two-factor-auth', { twoFactorAuth });
-  return result?.data || null;
+  try {
+    const result = await api.post('/user/set/two-factor-auth', {
+      twoFactorAuth,
+    });
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export const userService = {

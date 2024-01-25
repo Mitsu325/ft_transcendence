@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { EditOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  KeyOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from 'hooks/useAuth';
 import AvatarCustom from 'components/Avatar';
@@ -10,6 +15,7 @@ import 'pages/Register/style.css';
 import UserModel from 'interfaces/userModel';
 import { userService } from 'services/user.api';
 import FailureNotification from 'components/Notification/FailureNotification';
+import BlockUsers from './Content/blockUsers';
 
 export default function Register({ content }: { content: string }) {
   const { user } = useAuth();
@@ -39,6 +45,12 @@ export default function Register({ content }: { content: string }) {
       path: `/profile/${user?.username}/security`,
       icon: <KeyOutlined />,
       label: 'Segurança',
+    },
+    {
+      key: 'blocked-users',
+      path: `/profile/${user?.username}/blocked-users`,
+      icon: <TeamOutlined />,
+      label: 'Bloqueados',
     },
   ];
 
@@ -104,6 +116,8 @@ export default function Register({ content }: { content: string }) {
         return <UserEditProfile userProfile={userProfile} />;
       case 'security':
         return <UserSecurity userProfile={userProfile} />;
+      case 'blocked-users':
+        return <BlockUsers userProfile={userProfile} />;
       default:
         break;
     }

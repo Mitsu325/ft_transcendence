@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import {
   InviteBody,
   InviteStatusBody,
@@ -8,35 +9,59 @@ import { buildPaginationUrl } from 'utils/build-pagination-url';
 
 async function getFriends(pagination?: Pagination) {
   const url = buildPaginationUrl('/friend', pagination);
-  const result = await api.get(url);
-  return result?.data || null;
+  try {
+    const result = await api.get(url);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getInviteReceived(pagination?: Pagination) {
   const url = buildPaginationUrl('/friend/invite-received', pagination);
-  const result = await api.get(url);
-  return result?.data || null;
+  try {
+    const result = await api.get(url);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getInviteSent(pagination?: Pagination) {
   const url = buildPaginationUrl('/friend/invite-sent', pagination);
-  const result = await api.get(url);
-  return result?.data || null;
+  try {
+    const result = await api.get(url);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function invite(params: InviteBody) {
-  const result = await api.post('/friend/invite', params);
-  return result?.data || null;
+  try {
+    const result = await api.post('/friend/invite', params);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function updateInviteStatus(params: InviteStatusBody) {
-  const result = await api.patch('/friend/invite-status', params);
-  return result?.data || null;
+  try {
+    const result = await api.patch('/friend/invite-status', params);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function deleteInvite(inviteId: string) {
-  const result = await api.delete(`/friend/${inviteId}`);
-  return result?.data || null;
+  try {
+    const result = await api.delete(`/friend/${inviteId}`);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export const friendService = {

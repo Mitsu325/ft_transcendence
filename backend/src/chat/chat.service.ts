@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isSameDay, format } from 'date-fns';
@@ -8,12 +12,17 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { UserService } from 'src/user/user.service';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
+import { BlockedDto } from './dto/blocked.dto';
+import { Blocked } from './entities/blocked.entity';
+import { ChangeBlockedDto } from './dto/change-blocked.dto';
 
 @Injectable()
 export class ChatService {
     constructor(
         @InjectRepository(DirectMessage)
         private directMessageRepository: Repository<DirectMessage>,
+        @InjectRepository(Blocked)
+        private blockedRepository: Repository<Blocked>,
         private readonly userService: UserService,
     ) {}
 
@@ -22,6 +31,16 @@ export class ChatService {
     }
 
     async findAllInteractedUsers(loggedUserId: string) {
+        const blockedUsers: Blocked[] = await this.blockedRepository.find({
+            where: {
+                blocker: { id: loggedUserId },
+                active: true,
+            },
+            relations: ['blocker', 'blocked'],
+        });
+
+        const blockedIds = blockedUsers.map((item: Blocked) => item.blocked.id);
+
         const messages = await this.directMessageRepository.find({
             where: [
                 { sender: { id: loggedUserId } },
@@ -40,9 +59,13 @@ export class ChatService {
             }
         });
 
+        const filteredInteractedUserIds = new Set(
+            [...interactedUserIds].filter(item => !blockedIds.includes(item)),
+        );
+
         const currentDate = new Date();
         const interactedUsers = [];
-        for (const id of interactedUserIds) {
+        for (const id of filteredInteractedUserIds) {
             let lastMessage;
             if (id === loggedUserId) {
                 lastMessage = messages.find(
@@ -184,5 +207,93 @@ export class ChatService {
         } catch (error) {
             throw error;
         }
+    }
+
+    async findAllBlockedUsers(loggedUserId: string) {
+        const blockedUsers: Blocked[] = await this.blockedRepository.find({
+            where: {
+                blocker: { id: loggedUserId },
+                active: true,
+            },
+            relations: ['blocker', 'blocked'],
+        });
+
+        return blockedUsers.map((item: Blocked) => ({
+            id: item.id,
+            blocked: getNonSensitiveUserInfo(item.blocked),
+        }));
+    }
+
+    async blockUser(blockedDto: BlockedDto, loggedUserId: string) {
+        const { blockedId } = blockedDto;
+
+        if (loggedUserId === blockedId) {
+            throw new BadRequestException(
+                'The blocker and blocked are the same users',
+            );
+        }
+
+        const blockerUser = await this.userService.findById(loggedUserId);
+        if (!blockerUser) {
+            throw new NotFoundException('Blocker not found');
+        }
+
+        const blockedUser = await this.userService.findById(blockedId);
+        if (!blockedUser) {
+            throw new NotFoundException('Blocked not found');
+        }
+
+        const blocked = await this.blockedRepository.findOne({
+            where: {
+                blocker: { id: loggedUserId },
+                blocked: { id: blockedId },
+            },
+        });
+
+        if (blocked) {
+            await this.blockedRepository.update(
+                {
+                    blocker: { id: loggedUserId },
+                    blocked: { id: blockedId },
+                },
+                {
+                    active: true,
+                },
+            );
+        } else {
+            const params = {
+                blocker: blockerUser,
+                blocked: blockedUser,
+            };
+            await this.blockedRepository.create(params).save();
+        }
+        return;
+    }
+
+    async updateBlockUser(
+        changeBlockedDto: ChangeBlockedDto,
+        loggedUserId: string,
+    ) {
+        const { blockedId, active } = changeBlockedDto;
+
+        const blocked = await this.blockedRepository.findOne({
+            where: {
+                blocker: { id: loggedUserId },
+                blocked: { id: blockedId },
+            },
+        });
+
+        if (!blocked) {
+            throw new NotFoundException('Blocked not found');
+        }
+
+        await this.blockedRepository.update(
+            {
+                blocker: { id: loggedUserId },
+                blocked: { id: blockedId },
+            },
+            { active },
+        );
+        return;
     }
 }

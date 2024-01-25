@@ -37,6 +37,7 @@ export default function Chat() {
     queryParams.get('menu') || 'channel',
   );
   const [selectedUser, setSelectedUser] = useState<ChattingUser | undefined>();
+  const [reloadUsers, setReloadUsers] = useState<boolean>(false);
 
   const handleMenuClick = (key: string) => {
     setSelectedMenuItem(key);
@@ -47,6 +48,10 @@ export default function Chat() {
 
   const handleUserClick = (chattingUser?: ChattingUser) => {
     setSelectedUser(chattingUser);
+  };
+
+  const handleReloadUsers = () => {
+    setReloadUsers((prev: boolean) => !prev);
   };
 
   useEffect(() => {
@@ -82,6 +87,7 @@ export default function Chat() {
       case 'chat':
         return (
           <ChatList
+            reloadUsers={reloadUsers}
             handleUserClick={handleUserClick}
             selectedUser={selectedUser}
           />
@@ -103,9 +109,9 @@ export default function Chat() {
       }
       return (
         <MessageList
-          id={selectedUser.id}
-          name={selectedUser.name}
-          avatar={selectedUser.avatar}
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+          onReloadUsers={handleReloadUsers}
         />
       );
     }
