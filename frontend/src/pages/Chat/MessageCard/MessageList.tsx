@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Divider, List } from 'antd';
+import { Button, Divider, List, Popconfirm } from 'antd';
 import AvatarCustom from 'components/Avatar';
 import MessageBox from 'components/Message/MessageBox';
 import MessageInput from 'components/Message/MessageInput';
@@ -9,8 +9,22 @@ import { socket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
 import InfiniteScroll from 'components/InfiniteScroll';
 import { ChattingUser, Message } from 'interfaces/chat.interface';
+import { StopOutlined } from '@ant-design/icons';
+import SuccessNotification from 'components/Notification/SuccessNotification';
 
-export default function MessageList(selectedUser: ChattingUser) {
+interface MessageListProps {
+  selectedUser: ChattingUser;
+  setSelectedUser: React.Dispatch<
+    React.SetStateAction<ChattingUser | undefined>
+  >;
+  onReloadUsers: () => void;
+}
+
+export default function MessageList({
+  selectedUser,
+  setSelectedUser,
+  onReloadUsers,
+}: MessageListProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
@@ -137,11 +151,49 @@ export default function MessageList(selectedUser: ChattingUser) {
     }
   };
 
+  const confirm = (userId: string) => {
+    chatService
+      .blockUser({ blockedId: userId })
+      .then(() => {
+        setSelectedUser(undefined);
+        onReloadUsers();
+        SuccessNotification({
+          message: 'Usuário Bloqueado com Sucesso',
+          description:
+            'Agora, você não receberá mais interações dele. Caso mude de ideia, você pode gerenciar seus usuários bloqueados nas configurações da conta.',
+        });
+      })
+      .catch(() => {
+        FailureNotification({
+          message: 'Ops! Não foi possível bloquear o usuário.',
+          description: 'Verifique sua conexão e tente novamente',
+        });
+      });
+  };
+
   return (
     <>
       <div className="message-header">
-        <AvatarCustom src={selectedUser.avatar} size={48} />
-        <h1 className="title ml-12">{selectedUser.name}</h1>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <AvatarCustom src={selectedUser.avatar} size={48} />
+          <h1 className="title ml-12">{selectedUser.name}</h1>
+        </div>
+        {selectedUser.id !== user?.id && (
+          <Popconfirm
+            title={'Bloquear ' + selectedUser.name}
+            description="Você tem certeza que deseja continuar?"
+            onConfirm={() => confirm(selectedUser.id)}
+            okText="Sim"
+            cancelText="Não"
+          >
+            <Button
+              shape="circle"
+              icon={<StopOutlined />}
+              aria-label="Bloquear"
+              style={{ color: '#cf1322' }}
+            />
+          </Popconfirm>
+        )}
       </div>
       <Divider className="border-dark m-0" />
       <InfiniteScroll

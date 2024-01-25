@@ -40,9 +40,7 @@ const CommonLayout = () => {
       children: [
         {
           key: '2',
-          label: (
-            <Link to={'/profile/' + user?.username}>Dados de cadastro</Link>
-          ),
+          label: <Link to={'/profile/' + user?.username}>Perfil</Link>,
         },
         { key: '3', label: <Link to="/statistics">Estatísticas</Link> },
         { key: '4', label: <Link to="/historic">Histórico de partidas</Link> },

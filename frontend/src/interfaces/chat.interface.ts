@@ -1,3 +1,5 @@
+import { userNonSensitiveInfo } from './userModel';
+
 export type ChattingUser = {
   id: string;
   avatar: string;
@@ -35,3 +37,8 @@ export type Chat = {
   text: string;
   date: string;
 };
+
+export interface BlockedUser {
+  id: string;
+  blocked: userNonSensitiveInfo;
+}

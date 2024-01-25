@@ -29,6 +29,10 @@ const PrivateRoutes: React.FC = () => {
             path="/profile/:username/security"
             element={<Register content="security" />}
           />
+          <Route
+            path="/profile/:username/blocked-users"
+            element={<Register content="blocked-users" />}
+          />
           <Route path="/historic" element={<HistoricTable />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/friend" element={<Friend content="friend" />} />

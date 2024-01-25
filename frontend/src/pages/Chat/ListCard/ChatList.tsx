@@ -8,6 +8,7 @@ import { userService } from 'services/user.api';
 import { Chat, ChattingUser } from 'interfaces/chat.interface';
 
 interface ChatListProps {
+  reloadUsers: boolean;
   selectedUser: ChattingUser | undefined;
   handleUserClick: (chattingUser?: ChattingUser) => void;
 }
@@ -15,6 +16,7 @@ interface ChatListProps {
 export default function ChatList({
   selectedUser,
   handleUserClick,
+  reloadUsers,
 }: ChatListProps) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [users, setUsers] = useState<SelectProps['options']>([]);
@@ -22,22 +24,28 @@ export default function ChatList({
   let timeout: ReturnType<typeof setTimeout> | null;
   let currentSearchValue: string;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await chatService.getRecipients();
+  const getRecipients = () => {
+    chatService
+      .getRecipients()
+      .then(res => {
         setChats(res);
-      } catch (error) {
+      })
+      .catch(() => {
         FailureNotification({
           message: 'Ops! Encontramos algumas falhas durante o processo',
           description:
             'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
         });
-      }
-    };
+      });
+  };
 
-    fetchData();
+  useEffect(() => {
+    getRecipients();
   }, []);
+
+  useEffect(() => {
+    getRecipients();
+  }, [reloadUsers]);
 
   useEffect(() => {
     socket.on('message', ({ senderId, message }) => {

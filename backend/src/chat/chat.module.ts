@@ -8,12 +8,13 @@ import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { Blocked } from './entities/blocked.entity';
 
 @Module({
     imports: [
         AuthModule,
         UserModule,
-        TypeOrmModule.forFeature([DirectMessage]),
+        TypeOrmModule.forFeature([DirectMessage, Blocked]),
     ],
     controllers: [ChatController],
     providers: [
