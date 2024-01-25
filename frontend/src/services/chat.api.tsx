@@ -5,7 +5,7 @@ import { buildPaginationUrl } from 'utils/build-pagination-url';
 
 async function getRecipients() {
   const result = await api.get('/chat/recipients');
-  return result.data || null;
+  return result?.data || null;
 }
 
 async function getMessagesFromChattingUser(
@@ -17,12 +17,12 @@ async function getMessagesFromChattingUser(
     pagination,
   );
   const result = await api.get(url);
-  return result.data || null;
+  return result?.data || null;
 }
 
 async function sendMessage(params: SendMessageBody) {
   const result = await api.post('/chat/send-message', params);
-  return result.data || null;
+  return result?.data || null;
 }
 
 export const chatService = {

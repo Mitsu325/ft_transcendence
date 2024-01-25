@@ -241,6 +241,9 @@ export class FriendService {
         const invite = await this.friendRepository.findOne({
             where: { id: inviteId },
         });
+        if (!invite) {
+            throw new NotFoundException('Invite not found');
+        }
         if (invite.status !== 'pending') {
             throw new BadRequestException('The invitation is not pending');
         }

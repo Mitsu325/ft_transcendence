@@ -34,6 +34,10 @@ const PrivateRoutes: React.FC = () => {
           <Route path="/friend" element={<Friend content="friend" />} />
           <Route path="/friend/invite" element={<Friend content="invite" />} />
           <Route
+            path="/friend/invite/received"
+            element={<Friend content="invite-received" />}
+          />
+          <Route
             path="/friend/invite/sent"
             element={<Friend content="invite-sent" />}
           />

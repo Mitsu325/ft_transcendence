@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import FriendList from './Content/FriendList';
 import InviteReceivedList from './Content/InviteReceivedList';
 import InviteSentList from './Content/InviteSentList';
+import FriendInvite from './Content/Invite';
 
 const menuItems: MenuProps['items'] = [
   {
@@ -12,12 +13,16 @@ const menuItems: MenuProps['items'] = [
     key: 'friend',
   },
   {
-    label: <Link to="/friend/invite">Pendente</Link>,
-    key: 'invite',
+    label: <Link to="/friend/invite/received">Pendente</Link>,
+    key: 'invite-received',
   },
   {
     label: <Link to="/friend/invite/sent">Enviado</Link>,
     key: 'invite-sent',
+  },
+  {
+    label: <Link to="/friend/invite">Convidar</Link>,
+    key: 'invite',
   },
 ];
 
@@ -29,10 +34,12 @@ export default function Friend({ content }: { content: string }) {
     switch (content) {
       case 'friend':
         return <FriendList />;
-      case 'invite':
+      case 'invite-received':
         return <InviteReceivedList />;
       case 'invite-sent':
         return <InviteSentList />;
+      case 'invite':
+        return <FriendInvite />;
       default:
         break;
     }
@@ -48,6 +55,9 @@ export default function Friend({ content }: { content: string }) {
         break;
       case '/friend/invite/sent':
         setSelectedMenu('invite-sent');
+        break;
+      case '/friend/invite/received':
+        setSelectedMenu('invite-received');
         break;
       default:
         break;
