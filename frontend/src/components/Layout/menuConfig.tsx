@@ -36,7 +36,7 @@ export const menuItems = [
   { key: '5', label: 'Amigos', icon: <TeamOutlined /> },
   {
     key: 'sub2',
-    label: 'Canais e chat',
+    label: 'Chat',
     icon: <MessageOutlined />,
     children: [
       { key: '6', label: <Link to="/message">Chat</Link> },
