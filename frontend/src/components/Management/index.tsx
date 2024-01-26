@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
+
+import { Layout } from 'antd';
 import ChannelAdmin from './channelAdmin';
 import { channelApi } from '../../services/channel.api';
+import ChannelMessage from './channelMessage';
 import { adminService } from 'services/admin.api';
 import './style.css';
 const { Content, Sider } = Layout;
@@ -73,26 +74,15 @@ const ChannelManagement: React.FC = () => {
           <span className="title">Canais</span>
           <div className="line"></div>
         </div>
-        <Menu
-          mode="inline"
-          theme="dark"
-          selectedKeys={selectedChannel ? [selectedChannel.id] : []}
-          onClick={({ key }) =>
-            handleChannelClick(
-              channels.find(channel => channel.id === key) ||
-                ({} as ChannelProps),
-            )
-          }
-          style={{ color: 'white' }}
-        >
+        <ul className="list">
           {channels.map(channel => (
-            <Menu.Item
+            <li
+              className="items"
               key={channel.id}
               onClick={() => handleChannelClick(channel)}
               onMouseEnter={() => handleChannelHover(channel)}
-              onMouseLeave={() => handleMouseLeave()}
+              onMouseLeave={handleMouseLeave}
               style={{
-                color: 'white',
                 backgroundColor:
                   selectedChannel?.id === channel.id
                     ? '#1677FE'
@@ -100,24 +90,18 @@ const ChannelManagement: React.FC = () => {
                     ? '#1677FE'
                     : 'transparent',
               }}
-              className="channel-menu-item"
             >
               {channel.name_channel}
-            </Menu.Item>
+            </li>
           ))}
-        </Menu>
+        </ul>
       </Sider>
       <Layout>
         <Content style={{ marginLeft: '15px' }}>
           {selectedChannel && (isAdmin || isOwner) ? (
-            <ChannelAdmin channel={selectedChannel} />
+            <ChannelAdmin channel={selectedChannel} owner={isOwner} />
           ) : (
-            <>
-              <div className="msgContainer">
-                <ExclamationCircleOutlined className="exclamation" />
-                <p>Você não é administrador ou dono deste canal.</p>
-              </div>
-            </>
+            <ChannelMessage />
           )}
         </Content>
       </Layout>

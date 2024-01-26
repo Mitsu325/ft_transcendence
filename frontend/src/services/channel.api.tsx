@@ -46,6 +46,11 @@ async function getOwner(channelId: string) {
   return result;
 }
 
+async function updateOwner(channelId: string) {
+  const result = await api.patch(`/channel/update-owner/${channelId}`);
+  return result;
+}
+
 export const channelApi = {
   createChannel,
   getChannel,
@@ -54,4 +59,5 @@ export const channelApi = {
   verifyChannelPassword,
   getToken,
   getOwner,
+  updateOwner,
 };

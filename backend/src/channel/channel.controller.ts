@@ -130,7 +130,7 @@ export class ChannelController {
         try {
             const updateOwner = await this.channelService.updateOwner(id);
             return {
-                message: 'Owner updated successfully',
+                message: 'Success.',
                 owner: updateOwner.owner,
             };
         } catch (error) {

@@ -3,8 +3,10 @@ import { Card, Row, Col, List, Avatar, Button, Drawer, Tooltip } from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { channelApi } from '../../services/channel.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import { useAuth } from '../../hooks/useAuth';
 
 interface ChannelAdminProps {
   id: string;
@@ -15,6 +17,7 @@ interface ChannelAdminProps {
 
 interface Channel {
   channel: ChannelAdminProps;
+  owner: boolean;
 }
 
 interface User {
@@ -30,11 +33,13 @@ interface Admin {
   active: boolean;
 }
 
-const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
+const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
+
+  const userAvatar = useAuth()?.user;
 
   useEffect(() => {
     const getUsers = async () => {
@@ -115,8 +120,21 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
     }
   };
 
-  const handleLeave = () => {
-    console.log('teste');
+  const handleLeave = async () => {
+    if (admins && admins.length > 0) {
+      const res = await channelApi.updateOwner(channel.id);
+      if (res.data.message == 'Success') {
+        SuccessNotification({
+          message: 'Saiu do canal',
+          description: 'Você não é mais dono deste canal.',
+        });
+      }
+    } else {
+      FailureNotification({
+        message: 'Não é possível sair do canal.',
+        description: 'Adicione um administrador e tente novamente.',
+      });
+    }
   };
 
   return (
@@ -124,16 +142,20 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
       title={
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <span
-            style={{ marginRight: '18px' }}
-          >{`Dono do Canal: ${channel.owner}`}</span>
-          <Tooltip title="Sair do canal" placement="right" color="blue">
-            <Button
-              aria-label="Sair do canal"
-              className="leaveChnBtn"
-              icon={<LogoutOutlined />}
-              onClick={() => handleLeave()}
-            />
-          </Tooltip>
+            style={{ marginRight: '18px', color: '#001529' }}
+          >{`Dono do Canal: ${
+            channel.owner !== null ? channel.owner : ''
+          }`}</span>
+          {owner && (
+            <Tooltip title="Sair do canal">
+              <Button
+                aria-label="Sair do canal"
+                className="leaveChnBtn"
+                icon={<LogoutOutlined />}
+                onClick={() => handleLeave()}
+              />
+            </Tooltip>
+          )}
         </div>
       }
     >
@@ -141,7 +163,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
         <Col span={12}>
           <List
             header={
-              <div>
+              <div className="text-title">
                 Administradores do Canal:{' '}
                 <strong>{channel.name_channel}</strong>
               </div>
@@ -150,7 +172,17 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
             renderItem={admin => (
               <List.Item>
                 <List.Item.Meta
-                  avatar={<Avatar icon={<UserOutlined />} />}
+                  className="text-title"
+                  avatar={
+                    userAvatar?.avatar ? (
+                      <Avatar size={50} src={userAvatar.avatar} />
+                    ) : (
+                      <Avatar
+                        size={50}
+                        icon={<UserOutlined className="userOutlined" />}
+                      />
+                    )
+                  }
                   title={admin.admin_id}
                   description={`@${admin.admin_id}`}
                 />
@@ -161,7 +193,7 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
 
         <Col span={12}>
           <List
-            header={<div>Usuários</div>}
+            header={<div className="text-title">Usuários</div>}
             dataSource={users}
             renderItem={user => (
               <List.Item
@@ -171,7 +203,17 @@ const ChannelAdmin: React.FC<Channel> = ({ channel }) => {
                 style={{ cursor: 'pointer' }}
               >
                 <List.Item.Meta
-                  avatar={<Avatar icon={<UserOutlined />} />}
+                  className="text-title"
+                  avatar={
+                    userAvatar?.avatar ? (
+                      <Avatar size={50} src={userAvatar.avatar} />
+                    ) : (
+                      <Avatar
+                        size={50}
+                        icon={<UserOutlined className="userOutlined" />}
+                      />
+                    )
+                  }
                   title={user.name}
                   description={`@${user.username}`}
                 />
