@@ -39,7 +39,17 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
 
-  const userAvatar = useAuth()?.user;
+  // const userAvatar = useAuth()?.user;
+  const user = useAuth()?.user;
+
+  const userPlayer = React.useMemo(() => {
+    const newPlayer = {
+      id: user?.id ?? '',
+      name: user?.name ?? '',
+      avatar: user?.avatar ?? null,
+    };
+    return newPlayer;
+  }, [user]);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -174,8 +184,8 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
                 <List.Item.Meta
                   className="text-title"
                   avatar={
-                    userAvatar?.avatar ? (
-                      <Avatar size={50} src={userAvatar.avatar} />
+                    admin.id === userPlayer.id && userPlayer.avatar ? (
+                      <Avatar size={50} src={userPlayer.avatar} />
                     ) : (
                       <Avatar
                         size={50}
@@ -205,8 +215,8 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
                 <List.Item.Meta
                   className="text-title"
                   avatar={
-                    userAvatar?.avatar ? (
-                      <Avatar size={50} src={userAvatar.avatar} />
+                    user.id === userPlayer.id && userPlayer.avatar ? (
+                      <Avatar size={50} src={userPlayer.avatar} />
                     ) : (
                       <Avatar
                         size={50}
