@@ -52,9 +52,13 @@ const CommonLayout = () => {
       icon: <TeamOutlined />,
     },
     {
-      key: '6',
+      key: 'sub2',
+      label: 'Chat',
       icon: <MessageOutlined />,
-      label: <Link to="/message">Chat</Link>,
+      children: [
+        { key: '6', label: <Link to="/message">Chat</Link> },
+        { key: '7', label: <Link to="/manager">Gerenciamento</Link> },
+      ],
     },
   ];
 
