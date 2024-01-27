@@ -16,4 +16,5 @@ export const menuPaths: MenuPaths = {
   '/historic': '4',
   '/friend': '5',
   '/message': '6',
+  '/manager': '7',
 };

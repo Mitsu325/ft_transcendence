@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { UploadFileModule } from './upload-file/upload-file.module';
 import { ChannelModule } from './channel/channel.module';
 import { FriendModule } from './friend/friend.module';
+import { ChannelAdminModule } from './channel-admin/channel-admin.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { FriendModule } from './friend/friend.module';
         ChatModule,
         UploadFileModule,
         FriendModule,
+        ChannelAdminModule,
     ],
     controllers: [AppController],
     providers: [AppService],

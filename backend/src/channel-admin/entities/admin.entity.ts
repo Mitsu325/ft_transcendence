@@ -8,24 +8,23 @@ import {
     JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Channel } from '../../channel/entities/channel.entity';
 
 @Entity()
-export class Channel {
+export class ChannelAdmin {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'varchar', length: 200 })
-    name_channel: string;
-
-    @Column({ type: 'varchar', length: 50 })
-    type: string;
-
-    @Column({ type: 'varchar', nullable: true })
-    password?: string;
+    @ManyToOne(() => Channel, { eager: true })
+    @JoinColumn({ name: 'channel_id', referencedColumnName: 'id' })
+    channel: Channel;
 
     @ManyToOne(() => User, { eager: true })
-    @JoinColumn({ name: 'owner', referencedColumnName: 'id' })
-    owner: User;
+    @JoinColumn({ name: 'admin_id', referencedColumnName: 'id' })
+    admin: User;
+
+    @Column({ type: 'boolean', default: false })
+    active: boolean;
 
     @CreateDateColumn({
         name: 'created_at',

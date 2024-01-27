@@ -8,6 +8,7 @@ import Register from 'pages/Register';
 import HistoricTable from 'components/HistoricTable';
 import Statistics from 'components/Statistics';
 import Friend from 'pages/Friend';
+import Manager from 'components/Management';
 
 const PrivateRoutes: React.FC = () => {
   return (
@@ -45,6 +46,7 @@ const PrivateRoutes: React.FC = () => {
             path="/friend/invite/sent"
             element={<Friend content="invite-sent" />}
           />
+          <Route path="/manager" element={<Manager />} />
         </Route>
       </Routes>
     </BrowserRouter>

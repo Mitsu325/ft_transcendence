@@ -11,6 +11,11 @@ async function getUser() {
   }
 }
 
+async function getAllUsers() {
+  const result = await api.get('user/all');
+  return result.data || null;
+}
+
 async function getUserById(userId: string) {
   try {
     const result = await api.get(`/user/id/${userId}`);
@@ -63,6 +68,7 @@ async function update2fa(twoFactorAuth: boolean) {
 
 export const userService = {
   getUser,
+  getAllUsers,
   searchUserByName,
   getUserById,
   getUserByUsername,

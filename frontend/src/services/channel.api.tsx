@@ -41,6 +41,16 @@ async function getToken(roomId: string) {
   return result;
 }
 
+async function getOwner(channelId: string) {
+  const result = await api.get(`/channel/${channelId}`);
+  return result;
+}
+
+async function updateOwner(channelId: string) {
+  const result = await api.patch(`/channel/update-owner/${channelId}`);
+  return result;
+}
+
 export const channelApi = {
   createChannel,
   getChannel,
@@ -48,4 +58,6 @@ export const channelApi = {
   createMessage,
   verifyChannelPassword,
   getToken,
+  getOwner,
+  updateOwner,
 };

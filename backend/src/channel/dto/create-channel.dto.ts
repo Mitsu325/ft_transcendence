@@ -15,6 +15,5 @@ export class CreateChannelDto {
     password?: string;
 
     @IsString()
-    @IsNotEmpty()
     owner: User;
 }

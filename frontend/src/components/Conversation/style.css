@@ -11,10 +11,21 @@ p {
   margin: 0;
 }
 
+.btn {
+  margin-left: auto;
+  margin-right: 20px;
+}
+
 .divider-ch {
   margin-bottom: 1px;
   margin-top: 14px;
   border-color: #001529;
+}
+
+.management-container {
+  flex: 1;
+  margin-left: 20px;
+  display: flex;
 }
 
 .chat-messages {
@@ -40,7 +51,6 @@ p {
   display: inline-block;
   vertical-align: top;
   margin-left: 10px;
-  flex-grow:;
 }
 
 .username {

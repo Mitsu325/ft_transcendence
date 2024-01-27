@@ -16,10 +16,10 @@ interface Message {
   createdAt: string;
 }
 
-const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
-  roomId,
-  nameChannel,
-}) => {
+const Conversation: React.FC<{
+  roomId: string;
+  nameChannel: string;
+}> = ({ roomId, nameChannel }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState(false);
@@ -119,8 +119,8 @@ const Conversation: React.FC<{ roomId: string; nameChannel: string }> = ({
         <WechatOutlined style={{ marginRight: '15px' }} />
         <p>{nameChannel}</p>
       </div>
-      <div className="channel-card"></div>
       <Divider className="divider-ch" />
+
       <div className="chat-messages">
         {Object.keys(groupedMessages).map(formattedDate => (
           <div key={formattedDate}>

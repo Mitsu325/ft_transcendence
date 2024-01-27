@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Request, Post, Param } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Request,
+    Post,
+    Param,
+    Patch,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
@@ -94,6 +102,39 @@ export class ChannelController {
             return { token };
         } catch (error) {
             console.error('Error generating token:', error);
+        }
+    }
+
+    @ApiOperation({ description: 'Get owner of channelId' })
+    @ApiBearerAuth('access-token')
+    @Get(':channelId')
+    async findOwner(@Param('channelId') channelId: string) {
+        try {
+            const owner = await this.channelService.findOwner(channelId);
+
+            if (owner) {
+                return owner.id;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error(error);
+            return { error: 'Error finding owner.' };
+        }
+    }
+
+    @ApiOperation({ description: 'Update channel owner.' })
+    @ApiBearerAuth('access-token')
+    @Patch('update-owner/:id')
+    async updateOwner(@Param('id') id: string): Promise<any> {
+        try {
+            const updateOwner = await this.channelService.updateOwner(id);
+            return {
+                message: 'Success.',
+                owner: updateOwner.owner,
+            };
+        } catch (error) {
+            return { error: 'Error update owner.' };
         }
     }
 }

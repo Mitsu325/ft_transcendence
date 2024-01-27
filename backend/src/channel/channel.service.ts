@@ -22,12 +22,17 @@ export class ChannelService {
 
     async findAll(): Promise<ChannelDto[]> {
         const channels = await this.channelsRepository.find();
-        return channels.map(channel => ({
-            id: channel.id,
-            name_channel: channel.name_channel,
-            type: channel.type,
-            owner: channel.owner ? channel.owner.name : null,
-        }));
+
+        const channelDtos = await Promise.all(
+            channels.map(async channel => ({
+                id: channel.id,
+                name_channel: channel.name_channel,
+                type: channel.type,
+                owner: channel.owner ? channel.owner.name : null,
+            })),
+        );
+
+        return channelDtos;
     }
 
     async create(createChannelDto: CreateChannelDto) {
@@ -88,7 +93,31 @@ export class ChannelService {
             const token = jwt.sign({ roomId }, key, { expiresIn: '24h' });
             return token;
         } catch (error) {
-            console.error('Erro ao gerar token:', error);
+            console.error('Error generating token:', error);
+            throw error;
+        }
+    }
+
+    async findOwner(channelId: string) {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+                relations: ['owner'],
+            });
+            return channel ? channel.owner : null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateOwner(channelId: string): Promise<Channel> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+            });
+            channel.owner = null;
+            return this.channelsRepository.save(channel);
+        } catch (error) {
             throw error;
         }
     }
