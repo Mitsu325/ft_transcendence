@@ -296,4 +296,18 @@ export class ChatService {
         );
         return;
     }
+
+    async userIsBlocked(
+        blockerId: string,
+        blockedId: string,
+    ): Promise<boolean> {
+        const blocked = await this.blockedRepository.findOne({
+            where: {
+                blocker: { id: blockerId },
+                blocked: { id: blockedId },
+                active: true,
+            },
+        });
+        return !!blocked;
+    }
 }

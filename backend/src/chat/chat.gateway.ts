@@ -9,6 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { ChatService } from './chat.service';
 
 type TextMessage = {
     id: string;
@@ -46,7 +47,10 @@ type SendMessage = {
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(ChatGateway.name);
 
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly chatService: ChatService,
+    ) {}
 
     @WebSocketServer()
     server: Server;
@@ -74,14 +78,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage('message')
-    handleMessage(socket: Socket, { recipientId, message }: Message) {
-        this.server
-            .to(recipientId)
-            .emit('message', { senderId: socket.data.userId, message });
+    async handleMessage(socket: Socket, { recipientId, message }: Message) {
+        const isBlocked = await this.chatService.userIsBlocked(
+            recipientId,
+            socket.data.userId,
+        );
+        if (!isBlocked) {
+            this.server
+                .to(recipientId)
+                .emit('message', { senderId: socket.data.userId, message });
+        }
     }
 
     @SubscribeMessage('send-message')
-    handleSendMessage(socket: Socket, sendMessage: SendMessage) {
-        this.server.to(socket.data.userId).emit('send-message', sendMessage);
+    async handleSendMessage(socket: Socket, sendMessage: SendMessage) {
+        const isBlocked = await this.chatService.userIsBlocked(
+            sendMessage.recipient.id,
+            socket.data.userId,
+        );
+        if (!isBlocked) {
+            this.server
+                .to(socket.data.userId)
+                .emit('send-message', sendMessage);
+        }
     }
 }
