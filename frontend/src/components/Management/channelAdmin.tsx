@@ -39,7 +39,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
 
-  // const userAvatar = useAuth()?.user;
   const user = useAuth()?.user;
 
   const userPlayer = React.useMemo(() => {
@@ -65,7 +64,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
       const data = await adminService.getAdmins(channel.id);
       setAdmins(data);
     };
-
     getAdmins();
   }, [channel.id, admins]);
 
@@ -113,6 +111,9 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
           admin_id: selectedUser.id,
         });
         if (ret.success) {
+          setAdmins(prevAdmins =>
+            prevAdmins.filter(admin => admin.admin_id !== selectedUser.id),
+          );
           SuccessNotification({
             message: 'Ok',
             description: 'Adminstrador removido com sucesso',
@@ -126,7 +127,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
       }
     } catch (error) {
       console.error('Erro ao remover administrador:', error);
-      console.log('Erro ao remover administrador. Tente novamente mais tarde.');
     }
   };
 

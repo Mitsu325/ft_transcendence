@@ -1,9 +1,25 @@
-import { Body, Controller, Get, Post, Patch, Param } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Patch,
+    Param,
+    HttpCode,
+    HttpStatus,
+} from '@nestjs/common';
 import { ChannelAdminService } from './channel-admin.service';
-import { ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiOperation,
+    ApiBearerAuth,
+    ApiTags,
+    ApiBody,
+    ApiParam,
+} from '@nestjs/swagger';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
 
+@ApiTags('channel-admin')
 @Controller('channel-admin')
 export class ChannelAdminController {
     constructor(private readonly channelAdminService: ChannelAdminService) {}
@@ -17,18 +33,28 @@ export class ChannelAdminController {
 
     @ApiOperation({ description: 'Add a new Admin' })
     @ApiBearerAuth('access-token')
+    @ApiBody({ type: CreateAdminDto, description: 'Request body.' })
+    @HttpCode(HttpStatus.CREATED)
     @Post('add')
     create(@Body() createAdminDto: CreateAdminDto) {
         return this.channelAdminService.create(createAdminDto);
     }
 
+    @ApiOperation({ description: 'Remove an Admin' })
+    @ApiBearerAuth('access-token')
+    @ApiBody({ type: RemoveAdminDto, description: 'Request body.' })
     @Patch('removeAdmin')
-    async removeAdmin(@Param() params: RemoveAdminDto) {
-        return this.channelAdminService.removeAdmin(params);
+    async removeAdmin(@Body() removeAdminDto: RemoveAdminDto) {
+        return this.channelAdminService.removeAdmin(removeAdminDto);
     }
 
     @ApiOperation({ description: 'Get admins of channelId' })
     @ApiBearerAuth('access-token')
+    @ApiParam({
+        name: 'channelId',
+        type: 'string',
+        description: 'Channel ID',
+    })
     @Get('all/:channelId')
     async getAdmins(@Param('channelId') channelId: string) {
         try {

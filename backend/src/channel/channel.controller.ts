@@ -7,7 +7,13 @@ import {
     Param,
     Patch,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiOperation,
+    ApiTags,
+    ApiBearerAuth,
+    ApiBody,
+    ApiParam,
+} from '@nestjs/swagger';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel.dto';
@@ -27,6 +33,7 @@ export class ChannelController {
     }
 
     @ApiOperation({ description: 'Create a new channel' })
+    @ApiBody({ type: CreateChannelDto, description: 'Request body.' })
     @ApiBearerAuth('access-token')
     @Post()
     async create(@Body() createChannelDto: CreateChannelDto) {
@@ -51,6 +58,7 @@ export class ChannelController {
     }
 
     @ApiOperation({ description: 'Create a new message' })
+    @ApiBody({ type: CreateMessageDto, description: 'Request body.' })
     @ApiBearerAuth('access-token')
     @Post('message')
     async createMessage(@Body() createMessageDto: CreateMessageDto) {
@@ -59,6 +67,11 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Get all messages' })
     @ApiBearerAuth('access-token')
+    @ApiParam({
+        name: 'roomId',
+        type: 'string',
+        description: 'Channel Id',
+    })
     @Get('message/:roomId')
     async getAllMessages(@Request() req) {
         try {
@@ -93,6 +106,11 @@ export class ChannelController {
         description: 'Creates a token to access the protected channel.',
     })
     @ApiBearerAuth('access-token')
+    @ApiParam({
+        name: 'roomId',
+        type: 'string',
+        description: 'Channel Id',
+    })
     @Get('token/:roomId')
     async generateToken(
         @Param('roomId') roomId: string,
@@ -107,6 +125,11 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Get owner of channelId' })
     @ApiBearerAuth('access-token')
+    @ApiParam({
+        name: 'channelId',
+        type: 'string',
+        description: 'Channel Id',
+    })
     @Get(':channelId')
     async findOwner(@Param('channelId') channelId: string) {
         try {
@@ -125,6 +148,11 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Update channel owner.' })
     @ApiBearerAuth('access-token')
+    @ApiParam({
+        name: 'id',
+        type: 'string',
+        description: 'Channel Id',
+    })
     @Patch('update-owner/:id')
     async updateOwner(@Param('id') id: string): Promise<any> {
         try {

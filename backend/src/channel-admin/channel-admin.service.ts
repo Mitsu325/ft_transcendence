@@ -79,13 +79,13 @@ export class ChannelAdminService {
     }
 
     async removeAdmin(
-        params: RemoveAdminDto,
+        removeAdminDto: RemoveAdminDto,
     ): Promise<{ success: boolean; message?: string }> {
         try {
             const channelAdmin = await this.ChannelAdminRepository.findOne({
                 where: {
-                    channel: { id: params.channel_id },
-                    admin: { id: params.admin_id },
+                    channel: { id: removeAdminDto.channel_id },
+                    admin: { id: removeAdminDto.admin_id },
                     active: true,
                 },
             });
