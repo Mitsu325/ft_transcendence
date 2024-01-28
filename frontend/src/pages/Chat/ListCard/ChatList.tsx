@@ -3,7 +3,7 @@ import { List, Divider, Select, SelectProps } from 'antd';
 import UserListItem from 'components/List/UserListItem';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
-import { socket } from 'socket';
+import { chatSocket } from 'socket';
 import { userService } from 'services/user.api';
 import { Chat, ChattingUser } from 'interfaces/chat.interface';
 
@@ -48,7 +48,7 @@ export default function ChatList({
   }, [reloadUsers]);
 
   useEffect(() => {
-    socket.on('message', ({ senderId, message }) => {
+    chatSocket.on('message', ({ senderId, message }) => {
       setChats(prevChat => [
         {
           chatUser: message.senderUser,
@@ -59,7 +59,7 @@ export default function ChatList({
       ]);
     });
 
-    socket.on('send-message', ({ recipient, message }) => {
+    chatSocket.on('send-message', ({ recipient, message }) => {
       setChats(prevChat => [
         {
           chatUser: recipient,
@@ -71,8 +71,8 @@ export default function ChatList({
     });
 
     return () => {
-      socket.off('message');
-      socket.off('send-message');
+      chatSocket.off('message');
+      chatSocket.off('send-message');
     };
   }, [selectedUser]);
 

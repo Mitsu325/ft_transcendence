@@ -9,7 +9,7 @@ export default function WelcomeChat() {
         className="mb-24"
         style={{ color: '#001529', fontSize: '60px' }}
       />
-      <h1 className="title w-60">
+      <h1 className="message-header-title w-60">
         Vamos lá! Escolha um amigo para bater um papo e aproveitar o momento.
       </h1>
     </div>

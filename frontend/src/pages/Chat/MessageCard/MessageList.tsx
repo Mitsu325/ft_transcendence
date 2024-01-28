@@ -5,7 +5,7 @@ import MessageBox from 'components/Message/MessageBox';
 import MessageInput from 'components/Message/MessageInput';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
-import { socket } from 'socket';
+import { chatSocket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
 import InfiniteScroll from 'components/InfiniteScroll';
 import { ChattingUser, Message } from 'interfaces/chat.interface';
@@ -57,14 +57,14 @@ export default function MessageList({
   }, [selectedUser]);
 
   useEffect(() => {
-    socket.on('message', ({ senderId, message }) => {
+    chatSocket.on('message', ({ senderId, message }) => {
       if (user?.id !== selectedUser.id && senderId === selectedUser.id) {
         setMessages(prevMessages => [...prevMessages, message]);
       }
     });
 
     return () => {
-      socket.off('message');
+      chatSocket.off('message');
     };
   }, [selectedUser, user]);
 
@@ -110,12 +110,12 @@ export default function MessageList({
       .then(res => {
         if (res) {
           setMessages([...messages, res]);
-          socket.emit('message', {
+          chatSocket.emit('message', {
             recipientId: selectedUser.id,
             message: res,
           });
           if (user?.id !== selectedUser.id) {
-            socket.emit('send-message', {
+            chatSocket.emit('send-message', {
               recipient: selectedUser,
               message: res,
             });
@@ -176,7 +176,7 @@ export default function MessageList({
       <div className="message-header">
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AvatarCustom src={selectedUser.avatar} size={48} />
-          <h1 className="title ml-12">{selectedUser.name}</h1>
+          <h1 className="message-header-title ml-12">{selectedUser.name}</h1>
         </div>
         {selectedUser.id !== user?.id && (
           <Popconfirm
