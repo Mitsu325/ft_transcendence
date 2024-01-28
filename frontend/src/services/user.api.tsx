@@ -1,5 +1,6 @@
 import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
+import { User_Status } from '../interfaces/userStatus';
 
 async function getUser() {
   const result = await api.get('/user/me');
@@ -34,6 +35,12 @@ async function update2fa(twoFactorAuth: boolean) {
   return result.data || null;
 }
 
+async function updateUserStatus(userStatus: User_Status) {
+  const result = await api.post('user/set/user-status', userStatus);
+  console.log(result);
+  // return result.data || null;
+}
+
 export const userService = {
   getUser,
   searchUserByName,
@@ -41,4 +48,5 @@ export const userService = {
   getUserByUsername,
   uploadAvatar,
   update2fa,
+  updateUserStatus,
 };

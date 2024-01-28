@@ -11,16 +11,16 @@ import { UploadFileModule } from './upload-file/upload-file.module';
 import { ChannelModule } from './channel/channel.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forRoot(typeOrmConfig),
-        UserModule,
-        AuthModule,
-        ChannelModule,
-        GameModule,
-        ChatModule,
-        UploadFileModule,
-    ],
-    controllers: [AppController],
-    providers: [AppService],
+  imports: [
+    TypeOrmModule.forRoot(typeOrmConfig),
+    UserModule,
+    AuthModule,
+    ChannelModule,
+    GameModule,
+    ChatModule,
+    UploadFileModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

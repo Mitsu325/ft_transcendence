@@ -1,96 +1,85 @@
 import * as React from 'react';
-import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
-import { useLocation } from 'react-router-dom';
+import { userService } from '../services/user.api';
 
-let socket: Socket;
-
-interface UserStatusProps {
+export interface User_Status {
+  id: string;
   status: string;
 }
 
 export const UserStatusSocket = () => {
   const user = useAuth()?.user;
-  const location = useLocation();
 
   const userPlayer = React.useMemo(() => {
     const newPlayer = {
       id: user?.id ?? '',
-      name: user?.name ?? '',
-      avatar: user?.avatar ?? null,
     };
     return newPlayer;
   }, [user]);
 
-  const [userStatus, setUserStatus] = React.useState<UserStatusProps>({
-    status: 'offline',
-  });
-
-  const [userLoc, setUserLoc] = React.useState<any>();
+  const [startTime, setStartTime] = React.useState<number>();
+  const [userStatus, setUserStatus] = React.useState<string>('online');
 
   React.useEffect(() => {
-    const handleRotaChange = () => {
-      console.log('Usuário entrou em uma nova rota:', location.pathname);
-    };
+    const intervalId = setInterval(() => {
+      const currentTime = Date.now();
 
-    const unlisten = () => {
-      handleRotaChange();
-    };
+      console.log('startTime: ', startTime);
+      console.log('currentTime: ', currentTime);
 
-    handleRotaChange();
+      if (currentTime && startTime && startTime < currentTime) {
+        let timeSleep = Math.floor((currentTime - startTime) / 1000);
 
-    return () => {
-      unlisten();
-    };
-  }, [location.pathname]);
-
-  socket = React.useMemo(() => {
-    const newSocket = io('http://localhost:3003', {
-      reconnectionDelay: 10000,
-    });
-    return newSocket;
-  }, []);
-
-  React.useEffect(() => {
-    socket.on('connect', () => {
-      setUserStatus({ status: 'online' });
-    });
-
-    socket.on('ping', (latency: number) => {
-      if (latency !== undefined) {
-        socket.emit('pong', latency);
-      } else {
-        socket.emit('ping');
+        if (timeSleep > 30 && userStatus === 'online') {
+          setUserStatus('offline');
+          timeSleep = 0;
+        } else if (timeSleep <= 30 && userStatus === 'offline') {
+          setUserStatus('online');
+          timeSleep = 0;
+        }
       }
-    });
-
-    socket.on('ping', () => {
-      console.log('ping');
-    });
+    }, 40000);
 
     return () => {
-      socket.disconnect();
+      clearInterval(intervalId);
     };
-  }, [user]);
+  }, [startTime, userStatus]);
 
   React.useEffect(() => {
-    function handleWindowBlur() {
-      setUserLoc(location.pathname);
-      console.log('out: ', new Date().toLocaleTimeString());
-      console.log('rota: ', userLoc);
+    const status: User_Status = {
+      id: userPlayer.id,
+      status: userStatus,
+    };
+
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status);
+      setStartTime(Date.now());
     }
 
+    updateUserStatus();
+
+    // eslint-disable-next-line
+  }, [userStatus]);
+
+  React.useEffect(() => {
     function handleMouseOut() {
-      console.log('mouse: ', new Date().toLocaleTimeString());
-      console.log('rota: ', location.pathname);
+      setUserStatus('');
+      setUserStatus('online');
+      setStartTime(Date.now());
     }
 
-    window.addEventListener('blur', handleWindowBlur);
+    const sendKeyEvent = () => {
+      setUserStatus('');
+      setUserStatus('online');
+      setStartTime(Date.now());
+    };
+
     window.addEventListener('mouseout', handleMouseOut);
+    window.addEventListener('keydown', sendKeyEvent);
 
     return () => {
-      window.addEventListener('blur', handleWindowBlur);
       window.addEventListener('mouseout', handleMouseOut);
+      window.addEventListener('keydown', sendKeyEvent);
     };
   }, []);
 };

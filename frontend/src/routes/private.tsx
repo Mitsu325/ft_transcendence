@@ -7,8 +7,10 @@ import { Game } from 'components/Game';
 import Register from 'pages/Register';
 import HistoricTable from 'components/HistoricTable';
 import Statistics from 'components/Statistics';
+import { UserStatusSocket } from '../utils/user-status';
 
 const PrivateRoutes: React.FC = () => {
+  UserStatusSocket();
   return (
     <BrowserRouter>
       <Routes>

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Divider } from 'antd';
 import avatar from 'assets/avatar.png';
 import 'pages/Home/style.css';
-import UserStatus from 'components/UserStatus';
 
 export default function Home() {
   return (
@@ -47,7 +46,6 @@ export default function Home() {
 
       <p className="text">Chats</p>
       <Divider className="divider" />
-      <UserStatus />
     </>
   );
 }
