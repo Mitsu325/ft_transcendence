@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
 import RoomCard from 'components/RoomCard';
-import { Button, Modal } from 'antd';
+import { Button, Divider, Modal } from 'antd';
 import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
 import Court from 'components/Court';
 import {
@@ -29,6 +29,7 @@ export const Game = () => {
     const newPlayer = {
       id: user?.id ?? '',
       name: user?.name ?? '',
+      username: user?.username ?? '',
       avatar: user?.avatar ?? null,
     };
     return newPlayer;
@@ -280,78 +281,62 @@ export const Game = () => {
   return (
     <>
       {gameData.match && gameData.connected ? (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '50vh',
-          }}
-        >
-          <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
-          <h2>
-            {players.player1.toUpperCase()} X {players.player2.toUpperCase()}
+        <>
+          <h1 className="title">Pong</h1>
+          <h2 className="sub-title text-center">
+            {players.player1} X {players.player2}
           </h2>
-          <div>
-            <Court
-              roomId={userRoomId}
-              matchBall={balls[userRoomId]}
-              matchPadles={padles[userRoomId]}
-              matchScores={scores[userRoomId]}
-              matchLevel={level[userRoomId]}
-              onSendKey={sendKey}
-              onSendLevel={sendLevel}
-            />
-          </div>
-          <div style={{ padding: '20px' }}>
-            <Button onClick={leaveRoom}>Sair da sala</Button>
-          </div>
-        </div>
+          <Court
+            roomId={userRoomId}
+            matchBall={balls[userRoomId]}
+            matchPadles={padles[userRoomId]}
+            matchScores={scores[userRoomId]}
+            matchLevel={level[userRoomId]}
+            onSendKey={sendKey}
+            onSendLevel={sendLevel}
+          />
+          <Button
+            style={{ display: 'block', margin: '40px auto 0' }}
+            onClick={leaveRoom}
+          >
+            Sair da sala
+          </Button>
+        </>
       ) : (
-        <div style={{ display: 'flex', width: '100%' }}>
-          <div style={{ flex: '70%', marginRight: '30px' }}>
-            <h1 style={{ padding: '20px' }}>LOUNGE</h1>
-            <h2 style={{ padding: '10px' }}>
-              {user?.name && user.name.toUpperCase()}
-            </h2>
-            <h2 style={{ padding: '20px' }}>*** JOGADORES ***</h2>
-            <div className="players-container">
-              {gameData.players.map(player => (
-                <PlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-            <div>
-              <Button onClick={matchMakerRequest}>Encontrar Adversário</Button>
-            </div>
-            <h2 style={{ padding: '20px' }}>*** SALAS ***</h2>
-            <div>
-              <Button onClick={createRoom}>Criar sala</Button>
-            </div>
-            <div className="rooms-container">
-              {gameData.rooms.map(room => (
-                <RoomCard
-                  key={room.room_id}
-                  room={room}
-                  getInRoom={getInRoom}
-                />
-              ))}
-            </div>
+        <>
+          <h1 className="title">Lounge - {user?.name}</h1>
+          <h2 className="sub-title">Jogadores</h2>
+          <Divider />
+          <div className="players-container">
+            {gameData.players.map(player => (
+              <PlayerCard key={player.id} player={player} />
+            ))}
           </div>
-          <div>
-            <LeaveRoomModal visible={visible} message={newMessage} />
+          <Button className="mb-40" onClick={matchMakerRequest}>
+            Encontrar Adversário
+          </Button>
+
+          <h2 className="sub-title">Salas</h2>
+          <Divider />
+          <Button className="mb-20" onClick={createRoom}>
+            Criar sala
+          </Button>
+          <div className="rooms-container">
+            {gameData.rooms.map(room => (
+              <RoomCard key={room.room_id} room={room} getInRoom={getInRoom} />
+            ))}
           </div>
-          <div>
-            <Modal
-              title="Aviso!"
-              open={messageOpen}
-              onOk={() => setMessageOpen(false)}
-              onCancel={() => setMessageOpen(false)}
-            >
-              <p>{message}</p>
-            </Modal>
-          </div>
-        </div>
+
+          <LeaveRoomModal visible={visible} message={newMessage} />
+          <Modal
+            title="Aviso!"
+            open={messageOpen}
+            onOk={() => setMessageOpen(false)}
+            onCancel={() => setMessageOpen(false)}
+          >
+            <p>{message}</p>
+          </Modal>
+        </>
       )}
     </>
   );

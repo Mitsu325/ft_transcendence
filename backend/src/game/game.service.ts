@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 export interface Player {
     id: string;
     name: string;
+    username: string;
     avatar: null | string;
 }
 

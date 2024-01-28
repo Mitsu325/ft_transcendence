@@ -22,9 +22,9 @@ interface CourtProps {
 const courtDimensions = { width: 580, height: 320 };
 
 const courtCollorOptions = [
-  { label: 'preta', value: 'rgb(0, 0, 0)' },
-  { label: 'verde', value: 'rgb(0, 100, 0)' },
-  { label: 'azul', value: 'rgb(18, 10, 143)' },
+  { label: 'preta', value: '#000' },
+  { label: 'verde', value: '#237804' },
+  { label: 'azul', value: '#003eb3' },
 ];
 
 const levelMatchOptions = [
@@ -44,7 +44,7 @@ const Court: React.FC<CourtProps> = ({
   const [ball, setBall] = React.useState<Ball>();
   const [padles, setPadles] = React.useState<MatchPadles>();
   const [scores, setScores] = React.useState<MatchScores>();
-  const [courtCollor, setCourtCollor] = React.useState<string>('rgb(0, 0, 0)');
+  const [courtCollor, setCourtCollor] = React.useState<string>('#000');
   const [levelMatch, setLevelMatch] = React.useState<number>(1);
   const [selectedLevel, setselectedLevel] = React.useState<string>('fácil');
   const [disabled, setDisabled] = React.useState(false);
@@ -114,12 +114,7 @@ const Court: React.FC<CourtProps> = ({
 
   return (
     <div
-      style={{
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <SVG
         width={courtDimensions.width.toString()}
@@ -185,22 +180,23 @@ const Court: React.FC<CourtProps> = ({
           />
         )}
       </SVG>
-      <div style={{ marginTop: '10px' }}>
-        <h3>...escolha a cor da quadra...</h3>
-      </div>
-      <div style={{ marginTop: '5px' }}>
+      <div className="game-options">
+        <p className="text mb-12">Escolha a cor da quadra:</p>
         <Radio.Group
           options={courtCollorOptions}
           onChange={onChangeCollor}
           value={courtCollor}
           optionType="button"
           buttonStyle="solid"
+          className="mb-20"
         />
-      </div>
-      <div style={{ marginTop: '10px' }}>
-        <h3>...escolha o nível do jogo...</h3>
-      </div>
-      <div style={{ marginTop: '5px' }}>
+
+        <p className="text mb-12">
+          {disabled
+            ? 'Nível do jogo foi definido como ' + selectedLevel?.toString()
+            : 'Escolha o nível do jogo:'}
+        </p>
+
         <Radio.Group
           disabled={disabled}
           options={levelMatchOptions}
@@ -208,12 +204,8 @@ const Court: React.FC<CourtProps> = ({
           value={levelMatch}
           optionType="button"
           buttonStyle="solid"
+          className="mb-20"
         />
-      </div>
-      <div style={{ marginTop: '10px' }}>
-        <h3>
-          ... Nível do jogo foi definido como {selectedLevel?.toString()} ...
-        </h3>
       </div>
     </div>
   );

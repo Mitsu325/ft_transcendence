@@ -274,7 +274,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         if (!existingPlayer && !playerAlreadyInGame) {
             game.players[client.id] = {
                 id: player.id,
-                name: player.username,
+                name: player.name,
+                username: player.username,
                 avatar: player.avatar,
             };
         } else {

@@ -36,6 +36,20 @@
   margin: 20px auto 0;
 }
 
+.title {
+  font-size: 2rem;
+  margin-bottom: 32px;
+}
+
+.sub-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.text {
+  font-size: 1.2rem;
+}
+
 .mr-8 {
   margin-right: 8px;
 }

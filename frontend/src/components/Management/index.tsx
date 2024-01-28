@@ -71,7 +71,7 @@ const ChannelManagement: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Sider width={200} theme="dark">
         <div className="sider">
-          <span className="title">Canais</span>
+          <span className="sider-title">Canais</span>
           <div className="line"></div>
         </div>
         <ul className="list">
