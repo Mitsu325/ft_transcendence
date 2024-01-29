@@ -30,6 +30,9 @@ import {
 } from 'src/common/constants';
 import { Update2faDto } from './dto/update-2fa.dto';
 import { UpdateStatusResponse } from './user.service';
+import { PlayersService } from 'src/game/game.service';
+import { game } from 'src/game/game.gateway';
+import { Injectable, Inject } from '@nestjs/common';
 
 class UserStatus {
   id: string;
@@ -38,8 +41,12 @@ class UserStatus {
 
 @ApiTags('user')
 @Controller('user')
+@Injectable()
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(
+    private readonly userService: UserService,
+    private readonly playersService: PlayersService,
+  ) { }
 
   @ApiOperation({ description: 'Get all users' })
   @ApiBearerAuth('access-token')
@@ -142,10 +149,21 @@ export class UserController {
   @ApiBody({ type: UserStatus, description: 'Request body.' })
   @ApiBearerAuth('access-token')
   @Post('set/user-status')
-  async updateStatus(@Body() status: UserStatus): Promise<UpdateStatusResponse> {
+  async updateStatus(@Body() status: UserStatus, @Request() req): Promise<UpdateStatusResponse> {
+
+    const roomId = await this.playersService.findPlayerById(status.id, game);
+
+    if (roomId !== null) {
+      status.status = 'playing';
+    }
+    console.log('room: ', roomId);
+    console.log('status: ', status);
+
     const updatedStatus = await this.userService.updateStatusUser(status);
 
-    console.log('updatedStatus: ', updatedStatus);
+    // console.log('request: ', req);
+
+    // console.log('updatedStatus: ', updatedStatus);
 
     return updatedStatus;
   }

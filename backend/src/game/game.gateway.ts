@@ -28,7 +28,7 @@ interface Padle {
   room: string;
 }
 
-const game: Game = {
+export const game: Game = {
   players: {},
   rooms: {},
 };
