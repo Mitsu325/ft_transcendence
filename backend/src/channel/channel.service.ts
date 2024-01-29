@@ -135,14 +135,14 @@ export class ChannelService {
             await this.channelsRepository.save(channel);
             return true;
         } catch (error) {
-            console.error('Error adding password to channel:', error);
+            console.error('Error adding channel password:', error);
             return false;
         }
     }
 
     async changePassword(
         channelId: string,
-        password: string,
+        newPassword: string,
     ): Promise<boolean> {
         try {
             const channel = await this.channelsRepository.findOne({
@@ -151,11 +151,29 @@ export class ChannelService {
             if (!channel) {
                 throw new Error('Channel not find');
             }
-            channel.password = password;
+            channel.password = newPassword;
             await this.channelsRepository.save(channel);
             return true;
         } catch (error) {
-            console.error('Error change password channel:', error);
+            console.error('Error change channel password:', error);
+            return false;
+        }
+    }
+
+    async removePassword(channelId: string): Promise<boolean> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+            });
+            if (!channel) {
+                throw new Error('Channel not find');
+            }
+            channel.password = '';
+            channel.type = 'Público';
+            await this.channelsRepository.save(channel);
+            return true;
+        } catch (error) {
+            console.error('Error remove channel password:', error);
             return false;
         }
     }

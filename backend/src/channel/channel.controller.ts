@@ -193,19 +193,56 @@ export class ChannelController {
     @ApiBearerAuth('access-token')
     @Patch('change-password')
     async changePassword(
-        @Body() params: { channelId: string; password: string },
+        @Body()
+        params: {
+            channelId: string;
+            oldPassword: string;
+            newPassword: string;
+        },
     ): Promise<{ message: string }> {
         try {
             const rightPass = await this.channelService.verifyPassword(
                 params.channelId,
-                params.password,
+                params.oldPassword,
             );
             if (rightPass) {
-                const hashPass = await hashPassword(params.password);
+                const hashPass = await hashPassword(params.newPassword);
 
                 const success = await this.channelService.changePassword(
                     params.channelId,
                     hashPass,
+                );
+                if (success) {
+                    return { message: 'Ok' };
+                } else {
+                    return { message: 'Fail' };
+                }
+            } else {
+                return { message: 'Incorrect password' };
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    @ApiOperation({ description: 'Remove channel password.' })
+    @ApiBearerAuth('access-token')
+    @Patch('remove-password')
+    async removePassword(
+        @Body()
+        params: {
+            channelId: string;
+            oldPassword: string;
+        },
+    ): Promise<{ message: string }> {
+        try {
+            const rightPass = await this.channelService.verifyPassword(
+                params.channelId,
+                params.oldPassword,
+            );
+            if (rightPass) {
+                const success = await this.channelService.removePassword(
+                    params.channelId,
                 );
                 if (success) {
                     return { message: 'Ok' };

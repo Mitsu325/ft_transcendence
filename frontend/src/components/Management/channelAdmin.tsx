@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  Row,
-  Col,
-  List,
-  Avatar,
-  Button,
-  Drawer,
-  Tooltip,
-  Modal,
-  Input,
-} from 'antd';
+import { Card, Row, Col, List, Avatar, Button, Tooltip } from 'antd';
 import { userService } from '../../services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
@@ -18,6 +7,8 @@ import { channelApi } from '../../services/channel.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import { useAuth } from '../../hooks/useAuth';
+import PasswordModal from './PasswordModal';
+import UserDrawer from './UserDrawer';
 import './style.css';
 
 interface ChannelAdminProps {
@@ -49,10 +40,8 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [channelPassword, setChannelPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
   const user = useAuth()?.user;
@@ -85,12 +74,12 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
 
   const showDrawer = (user: User) => {
     setSelectedUser(user);
-    setOpen(true);
+    setDrawerOpen(true);
   };
 
-  const onClose = () => {
+  const onCloseDrawer = () => {
     setSelectedUser(null);
-    setOpen(false);
+    setDrawerOpen(false);
   };
 
   const addAdmin = async () => {
@@ -163,39 +152,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
     }
   };
 
-  const handleAddPassword = async () => {
-    const res = await channelApi.addPassword(channel.id, channelPassword);
-
-    if (res.data.message == 'Ok') {
-      SuccessNotification({
-        message: 'Ok',
-        description: 'Senha adicionada com sucesso.',
-      });
-    } else {
-      FailureNotification({
-        message: 'Erro',
-        description:
-          'Não foi possível adicionar uma senha. Tente novamente mais tarde.',
-      });
-    }
-    setChannelPassword('');
-    setIsModalOpen(false);
-  };
-
-  const handleChangePassword = () => {
-    setNewPassword('');
-    setOpenModal(false);
-  };
-
-  const handleRemovePassword = () => {
-    setOpenModal(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setOpenModal(false);
-  };
-
   const handlePassword = async () => {
     if (channel.type == 'Público' || channel.type == 'Privado') {
       setIsModalOpen(true);
@@ -241,49 +197,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
               </Tooltip>
             )}
           </div>
-
-          <Modal
-            title="Gerenciar Senha do Canal"
-            open={isModalOpen}
-            onCancel={handleCancel}
-            closable={true}
-            footer={null}
-          >
-            <Input
-              type="password"
-              placeholder="Digite a senha"
-              value={channelPassword}
-              onChange={e => setChannelPassword(e.target.value)}
-            />
-            <Button type="primary" onClick={handleAddPassword}>
-              Adicionar Senha
-            </Button>
-          </Modal>
-
-          <Modal
-            title="Gerenciar Senha do Canal"
-            open={openModal}
-            onCancel={handleCancel}
-            closable={true}
-            footer={null}
-          >
-            <Input
-              type="password"
-              placeholder="Senha atual"
-              value={channelPassword}
-              onChange={e => setChannelPassword(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Nova senha"
-              value={newPassword}
-              onChange={e => setChannelPassword(e.target.value)}
-            />
-            <Button type="primary" onClick={handleChangePassword}>
-              Mudar Senha
-            </Button>
-            <Button onClick={handleRemovePassword}>Remover Senha</Button>
-          </Modal>
         </div>
       }
     >
@@ -351,30 +264,22 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
         </Col>
       </Row>
 
-      <Drawer
-        title="Gerenciar"
-        placement="right"
-        onClose={onClose}
-        open={open}
-        getContainer={false}
-      >
-        <Button
-          key="addAdmin"
-          type="primary"
-          onClick={addAdmin}
-          style={{ marginBottom: '10px' }}
-        >
-          Adicionar como administrador
-        </Button>
-        <Button
-          key="removeAdmin"
-          type="primary"
-          onClick={removeAdmin}
-          style={{ marginBottom: '10px' }}
-        >
-          Remover administrador
-        </Button>
-      </Drawer>
+      <UserDrawer
+        open={drawerOpen}
+        onClose={onCloseDrawer}
+        addAdmin={addAdmin}
+        removeAdmin={removeAdmin}
+      />
+
+      <PasswordModal
+        channel={channel.id}
+        isModalOpen={isModalOpen}
+        openModal={openModal}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setOpenModal(false);
+        }}
+      />
     </Card>
   );
 };

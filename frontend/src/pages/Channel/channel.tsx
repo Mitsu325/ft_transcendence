@@ -111,6 +111,7 @@ export default function Channels({
         }
         break;
       case 'Privado':
+        setComponent('create');
         FailureNotification({
           message: 'Canal Privado',
           description: 'Apenas usuários convidados podem participar',

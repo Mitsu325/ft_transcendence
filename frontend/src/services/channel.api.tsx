@@ -59,6 +59,27 @@ async function addPassword(channelId: string, password: string) {
   return result;
 }
 
+async function changePassword(
+  channelId: string,
+  oldPassword: string,
+  newPassword: string,
+) {
+  const result = await api.patch('/channel/change-password', {
+    channelId: channelId,
+    oldPassword: oldPassword,
+    newPassword: newPassword,
+  });
+  return result;
+}
+
+async function removePassword(channelId: string, oldPassword: string) {
+  const result = await api.patch('/channel/remove-password', {
+    channelId: channelId,
+    oldPassword: oldPassword,
+  });
+  return result;
+}
+
 export const channelApi = {
   createChannel,
   getChannel,
@@ -69,4 +90,6 @@ export const channelApi = {
   getOwner,
   updateOwner,
   addPassword,
+  changePassword,
+  removePassword,
 };

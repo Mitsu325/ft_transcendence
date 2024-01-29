@@ -57,7 +57,7 @@ const ChannelManagement: React.FC = () => {
       }
     };
     getChannels();
-  }, []);
+  }, [channels]);
 
   const handleChannelHover = (channel: ChannelProps) => {
     setHoveredChannel(channel.id);
