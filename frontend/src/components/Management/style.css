@@ -55,11 +55,10 @@
   margin-right: 15px;
 }
 
-.leave-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px auto 0;
+.leave-btn,
+.pass-btn {
+  color: #001529;
+  margin: 10px;
 }
 
 .text-title {

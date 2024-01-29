@@ -165,4 +165,58 @@ export class ChannelController {
             return { error: 'Error update owner.' };
         }
     }
+
+    @ApiOperation({ description: 'Add channel password.' })
+    @ApiBearerAuth('access-token')
+    @Patch('add-password')
+    async addPassword(
+        @Body() params: { channelId: string; password: string },
+    ): Promise<{ message: string }> {
+        try {
+            const hashPass = await hashPassword(params.password);
+
+            const success = await this.channelService.addPassword(
+                params.channelId,
+                hashPass,
+            );
+            if (success) {
+                return { message: 'Ok' };
+            } else {
+                return { message: 'Fail' };
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    @ApiOperation({ description: 'Change channel password.' })
+    @ApiBearerAuth('access-token')
+    @Patch('change-password')
+    async changePassword(
+        @Body() params: { channelId: string; password: string },
+    ): Promise<{ message: string }> {
+        try {
+            const rightPass = await this.channelService.verifyPassword(
+                params.channelId,
+                params.password,
+            );
+            if (rightPass) {
+                const hashPass = await hashPassword(params.password);
+
+                const success = await this.channelService.changePassword(
+                    params.channelId,
+                    hashPass,
+                );
+                if (success) {
+                    return { message: 'Ok' };
+                } else {
+                    return { message: 'Fail' };
+                }
+            } else {
+                return { message: 'Incorrect password' };
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }

@@ -121,4 +121,42 @@ export class ChannelService {
             throw error;
         }
     }
+
+    async addPassword(channelId: string, password: string): Promise<boolean> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+            });
+            if (!channel) {
+                throw new Error('Channel not find');
+            }
+            channel.password = password;
+            channel.type = 'Protegido';
+            await this.channelsRepository.save(channel);
+            return true;
+        } catch (error) {
+            console.error('Error adding password to channel:', error);
+            return false;
+        }
+    }
+
+    async changePassword(
+        channelId: string,
+        password: string,
+    ): Promise<boolean> {
+        try {
+            const channel = await this.channelsRepository.findOne({
+                where: { id: channelId },
+            });
+            if (!channel) {
+                throw new Error('Channel not find');
+            }
+            channel.password = password;
+            await this.channelsRepository.save(channel);
+            return true;
+        } catch (error) {
+            console.error('Error change password channel:', error);
+            return false;
+        }
+    }
 }
