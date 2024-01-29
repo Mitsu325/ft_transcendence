@@ -6,7 +6,6 @@ import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { channelApi } from '../../services/channel.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
-import { useAuth } from '../../hooks/useAuth';
 import PasswordModal from './PasswordModal';
 import UserDrawer from './UserDrawer';
 import './style.css';
@@ -27,6 +26,7 @@ interface User {
   id: string;
   name: string;
   username: string;
+  avatar: string;
 }
 
 interface Admin {
@@ -34,6 +34,7 @@ interface Admin {
   channel_id: string;
   admin_id: string;
   active: boolean;
+  avatar: string;
 }
 
 const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
@@ -43,17 +44,6 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-
-  const user = useAuth()?.user;
-
-  const userPlayer = React.useMemo(() => {
-    const newPlayer = {
-      id: user?.id ?? '',
-      name: user?.name ?? '',
-      avatar: user?.avatar ?? null,
-    };
-    return newPlayer;
-  }, [user]);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -215,8 +205,8 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
                 <List.Item.Meta
                   className="text-title"
                   avatar={
-                    admin.id === userPlayer.id && userPlayer.avatar ? (
-                      <Avatar size={50} src={userPlayer.avatar} />
+                    admin.avatar ? (
+                      <Avatar size={50} src={admin.avatar} />
                     ) : (
                       <Avatar
                         size={50}
@@ -246,8 +236,8 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
                 <List.Item.Meta
                   className="text-title"
                   avatar={
-                    user.id === userPlayer.id && userPlayer.avatar ? (
-                      <Avatar size={50} src={userPlayer.avatar} />
+                    user.avatar ? (
+                      <Avatar size={50} src={user.avatar} />
                     ) : (
                       <Avatar
                         size={50}

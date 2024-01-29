@@ -142,7 +142,9 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
           value={removePassword}
           onChange={e => setRemovePassword(e.target.value)}
         />
-        <Button onClick={handleRemovePassword}>Remover Senha</Button>
+        <Button type="primary" onClick={handleRemovePassword}>
+          Remover Senha
+        </Button>
       </Modal>
     </>
   );

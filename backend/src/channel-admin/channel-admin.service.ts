@@ -71,6 +71,7 @@ export class ChannelAdminService {
                 channel_id: admin.channel.name_channel,
                 admin_id: admin.admin.name,
                 active: admin.active,
+                avatar: admin.admin.avatar,
             }));
         } catch (error) {
             console.error('Error to find channel administrators:', error);

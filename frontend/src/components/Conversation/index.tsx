@@ -5,8 +5,6 @@ import { useAuth } from 'hooks/useAuth';
 import { socket } from '../../Socket/Socket';
 import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
 import { channelApi } from '../../services/channel.api';
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar } from 'antd';
 import './style.css';
 
 const { TextArea } = Input;
@@ -122,48 +120,40 @@ const Conversation: React.FC<{
       <Divider className="divider-ch" />
 
       <div className="chat-messages">
-        {Object.keys(groupedMessages).map(formattedDate => (
-          <div key={formattedDate}>
-            <p className="date">{formattedDate}</p>
-            {groupedMessages[formattedDate].map((data, index) => {
-              const messageDate = new Date(data.createdAt);
-              messageDate.setMinutes(
-                messageDate.getMinutes() - messageDate.getTimezoneOffset(),
-              );
+        {Object.keys(groupedMessages)
+          .sort()
+          .map(formattedDate => (
+            <div key={formattedDate}>
+              <p className="date">{formattedDate}</p>
+              {groupedMessages[formattedDate].map((data, index) => {
+                const messageDate = new Date(data.createdAt);
+                messageDate.setMinutes(
+                  messageDate.getMinutes() - messageDate.getTimezoneOffset(),
+                );
 
-              const formattedHour = messageDate.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              });
+                const formattedHour = messageDate.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
 
-              return (
-                <div className="message-container" key={index}>
-                  <div className="avatar">
-                    <Avatar
-                      size={40}
-                      icon={<UserOutlined />}
-                      src={
-                        data.userName === userPlayer.name
-                          ? userPlayer.avatar
-                          : undefined
-                      }
-                      alt={data.userName}
-                    />
-                    <div className="username-container">
-                      <p className="username">
-                        <strong>{data.userName}</strong>
-                      </p>
+                return (
+                  <div className="message-container" key={index}>
+                    <div className="avatar">
+                      <div className="username-container">
+                        <p className="username">
+                          <strong>{data.userName}:</strong>
+                        </p>
+                      </div>
+                      <p className="msg">{data.message}</p>
                     </div>
-                    <p className="msg">{data.message}</p>
+                    <div className="hour">
+                      <span>{formattedHour}</span>
+                    </div>
                   </div>
-                  <div className="hour">
-                    <span>{formattedHour}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                );
+              })}
+            </div>
+          ))}
       </div>
       <div style={{ position: 'relative' }}>
         <TextArea

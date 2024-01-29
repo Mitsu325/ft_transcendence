@@ -29,6 +29,18 @@ const ChannelManagement: React.FC = () => {
 
   const user = useAuth()?.user;
 
+  useEffect(() => {
+    const getChannels = async () => {
+      try {
+        const channelsData = await channelApi.getChannel();
+        setChannels(channelsData);
+      } catch (error) {
+        console.error('Erro ao obter canais:', error);
+      }
+    };
+    getChannels();
+  }, [channels]);
+
   const handleChannelClick = async (channel: ChannelProps) => {
     setIsOwner(false);
     setIsAdmin(false);
@@ -46,18 +58,6 @@ const ChannelManagement: React.FC = () => {
       setIsAdmin(true);
     }
   };
-
-  useEffect(() => {
-    const getChannels = async () => {
-      try {
-        const channelsData = await channelApi.getChannel();
-        setChannels(channelsData);
-      } catch (error) {
-        console.error('Erro ao obter canais:', error);
-      }
-    };
-    getChannels();
-  }, [channels]);
 
   const handleChannelHover = (channel: ChannelProps) => {
     setHoveredChannel(channel.id);
@@ -98,11 +98,13 @@ const ChannelManagement: React.FC = () => {
       </Sider>
       <Layout>
         <Content style={{ marginLeft: '15px' }}>
-          {selectedChannel && (isAdmin || isOwner) ? (
-            <ChannelAdmin channel={selectedChannel} owner={isOwner} />
-          ) : (
-            <ChannelMessage />
-          )}
+          <>
+            {selectedChannel && (isAdmin || isOwner) ? (
+              <ChannelAdmin channel={selectedChannel} owner={isOwner} />
+            ) : (
+              <ChannelMessage />
+            )}
+          </>
         </Content>
       </Layout>
     </Layout>
