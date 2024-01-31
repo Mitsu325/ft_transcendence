@@ -80,6 +80,11 @@ async function removePassword(channelId: string, oldPassword: string) {
   return result;
 }
 
+async function isUserInChannel(userId: string, channelId: string) {
+  const result = await api.get(`/channel/${userId}/${channelId}`);
+  return result.data;
+}
+
 export const channelApi = {
   createChannel,
   getChannel,
@@ -92,4 +97,5 @@ export const channelApi = {
   addPassword,
   changePassword,
   removePassword,
+  isUserInChannel,
 };

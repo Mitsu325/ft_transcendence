@@ -42,7 +42,6 @@ export class ChannelController {
                 const hashPass = await hashPassword(createChannelDto.password);
                 createChannelDto.password = hashPass;
             }
-
             const channel = this.channelService.create(createChannelDto);
             if (channel) {
                 return {
@@ -86,6 +85,16 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Verify channel password' })
     @ApiBearerAuth('access-token')
+    @ApiBody({
+        type: Object,
+        description: 'Request body',
+        schema: {
+            properties: {
+                roomId: { type: 'string' },
+                password: { type: 'string' },
+            },
+        },
+    })
     @Post('verify-password')
     async verifyPass(
         @Body() params: { roomId: string; password: string },
@@ -134,14 +143,9 @@ export class ChannelController {
     async findOwner(@Param('channelId') channelId: string) {
         try {
             const owner = await this.channelService.findOwner(channelId);
-
-            if (owner) {
-                return owner.id;
-            } else {
-                return null;
-            }
+            return owner ? owner.id : null;
         } catch (error) {
-            console.error(error);
+            console.error('Error finding owner:', error);
             return { error: 'Error finding owner.' };
         }
     }
@@ -168,6 +172,16 @@ export class ChannelController {
 
     @ApiOperation({ description: 'Add channel password.' })
     @ApiBearerAuth('access-token')
+    @ApiBody({
+        type: Object,
+        description: 'Request body',
+        schema: {
+            properties: {
+                channelId: { type: 'string' },
+                password: { type: 'string' },
+            },
+        },
+    })
     @Patch('add-password')
     async addPassword(
         @Body() params: { channelId: string; password: string },
@@ -179,13 +193,10 @@ export class ChannelController {
                 params.channelId,
                 hashPass,
             );
-            if (success) {
-                return { message: 'Ok' };
-            } else {
-                return { message: 'Fail' };
-            }
+            return { message: success ? 'Ok' : 'Fail' };
         } catch (error) {
-            console.log(error);
+            console.error('Error adding password:', error);
+            return { message: 'Fail' };
         }
     }
 
@@ -205,55 +216,74 @@ export class ChannelController {
                 params.channelId,
                 params.oldPassword,
             );
-            if (rightPass) {
-                const hashPass = await hashPassword(params.newPassword);
 
-                const success = await this.channelService.changePassword(
-                    params.channelId,
-                    hashPass,
-                );
-                if (success) {
-                    return { message: 'Ok' };
-                } else {
-                    return { message: 'Fail' };
-                }
-            } else {
+            if (!rightPass) {
                 return { message: 'Incorrect password' };
             }
+
+            const hashPass = await hashPassword(params.newPassword);
+            const success = await this.channelService.changePassword(
+                params.channelId,
+                hashPass,
+            );
+
+            return { message: success ? 'Ok' : 'Fail' };
         } catch (error) {
-            console.log(error);
+            console.error('Error changing password:', error);
+            return { message: 'Fail' };
         }
     }
 
     @ApiOperation({ description: 'Remove channel password.' })
     @ApiBearerAuth('access-token')
+    @ApiBody({
+        type: Object,
+        description: 'Request body',
+        schema: {
+            properties: {
+                channelId: { type: 'string' },
+                oldPassword: { type: 'string' },
+            },
+        },
+    })
     @Patch('remove-password')
     async removePassword(
-        @Body()
-        params: {
-            channelId: string;
-            oldPassword: string;
-        },
+        @Body() params: { channelId: string; oldPassword: string },
     ): Promise<{ message: string }> {
         try {
             const rightPass = await this.channelService.verifyPassword(
                 params.channelId,
                 params.oldPassword,
             );
-            if (rightPass) {
-                const success = await this.channelService.removePassword(
-                    params.channelId,
-                );
-                if (success) {
-                    return { message: 'Ok' };
-                } else {
-                    return { message: 'Fail' };
-                }
-            } else {
+
+            if (!rightPass) {
                 return { message: 'Incorrect password' };
             }
+
+            const success = await this.channelService.removePassword(
+                params.channelId,
+            );
+
+            return { message: success ? 'Ok' : 'Fail' };
         } catch (error) {
-            console.log(error);
+            console.error('Error removing password:', error);
+            return { message: 'Fail' };
         }
+    }
+
+    @ApiOperation({ description: 'Verify if userId is in private channel.' })
+    @ApiBearerAuth('access-token')
+    @ApiParam({ name: 'userId', type: 'string', description: 'User ID' })
+    @ApiParam({ name: 'channelId', type: 'string', description: 'Channel ID' })
+    @Get('/:userId/:channelId')
+    async isUserInChannel(
+        @Param('userId') userId: string,
+        @Param('channelId') channelId: string,
+    ): Promise<{ isInChannel: boolean }> {
+        const isInChannel = await this.channelService.isUserInChannel(
+            userId,
+            channelId,
+        );
+        return { isInChannel };
     }
 }

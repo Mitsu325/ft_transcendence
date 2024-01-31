@@ -3,6 +3,7 @@ interface ChannelInterface {
   type: string;
   password?: string;
   owner: string;
+  users?: string[];
 }
 
 export default ChannelInterface;

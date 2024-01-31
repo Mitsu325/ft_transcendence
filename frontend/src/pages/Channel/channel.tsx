@@ -93,6 +93,8 @@ export default function Channels({
     setNameChannel(name);
     setActiveChannel(roomId);
     const userName = user?.name ?? '';
+    const userId = user?.id ?? '';
+    const res = await channelApi.isUserInChannel(userId, roomId);
 
     if (!channel) {
       return;
@@ -111,11 +113,17 @@ export default function Channels({
         }
         break;
       case 'Privado':
-        setComponent('create');
-        FailureNotification({
-          message: 'Canal Privado',
-          description: 'Apenas usuários convidados podem participar',
-        });
+        if (res.isInChannel) {
+          handleJoin(roomId, userName);
+          setCurrentRoom(roomId);
+          setComponent('conversation');
+        } else {
+          setComponent('create');
+          FailureNotification({
+            message: 'Canal Privado',
+            description: 'Apenas usuários convidados podem participar',
+          });
+        }
         break;
       default:
         console.warn(`Tipo de canal desconhecido: $(channel.type)`);

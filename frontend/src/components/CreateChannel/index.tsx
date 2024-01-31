@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from 'hooks/useAuth';
 import { channelApi } from '../../services/channel.api';
-import { Modal, Input, Button } from 'antd';
+import { userService } from '../../services/user.api';
+import { Modal, Input, Button, Select } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import './style.css';
+
+const { Option } = Select;
+
+interface User {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+}
 
 const CreateChannel: React.FC<{ newChannels: () => void }> = ({
   newChannels,
 }) => {
   const [typeModalVisible, setTypeModalVisible] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelName, setChannelName] = useState('');
   const [channelType, setChannelType] = useState('');
   const [channelPassword, setChannelPassword] = useState('');
+
+  useEffect(() => {
+    const getUsers = async () => {
+      const data = await userService.getAllUsers();
+      setUsers(data);
+    };
+
+    getUsers();
+  }, []);
 
   const showTypeSelectionModal = () => {
     setTypeModalVisible(true);
@@ -32,11 +53,13 @@ const CreateChannel: React.FC<{ newChannels: () => void }> = ({
         type: channelType,
         owner: user.id,
         password: channelPassword,
+        users: selectedUsers,
       });
       newChannels();
       setChannelName('');
       setChannelType('');
       setChannelPassword('');
+      setSelectedUsers([]);
     }
 
     setIsModalOpen(false);
@@ -95,6 +118,23 @@ const CreateChannel: React.FC<{ newChannels: () => void }> = ({
             value={channelPassword}
             onChange={e => setChannelPassword(e.target.value)}
           />
+        )}
+        {channelType === 'Privado' && (
+          <>
+            <Select
+              mode="multiple"
+              placeholder="Selecione usuários para adicionar ao canal"
+              value={selectedUsers}
+              onChange={values => setSelectedUsers(values)}
+              style={{ width: '100%', marginTop: '10px' }}
+            >
+              {users.map(user => (
+                <Option key={user.id} value={user.id}>
+                  {user.name}
+                </Option>
+              ))}
+            </Select>{' '}
+          </>
         )}
       </Modal>
     </>

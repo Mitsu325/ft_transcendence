@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsArray } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -21,4 +21,8 @@ export class CreateChannelDto {
     @IsString()
     @ApiProperty()
     owner: User;
+
+    @IsArray()
+    @IsString({ each: true })
+    users?: string[];
 }
