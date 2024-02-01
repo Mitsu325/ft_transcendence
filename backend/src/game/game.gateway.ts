@@ -17,6 +17,7 @@ import {
     Room,
     Game,
     MatchPadle,
+    CreateRoom,
 } from './game.service';
 
 interface Padle {
@@ -83,7 +84,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('CreateRoom')
     handleCreateRoom(
-        @MessageBody() user: Player,
+        @MessageBody() { user, guestId }: CreateRoom,
         @ConnectedSocket() client: Socket,
     ) {
         if (!game.rooms[client.id]) {
@@ -100,6 +101,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                 ballService: null,
                 isRunning: false,
                 level: 1,
+                guestId,
             };
             this.server.emit('game', game);
             this.server.emit('cleanRoom', game.rooms[client.id]);
@@ -148,6 +150,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                     return;
                 }
             }
+            client.emit('message', 'Não há salas disponíveis no momento!');
         } else {
             client.emit('message', 'Não há salas disponíveis no momento!');
         }
@@ -237,23 +240,35 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() client: Socket,
     ) {
         if (game.rooms[room.userRoomId]) {
-            game.rooms[room.userRoomId].isRunning = false;
-            const battle = this.gameService.getDataBattle(
-                room.userRoomId,
-                game,
-            );
-            this.gameService.saveBattle(battle);
-            try {
+            if (game.rooms[room.userRoomId].isRunning) {
+                game.rooms[room.userRoomId].isRunning = false;
+
+                const battle = this.gameService.getDataBattle(
+                    room.userRoomId,
+                    game,
+                );
+                this.gameService.saveBattle(battle);
+                try {
+                    this.server
+                        .to(room.userRoomId)
+                        .emit(
+                            'playerLeftRoom',
+                            'GameOver: Player left the room!',
+                        );
+                } catch (error) {}
+
+                this.gameService.removeRoomAndNotify(
+                    room.userRoomId,
+                    room.userPlayer.id,
+                    game,
+                    this.server,
+                );
+            } else {
+                delete game.rooms[room.userRoomId];
                 this.server
                     .to(room.userRoomId)
-                    .emit('playerLeftRoom', 'GameOver: Player left the room!');
-            } catch (error) {}
-            this.gameService.removeRoomAndNotify(
-                room.userRoomId,
-                room.userPlayer.id,
-                game,
-                this.server,
-            );
+                    .emit('leaveRoom', { leaveRoom: true });
+            }
             client.leave(room.userRoomId);
         } else {
             console.error(`Room not found for user ${room.userPlayer.id}`);

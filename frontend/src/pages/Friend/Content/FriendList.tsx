@@ -14,12 +14,18 @@ import { friendService } from 'services/friend.api';
 import 'pages/Friend/Content/style.css';
 import { LineOutlined, TrophyOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import { friendSocket } from 'socket';
+import { createSearchParams, useNavigate } from 'react-router-dom';
+import { userNonSensitiveInfo } from 'interfaces/userModel';
+import { useAuth } from 'hooks/useAuth';
 
 export default function FriendList() {
+  const { user } = useAuth();
   const [friend, setFriend] = useState<Invite[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const limit = 10;
+  const navigate = useNavigate();
 
   const loadFriends = (page: number) => {
     setLoading(true);
@@ -72,6 +78,24 @@ export default function FriendList() {
       });
   };
 
+  const inviteToPlay = (friend: userNonSensitiveInfo) => {
+    friendSocket.emit('invite-play', {
+      sender: {
+        id: user?.id,
+        name: user?.name,
+        username: user?.username,
+        avatar: user?.avatar,
+      },
+      recipient: friend,
+    });
+
+    const path = {
+      pathname: '/game-options',
+      search: createSearchParams({ guestId: friend.id }).toString(),
+    };
+    navigate(path);
+  };
+
   return (
     <>
       <List
@@ -95,6 +119,7 @@ export default function FriendList() {
                 icon={<TrophyOutlined />}
                 aria-label="Convidar para jogar"
                 style={{ marginRight: '8px' }}
+                onClick={() => inviteToPlay(item.friend)}
               />
             </Tooltip>
             <Popconfirm

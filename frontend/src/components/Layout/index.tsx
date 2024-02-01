@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Button, Layout, Menu, Tooltip } from 'antd';
 import {
+  Link,
+  Outlet,
+  createSearchParams,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
+import { Button, Layout, Menu, Modal, Tooltip } from 'antd';
+import {
+  AlertOutlined,
   AppstoreOutlined,
+  FlagOutlined,
   HomeOutlined,
   LogoutOutlined,
   MessageOutlined,
@@ -16,6 +24,8 @@ import FailureNotification from 'components/Notification/FailureNotification';
 import { useAuth } from 'hooks/useAuth';
 import { isTokenExpired } from 'utils/jwt-decode';
 import 'components/Layout/style.css';
+import { friendSocket } from 'socket';
+import { userNonSensitiveInfo } from 'interfaces/userModel';
 
 const { Header, Content, Sider } = Layout;
 
@@ -25,6 +35,8 @@ const CommonLayout = () => {
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
+  const [modal, contextHolder] = Modal.useModal();
+  const navigate = useNavigate();
 
   const menuItems = [
     { key: '0', icon: <HomeOutlined />, label: <Link to="/">Home</Link> },
@@ -61,6 +73,68 @@ const CommonLayout = () => {
       ],
     },
   ];
+
+  const handleOk = (sender: userNonSensitiveInfo) => {
+    const path = {
+      pathname: '/game-options',
+      search: createSearchParams({ hostId: sender.id }).toString(),
+    };
+    navigate(path);
+  };
+
+  const handleCancel = (sender: userNonSensitiveInfo) => {
+    friendSocket.emit('decline-invite', {
+      sender,
+      recipient: {
+        id: user?.id,
+        name: user?.name,
+        username: user?.username,
+        avatar: user?.avatar,
+      },
+    });
+  };
+
+  const closeWarningModal = () => {
+    const path = {
+      pathname: '/game-options',
+      search: createSearchParams({ cleanRoom: 'true' }).toString(),
+    };
+    navigate(path);
+    Modal.destroyAll();
+  };
+
+  useEffect(() => {
+    friendSocket.auth = { token: localStorage.getItem('token') };
+    friendSocket.connect();
+
+    friendSocket.on('invite-play', ({ sender }) => {
+      modal.confirm({
+        title: 'Você recebeu um convite para jogar Pong!',
+        icon: <FlagOutlined />,
+        content: `Aceite o desafio de ${sender?.name} e divirta-se em uma emocionante partida.`,
+        okText: 'Aceitar',
+        cancelText: 'Recusar',
+        onOk: () => handleOk(sender),
+        onCancel: () => handleCancel(sender),
+      });
+    });
+
+    friendSocket.on('decline-invite', ({ recipient }) => {
+      modal.warning({
+        title: 'Convite Recusado',
+        icon: <AlertOutlined />,
+        content: `Infelizmente, ${recipient?.name} recusou o convite para jogar. Sem problemas, você sempre pode convidá-lo novamente para uma partida mais tarde!`,
+        okText: 'Fechar sala do jogo',
+        onOk: closeWarningModal,
+      });
+    });
+
+    return () => {
+      friendSocket.off('invite-play');
+      friendSocket.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!loading && isTokenExpired()) {
@@ -99,42 +173,43 @@ const CommonLayout = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header className="header align-end">
-        <div className="header-user-info">
-          <p className="mr-8">{user?.name}</p>
-          <AvatarCustom src={user?.avatar || ''} size={40} />
-        </div>
-      </Header>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={value => setCollapsed(value)}
-        style={{ marginTop: 64 }}
-      >
-        <Menu
-          theme="dark"
-          selectedKeys={selectedMenuKey}
-          mode="inline"
-          onClick={handleMenuClick}
-          items={menuItems}
-        />
-        <Tooltip title="Sair da conta" placement="right" color="blue">
-          <Button
-            aria-label="Sair da conta"
-            className="logout-btn"
-            icon={<LogoutOutlined />}
-            loading={loading}
-            onClick={() => onLogout()}
+    <>
+      <Layout style={{ minHeight: '100vh' }}>
+        <Header className="header align-end">
+          <div className="header-user-info">
+            <p className="mr-8">{user?.name}</p>
+            <AvatarCustom src={user?.avatar || ''} size={40} />
+          </div>
+        </Header>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={value => setCollapsed(value)}
+          style={{ marginTop: 64 }}
+        >
+          <Menu
+            theme="dark"
+            selectedKeys={selectedMenuKey}
+            mode="inline"
+            onClick={handleMenuClick}
+            items={menuItems}
           />
-        </Tooltip>
-      </Sider>
-      <Layout>
+          <Tooltip title="Sair da conta" placement="right" color="blue">
+            <Button
+              aria-label="Sair da conta"
+              className="logout-btn"
+              icon={<LogoutOutlined />}
+              loading={loading}
+              onClick={() => onLogout()}
+            />
+          </Tooltip>
+        </Sider>
         <Content className="content">
           <Outlet />
         </Content>
       </Layout>
-    </Layout>
+      {contextHolder}
+    </>
   );
 };
 

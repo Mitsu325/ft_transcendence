@@ -34,8 +34,6 @@ export class FriendGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @UseGuards(AuthGuard)
     async handleConnection(socket: Socket) {
         this.logger.log(`Connected socket ${socket.id}`);
-        console.log('Connect');
-
         const jwt = socket.handshake.auth.token || null;
         if (!jwt) {
             this.handleDisconnect(socket);
@@ -48,18 +46,19 @@ export class FriendGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         socket.data.userId = userId;
         socket.join(userId);
-        console.log('Join...');
     }
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Socket disconnected ${socket.id}`);
-        console.log('Disconnect');
     }
 
     @SubscribeMessage('invite-play')
-    handleMessage(@MessageBody() { recipient, sender }: InvitePlay) {
-        console.log('recipient', recipient);
-        console.log('sender', sender);
+    handleInviteToPlay(@MessageBody() { recipient, sender }: InvitePlay) {
         this.server.to(recipient.id).emit('invite-play', { sender });
+    }
+
+    @SubscribeMessage('decline-invite')
+    handleDeclineInvite(@MessageBody() { recipient, sender }: InvitePlay) {
+        this.server.to(sender.id).emit('decline-invite', { recipient });
     }
 }

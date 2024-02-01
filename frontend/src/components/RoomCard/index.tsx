@@ -25,7 +25,7 @@ function getRandomColor() {
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, getInRoom }) => (
   <div key={room.room_id} className="room-card">
-    <a href="#" onClick={() => getInRoom(room)}>
+    <a onClick={() => getInRoom(room)}>
       <Avatar
         src={room.player1.avatar}
         size={42}

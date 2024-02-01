@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
@@ -19,13 +19,15 @@ import {
   Players,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
+import { useSearchParams } from 'react-router-dom';
 
 let socket: Socket;
 
 export const Game = () => {
   const user = useAuth()?.user;
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const userPlayer = React.useMemo(() => {
+  const userPlayer = useMemo(() => {
     const newPlayer = {
       id: user?.id ?? '',
       name: user?.name ?? '',
@@ -35,7 +37,7 @@ export const Game = () => {
     return newPlayer;
   }, [user]);
 
-  const [gameData, setGameData] = React.useState<GameData>({
+  const [gameData, setGameData] = useState<GameData>({
     players: [],
     rooms: [],
     status: '',
@@ -44,42 +46,96 @@ export const Game = () => {
     message: '',
   });
 
-  socket = React.useMemo(() => {
+  socket = useMemo(() => {
     const newSocket = io('http://localhost:3003', {
       reconnectionDelay: 10000,
     });
     return newSocket;
   }, []);
 
-  const [userRoomId, setUserRoomId] = React.useState<string>(socket.id);
-  const [roomOpen, setRoomOpen] = React.useState<string>('');
-  const [players, setPlayers] = React.useState<Players>({
+  const [userRoomId, setUserRoomId] = useState<string>(socket.id);
+  const [roomOpen, setRoomOpen] = useState<string>('');
+  const [players, setPlayers] = useState<Players>({
     player1: 'Anfitrião',
     player2: 'Convidado',
   });
-  const [balls, setBalls] = React.useState<{ [roomId: string]: Ball }>({
+  const [balls, setBalls] = useState<{ [roomId: string]: Ball }>({
     [socket.id]: initialBall,
   });
-  const [padles, setPadles] = React.useState<{ [roomId: string]: MatchPadles }>(
-    { ['0']: initialPadles },
-  );
-  const [scores, setScores] = React.useState<{ [roomId: string]: MatchScores }>(
-    { ['0']: initialScores },
-  );
-  const [level, setLevel] = React.useState<{ [roomId: string]: MatchLevel }>({
+  const [padles, setPadles] = useState<{ [roomId: string]: MatchPadles }>({
+    ['0']: initialPadles,
+  });
+  const [scores, setScores] = useState<{ [roomId: string]: MatchScores }>({
+    ['0']: initialScores,
+  });
+  const [level, setLevel] = useState<{ [roomId: string]: MatchLevel }>({
     ['0']: { level: 1 },
   });
 
-  const [newMessage, setNewMessage] = React.useState('');
-  const [visible, setVisible] = React.useState(false);
-  const [message, setMessage] = React.useState('');
-  const [messageOpen, setMessageOpen] = React.useState(visible);
+  const [newMessage, setNewMessage] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageOpen, setMessageOpen] = useState(visible);
+  const [enable, setEnable] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (enable && searchParams.has('guestId')) {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        status: 'CREATED',
+        message: 'Sala criada',
+        connected: true,
+        match: true,
+      }));
+      socket.emit('CreateRoom', {
+        user: userPlayer,
+        guestId: searchParams.get('guestId'),
+      });
+      setUserRoomId(socket.id);
+      searchParams.delete('guestId');
+      setSearchParams(searchParams);
+    }
+    if (enable && searchParams.has('hostId')) {
+      const hostId = searchParams.get('hostId');
+      const room = gameData.rooms.find(
+        item => item.player1.id === hostId && item.guestId === user?.id,
+      );
+      if (room) {
+        room.player2 = userPlayer;
+        socket.emit('GetInRoom', room);
+        setGameData(prevGameData => ({
+          ...prevGameData,
+          match: true,
+        }));
+        setUserRoomId(room.room_id);
+        searchParams.delete('hostId');
+        setSearchParams(searchParams);
+        startMatch(room.room_id);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enable, searchParams]);
+
+  useEffect(() => {
+    if (searchParams.has('cleanRoom')) {
+      leaveRoom();
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        status: 'LEAVE',
+        match: false,
+      }));
+      searchParams.delete('cleanRoom');
+      setSearchParams(searchParams);
+      setVisible(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
     setVisible(true);
   }, [newMessage]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     socket.on('connect', () => {
       socket.emit('PlayerConnected', user);
       setGameData(prevGameData => ({
@@ -101,6 +157,7 @@ export const Game = () => {
       const playersArray = Object.values(receivedGame.players);
       const roomsArray = Object.values(receivedGame.rooms);
 
+      setEnable(true);
       setGameData(prevGameData => ({
         ...prevGameData,
         players: playersArray,
@@ -126,6 +183,17 @@ export const Game = () => {
 
     socket.on('roomOpen', roomId => {
       setRoomOpen(roomId);
+    });
+
+    socket.on('leaveRoom', leaveRoom => {
+      if (leaveRoom) {
+        setGameData(prevGameData => ({
+          ...prevGameData,
+          match: false,
+          status: 'LEAVE',
+        }));
+        setVisible(false);
+      }
     });
 
     socket.on('matchStarted', (roomId, recevedBall) => {
@@ -199,22 +267,26 @@ export const Game = () => {
       message: 'Sala criada',
       match: true,
     }));
-    socket.emit('CreateRoom', userPlayer);
+    socket.emit('CreateRoom', { user: userPlayer });
     setUserRoomId(socket.id);
   };
 
   const getInRoom = (room: RoomGame) => {
-    if (userPlayer.id !== room.player1.id && room.player2 === null) {
-      room.player2 = userPlayer;
-      socket.emit('GetInRoom', room);
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        match: true,
-      }));
-    } else {
-      setNewMessage('');
-      setNewMessage('Sala ocupada');
+    if (
+      userPlayer.id === room.player1.id ||
+      room.guestId ||
+      room.player2 !== null
+    ) {
+      setMessage('Sala ocupada');
+      setMessageOpen(true);
+      return;
     }
+    room.player2 = userPlayer;
+    socket.emit('GetInRoom', room);
+    setGameData(prevGameData => ({
+      ...prevGameData,
+      match: true,
+    }));
     let room_id = socket.id;
     gameData.rooms.forEach(room => {
       if (room.player2?.id === userPlayer.id) {
@@ -229,7 +301,7 @@ export const Game = () => {
     socket.emit('requestRoomOpen', userPlayer);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (roomOpen !== '') {
       const room = gameData.rooms.find(
         room => room.room_id === roomOpen && room.player2 === null,
