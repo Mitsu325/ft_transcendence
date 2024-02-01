@@ -36,9 +36,12 @@ async function update2fa(twoFactorAuth: boolean) {
 }
 
 async function updateUserStatus(userStatus: User_Status) {
-  const result = await api.post('user/set/user-status', userStatus);
-  console.log(result);
-  // return result.data || null;
+  await api.post('user/set/user-status', userStatus);
+}
+
+async function getUsersStatus() {
+  const result = await api.get('/user/get/all-users-status');
+  return result.data || null;
 }
 
 export const userService = {
@@ -49,4 +52,5 @@ export const userService = {
   uploadAvatar,
   update2fa,
   updateUserStatus,
+  getUsersStatus,
 };

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import api from 'services/api';
 import { Table, Modal } from 'antd';
+import { userService } from '../../services/user.api';
 
 interface DataType {
   battle_id: number;
@@ -97,6 +98,11 @@ const HistoricTable: React.FC = () => {
 
   React.useEffect(() => {
     setLoading(true);
+  }, []);
+
+  React.useEffect(() => {
+    const playersStatus = userService.getUsersStatus();
+    console.log(playersStatus);
   }, []);
 
   return (

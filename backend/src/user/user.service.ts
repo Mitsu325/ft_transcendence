@@ -153,7 +153,7 @@ export class UserService {
   }
 
   private userStatusData: Record<string, UserStatus> = {};
-  async updateStatusUser(status: UserStatus): Promise<UpdateStatusResponse> {
+  async updateStatusUser(status: UserStatus) {
     const { id, status: newStatus } = status;
 
     if (this.userStatusData[id]) {
@@ -161,7 +161,9 @@ export class UserService {
     } else {
       this.userStatusData[id] = { id, status: newStatus };
     }
+  }
 
+  async updatedUsersStatus() {
     const updatedData: UpdateStatusResponse = Object.entries(this.userStatusData).reduce(
       (acc, [userId, userData]) => {
         acc[userId] = { id: userId, status: userData.status };
@@ -169,7 +171,6 @@ export class UserService {
       },
       {} as UpdateStatusResponse,
     );
-
     return updatedData;
   }
 }

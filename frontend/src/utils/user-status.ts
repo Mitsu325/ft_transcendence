@@ -24,9 +24,6 @@ export const UserStatusSocket = () => {
     const intervalId = setInterval(() => {
       const currentTime = Date.now();
 
-      console.log('startTime: ', startTime);
-      console.log('currentTime: ', currentTime);
-
       if (currentTime && startTime && startTime < currentTime) {
         let timeSleep = Math.floor((currentTime - startTime) / 1000);
 
@@ -53,7 +50,6 @@ export const UserStatusSocket = () => {
 
     async function updateUserStatus() {
       await userService.updateUserStatus(status);
-      setStartTime(Date.now());
     }
 
     updateUserStatus();
