@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import api from 'services/api';
-import { Table, Modal } from 'antd';
+import { Table, Modal, Badge } from 'antd';
 import { userService } from '../../services/user.api';
 
 interface DataType {
@@ -73,7 +73,6 @@ const HistoricTable: React.FC = () => {
         const resp = await getData(playerId, '/battles/performance_player');
         setPlayerPerformance(resp);
         setShowModal(true);
-        console.log(resp);
       } catch (error) {
         console.error('Error data:', error);
       }
@@ -133,9 +132,11 @@ const HistoricTable: React.FC = () => {
             dataIndex: 'battle_guest',
             key: 'guest',
             render: (text, record) => (
-              <a onClick={() => getPerformancePlayer(record.battle_guest_id)}>
-                {text}
-              </a>
+              <Badge count={'ol'} color="blue" offset={[20, 0]}>
+                <a onClick={() => getPerformancePlayer(record.battle_guest_id)}>
+                  {text}
+                </a>
+              </Badge>
             ),
           },
           {
