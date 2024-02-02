@@ -93,9 +93,9 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                 room_id: client.id,
                 player1: { ...user },
                 player2: null,
-                padles: initialPadles,
+                padles: JSON.parse(JSON.stringify(initialPadles)),
                 padlesService: null,
-                scores: initialScores,
+                scores: JSON.parse(JSON.stringify(initialScores)),
                 scoresService: null,
                 ball: initialBall,
                 ballService: null,
@@ -174,8 +174,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                 xdirection: initD,
                 ydirection: initD,
             };
-            game.rooms[room].scores = initialScores;
-            game.rooms[room].padles = initialPadles;
+            game.rooms[room].scores = JSON.parse(JSON.stringify(initialScores));
+            game.rooms[room].padles = JSON.parse(JSON.stringify(initialPadles));
             loopGame = setInterval(async () => {
                 if (!game.rooms[room]?.isRunning) {
                     clearInterval(loopGame);
@@ -213,9 +213,11 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         if (game.rooms[padle.room] && direction === 'GO') {
-            game.rooms[padle.room].padles = await game.rooms[
-                padle.room
-            ].padlesService.movePadle(padle, initialPadles, player);
+            await game.rooms[padle.room].padlesService.movePadle(
+                padle,
+                game.rooms[padle.room].padles,
+                player,
+            );
             this.server
                 .to(padle.room)
                 .emit('movePadles', padle.room, game.rooms[padle.room].padles);

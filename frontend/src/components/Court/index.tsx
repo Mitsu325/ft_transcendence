@@ -68,7 +68,9 @@ const Court: React.FC<CourtProps> = ({
   }, [matchBall]);
 
   React.useEffect(() => {
-    setPadles(matchPadles);
+    if (matchPadles) {
+      setPadles(matchPadles);
+    }
   }, [matchPadles]);
 
   React.useEffect(() => {
