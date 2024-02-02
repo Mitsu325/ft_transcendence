@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - DB_PORT=${PG_PORT}
+      - DB_USERNAME=${PG_USERNAME}
+      - DB_PASSWORD=${PG_PASSWORD}
+      - DB_NAME=${PG_DBNAME}
+    depends_on:
+      - pgsql
+    env_file:
+      - .env
+    networks:
+      - ft_transcendence
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3003:3003
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    networks:
+      - ft_transcendence
+    restart: always
+
+  pgsql:
+    image: postgres:alpine
+    container_name: 'pgsql'
+    ports:
+      - ${PG_PORT}:${PG_PORT}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USERNAME: ${PG_USERNAME}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DBNAME: ${PG_DBNAME}
+    networks:
+      - ft_transcendence
+    restart: always
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  ft_transcendence:
+    driver: bridge
+
+volumes:
+  pg-data:
