@@ -50,6 +50,7 @@ const HistoricTable: React.FC = () => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [playerPerformance, setPlayerPerformance] =
     React.useState<PerformancePlayer>(initPerformancePlayer);
+  const [playerStatus, setPlayerStatus] = React.useState('');
 
   const getData = async (userId: string, route: string) => {
     try {
@@ -99,11 +100,6 @@ const HistoricTable: React.FC = () => {
     setLoading(true);
   }, []);
 
-  React.useEffect(() => {
-    const playersStatus = userService.getUsersStatus();
-    console.log(playersStatus);
-  }, []);
-
   return (
     <>
       <Table
@@ -132,11 +128,9 @@ const HistoricTable: React.FC = () => {
             dataIndex: 'battle_guest',
             key: 'guest',
             render: (text, record) => (
-              <Badge count={'ol'} color="blue" offset={[20, 0]}>
-                <a onClick={() => getPerformancePlayer(record.battle_guest_id)}>
-                  {text}
-                </a>
-              </Badge>
+              <a onClick={() => getPerformancePlayer(record.battle_guest_id)}>
+                {text}
+              </a>
             ),
           },
           {

@@ -162,7 +162,8 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @Get('get/all-users-status')
   async getUsersStatus() {
-    const usersStatus = this.userService.updatedUsersStatus();
+    const usersStatus = await this.userService.updatedUsersStatus();
+    console.log(usersStatus);
     return usersStatus;
   }
 }

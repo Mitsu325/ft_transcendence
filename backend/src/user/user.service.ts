@@ -14,10 +14,7 @@ interface UserStatus {
 }
 
 export interface UpdateStatusResponse {
-  [userId: string]: {
-    id: string;
-    status: string;
-  };
+  [userId: string]: { status: string; }
 }
 
 @Injectable()
@@ -166,7 +163,9 @@ export class UserService {
   async updatedUsersStatus() {
     const updatedData: UpdateStatusResponse = Object.entries(this.userStatusData).reduce(
       (acc, [userId, userData]) => {
-        acc[userId] = { id: userId, status: userData.status };
+        if (userData.status !== 'offline') {
+          acc[userId] = { status: userData.status };
+        }
         return acc;
       },
       {} as UpdateStatusResponse,
