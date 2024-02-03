@@ -18,4 +18,7 @@ export interface PerformancePlayer {
   totalWins: number;
   totalLoses: number;
   totalDraws: number;
+  winPercent: number;
+  losePercent: number;
+  drawPercent: number;
 }

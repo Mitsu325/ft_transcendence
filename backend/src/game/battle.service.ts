@@ -52,10 +52,10 @@ export class BattlesService {
                 return null;
             }
 
-            let totalBattles = 0;
-            let totalWins = 0;
-            let totalLoses = 0;
-            let totalDraws = 0;
+            let totalBattles: number = 0;
+            let totalWins: number = 0;
+            let totalLoses: number = 0;
+            let totalDraws: number = 0;
 
             battles.forEach(battle => {
                 totalBattles++;
@@ -80,6 +80,15 @@ export class BattlesService {
                 totalWins: totalWins,
                 totalLoses: totalLoses,
                 totalDraws: totalDraws,
+                winPercent: !totalBattles
+                    ? 0
+                    : (totalWins / totalBattles) * 100,
+                losePercent: !totalBattles
+                    ? 0
+                    : (totalLoses / totalBattles) * 100,
+                drawPercent: !totalBattles
+                    ? 0
+                    : (totalDraws / totalBattles) * 100,
             };
 
             return playerPerformance;

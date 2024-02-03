@@ -6,7 +6,6 @@ import Chat from 'pages/Chat';
 import { Game } from 'components/Game';
 import Register from 'pages/Register';
 import HistoricTable from 'components/HistoricTable';
-import Statistics from 'components/Statistics';
 import Friend from 'pages/Friend';
 import Manager from 'components/Management';
 
@@ -35,7 +34,6 @@ const PrivateRoutes: React.FC = () => {
             element={<Register content="blocked-users" />}
           />
           <Route path="/historic" element={<HistoricTable />} />
-          <Route path="/statistics" element={<Statistics />} />
           <Route path="/friend" element={<Friend content="friend" />} />
           <Route path="/friend/invite" element={<Friend content="invite" />} />
           <Route

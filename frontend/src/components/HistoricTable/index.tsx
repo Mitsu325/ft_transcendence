@@ -18,6 +18,9 @@ const HistoricTable = () => {
       totalWins: 0,
       totalLoses: 0,
       totalDraws: 0,
+      winPercent: 0,
+      losePercent: 0,
+      drawPercent: 0,
     },
   );
 

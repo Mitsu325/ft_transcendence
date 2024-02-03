@@ -2,6 +2,7 @@ import React from 'react';
 import UserModel from 'interfaces/userModel';
 import { useAuth } from 'hooks/useAuth';
 import 'pages/Register/Content/style.css';
+import Statistics from 'components/Statistics';
 
 export default function UserProfileData({
   userProfile,
@@ -18,6 +19,7 @@ export default function UserProfileData({
       {user?.username === userProfile?.username && (
         <p className="profile-text mb-12">E-mail: {userProfile?.email}</p>
       )}
+      <Statistics userId={userProfile?.id || ''} />
     </>
   );
 }

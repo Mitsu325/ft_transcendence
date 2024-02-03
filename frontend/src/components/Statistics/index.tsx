@@ -1,7 +1,5 @@
-import * as React from 'react';
-import { useAuth } from 'hooks/useAuth';
-import api from 'services/api';
-import { Progress, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Progress } from 'antd';
 import {
   RightOutlined,
   LeftOutlined,
@@ -9,191 +7,121 @@ import {
   FrownOutlined,
   MehOutlined,
 } from '@ant-design/icons';
-import { Col, Row, Statistic } from 'antd';
+import { Statistic } from 'antd';
+import { PerformancePlayer } from 'interfaces/battle.interface';
+import { gameService } from 'services/game.api';
+import FailureNotification from 'components/Notification/FailureNotification';
+import './style.css';
 
-interface PerformancePlayer {
-  userId: string;
-  name: string;
-  total_battles: number;
-  total_wins: number;
-  total_loses: number;
-  total_draws: number;
-}
+const Statistics = ({ userId }: { userId: string }) => {
+  const [playerPerformance, setPlayerPerformance] = useState<PerformancePlayer>(
+    {
+      userId: '',
+      name: '',
+      totalBattles: 0,
+      totalWins: 0,
+      totalLoses: 0,
+      totalDraws: 0,
+      winPercent: 0,
+      losePercent: 0,
+      drawPercent: 0,
+    },
+  );
 
-const initPerformancePlayer: PerformancePlayer = {
-  userId: '',
-  name: '',
-  total_battles: 0,
-  total_wins: 0,
-  total_loses: 0,
-  total_draws: 0,
-};
-
-const Statistics: React.FC = () => {
-  const user = useAuth()?.user;
-
-  const userPlayer = React.useMemo(() => {
-    const newPlayer = {
-      id: user?.id ?? '',
-    };
-    return newPlayer;
-  }, [user]);
-
-  const [playerPerformance, setPlayerPerformance] =
-    React.useState<PerformancePlayer>(initPerformancePlayer);
-
-  const getData = async (userId: string, route: string) => {
-    try {
-      const response = await api.post(route, {
-        userId: userId,
-      });
-      if (response.data) {
-        return response.data;
-      } else {
-        return null;
-      }
-    } catch (err) {
-      console.error(err);
-      throw err;
+  useEffect(() => {
+    if (!userId) {
+      return;
     }
-  };
-
-  const getPerformancePlayer = (playerId: string) => {
-    const fetchData = async () => {
-      try {
-        const resp = await getData(playerId, '/battles/performance_player');
-        setPlayerPerformance(resp);
-      } catch (error) {
-        console.error('Error data:', error);
-      }
-    };
-    fetchData();
-  };
-
-  React.useEffect(() => {
-    getPerformancePlayer(userPlayer.id);
-    // eslint-disable-next-line
-  }, []);
+    gameService
+      .getPerformancePlayers(userId)
+      .then(res => {
+        setPlayerPerformance(res);
+      })
+      .catch(() => {
+        FailureNotification({
+          message: 'Ops! Encontramos algumas falhas durante o processo',
+          description:
+            'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
+        });
+      });
+  }, [userId]);
 
   return (
     <>
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '60vh',
-        }}
-      >
-        <div style={{ width: '50%', alignItems: 'center', padding: 10 }}>
-          <h2>Total de Batalhas</h2>
-          <Row gutter={20} justify="center" style={{ padding: 10 }}>
-            <Col span={6}>
-              <Statistic
-                // title="Total"
-                value={playerPerformance?.total_battles}
-                prefix={<RightOutlined />}
-                suffix={<LeftOutlined />}
-                valueStyle={{
-                  color: '#000000',
-                  fontWeight: 'bold',
-                  alignContent: 'center',
-                  fontSize: 35,
-                }}
-              />
-            </Col>
-          </Row>
-          <Row gutter={50} justify="center">
-            <Col span={5}>
-              <Statistic
-                title="Vitórias"
-                value={playerPerformance?.total_wins}
-                prefix={<SmileOutlined />}
-                valueStyle={{
-                  color: 'rgb(0, 106, 255)',
-                  fontWeight: 'bold',
-                  alignContent: 'right',
-                  fontSize: 30,
-                }}
-              />
-            </Col>
-            <Col span={5}>
-              <Statistic
-                title="Derrotas"
-                value={playerPerformance?.total_loses}
-                prefix={<FrownOutlined />}
-                valueStyle={{
-                  color: 'red',
-                  fontWeight: 'bold',
-                  alignContent: 'right',
-                  fontSize: 30,
-                }}
-              />
-            </Col>
-            <Col span={5}>
-              <Statistic
-                title="Empates"
-                value={playerPerformance?.total_draws}
-                prefix={<MehOutlined />}
-                valueStyle={{
-                  color: 'grey',
-                  fontWeight: 'bold',
-                  alignContent: 'right',
-                  fontSize: 30,
-                }}
-              />
-            </Col>
-          </Row>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            width: '50%',
-            padding: 40,
-            justifyContent: 'center',
-          }}
-        >
-          <Space wrap size={30}>
-            <Progress
-              type="circle"
-              percent={
-                playerPerformance &&
-                ((
-                  (playerPerformance?.total_wins /
-                    playerPerformance?.total_battles) *
-                  100
-                ).toFixed(2) as unknown as number)
-              }
-            />
-            <Progress
-              type="circle"
-              percent={
-                playerPerformance &&
-                ((
-                  (playerPerformance?.total_loses /
-                    playerPerformance?.total_battles) *
-                  100
-                ).toFixed(2) as unknown as number)
-              }
-              strokeColor="red"
-            />
-            <Progress
-              type="circle"
-              percent={
-                playerPerformance &&
-                ((
-                  (playerPerformance?.total_draws /
-                    playerPerformance?.total_battles) *
-                  100
-                ).toFixed(2) as unknown as number)
-              }
-              strokeColor="gray"
-            />
-          </Space>
-        </div>
+      <div className="static-group">
+        <Card className="static-card">
+          <Statistic
+            title="Total de batalhas"
+            value={playerPerformance.totalBattles}
+            prefix={<RightOutlined />}
+            suffix={<LeftOutlined />}
+            valueStyle={{
+              color: '#001529',
+              fontSize: '2rem',
+              textAlign: 'center',
+            }}
+          />
+        </Card>
+        <Card className="static-card">
+          <Statistic
+            title="Vitórias"
+            value={playerPerformance.totalWins}
+            prefix={<SmileOutlined style={{ marginRight: '12px' }} />}
+            valueStyle={{
+              color: '#0958d9',
+              fontSize: '2rem',
+              textAlign: 'center',
+            }}
+          />
+        </Card>
+        <Card className="static-card">
+          <Statistic
+            title="Derrotas"
+            value={playerPerformance.totalLoses}
+            prefix={<FrownOutlined style={{ marginRight: '12px' }} />}
+            valueStyle={{
+              color: '#cf1322',
+              fontSize: '2rem',
+              textAlign: 'center',
+            }}
+          />
+        </Card>
+        <Card className="static-card">
+          <Statistic
+            title="Empates"
+            value={playerPerformance.totalDraws}
+            prefix={<MehOutlined style={{ marginRight: '12px' }} />}
+            valueStyle={{
+              color: '#595959',
+              fontSize: '2rem',
+              textAlign: 'center',
+            }}
+          />
+        </Card>
       </div>
+      <Card className="static-card-lg">
+        <p className="static-card-text">Performance</p>
+        <div className="static-card-progress">
+          <Progress
+            type="dashboard"
+            percent={playerPerformance.winPercent}
+            format={percent => `${percent?.toFixed(2)}% Vitória`}
+            strokeColor="#0958d9"
+          />
+          <Progress
+            type="dashboard"
+            percent={playerPerformance.losePercent}
+            format={percent => `${percent?.toFixed(2)}% Derrota`}
+            strokeColor="#cf1322"
+          />
+          <Progress
+            type="dashboard"
+            percent={playerPerformance.drawPercent}
+            format={percent => `${percent?.toFixed(2)}% Empate`}
+            strokeColor="#595959"
+          />
+        </div>
+      </Card>
     </>
   );
 };
