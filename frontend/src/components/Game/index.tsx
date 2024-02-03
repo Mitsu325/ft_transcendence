@@ -173,6 +173,7 @@ export const Game = () => {
         message: data.message,
         match: false,
       }));
+      setRoomOpen('');
     });
 
     socket.on('cleanRoom', receivedRoom => {

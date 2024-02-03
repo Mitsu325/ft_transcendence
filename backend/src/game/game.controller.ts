@@ -1,7 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BattlesService, PerformancePlayer } from './game.service';
 import { Public } from 'src/common/constants';
+import { BattlesService } from './battle.service';
+import { PerformancePlayer } from './interfaces/game.interface';
 
 class PlayerRequest {
     userId: string;

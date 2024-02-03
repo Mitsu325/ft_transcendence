@@ -14,22 +14,13 @@ interface RoomCardProps {
   getInRoom: (room: RoomGame) => void;
 }
 
-function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
 const RoomCard: React.FC<RoomCardProps> = ({ room, getInRoom }) => (
   <div key={room.room_id} className="room-card">
     <a onClick={() => getInRoom(room)}>
       <Avatar
         src={room.player1.avatar}
         size={42}
-        style={{ backgroundColor: getRandomColor() }}
+        style={{ backgroundColor: room.player2?.name ? '#cf1322' : '#0958d9' }}
       >
         {room.player2?.name ? 'X' : 'Livre'}
       </Avatar>
