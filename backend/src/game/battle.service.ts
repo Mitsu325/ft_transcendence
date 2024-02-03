@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Battle } from './entities/game.entity';
-import { PerformancePlayer } from './interfaces/game.interface';
+import { BattleHistoric, PerformancePlayer } from './interfaces/game.interface';
 
 @Injectable()
 export class BattlesService {
@@ -11,7 +11,7 @@ export class BattlesService {
         private battlesRepository: Repository<Battle>,
     ) {}
 
-    async getPlayersBattleDetails(userId: string): Promise<any> {
+    async getPlayersBattleDetails(userId: string): Promise<BattleHistoric[]> {
         try {
             const battles = await this.battlesRepository.find({
                 where: [{ host: { id: userId } }, { guest: { id: userId } }],
@@ -24,16 +24,16 @@ export class BattlesService {
             }
 
             return battles.map(battle => ({
-                battle_id: battle.id,
-                battle_status: battle.status,
-                battle_winner: battle.winner ? battle.winner.name : null,
-                battle_host: battle.host.name,
-                battle_host_id: battle.host.id,
-                battle_guest: battle.guest.name,
-                battle_guest_id: battle.guest.id,
-                battle_score_winner: battle.winner_score,
-                battle_score_loser: battle.loser_score,
-                battle_created_date: battle.createdAt,
+                id: battle.id,
+                status: battle.status,
+                winnerName: battle?.winner?.name,
+                hostName: battle.host?.name,
+                hostId: battle.host?.id,
+                guestName: battle.guest?.name,
+                guestId: battle.guest?.id,
+                scoreWinner: battle.winnerScore,
+                scoreLoser: battle.loserScore,
+                createdAt: battle.createdAt,
             }));
         } catch (error) {
             throw error;
@@ -42,19 +42,13 @@ export class BattlesService {
 
     async getPerformancePlayers(userId: string): Promise<PerformancePlayer> {
         try {
-            const battles = await this.battlesRepository
-                .createQueryBuilder('battle')
-                .where(
-                    'battle.host_id = :userId OR battle.guest_id = :userId',
-                    { userId },
-                )
-                .leftJoinAndSelect('battle.host', 'host')
-                .leftJoinAndSelect('battle.guest', 'guest')
-                .leftJoinAndSelect('battle.winner', 'winner')
-                .orderBy('battle.updated_at', 'DESC')
-                .getMany();
+            const battles = await this.battlesRepository.find({
+                where: [{ host: { id: userId } }, { guest: { id: userId } }],
+                order: { updatedAt: 'DESC' },
+                relations: ['host', 'guest', 'winner'],
+            });
 
-            if (!battles || battles.length === 0) {
+            if (!battles.length) {
                 return null;
             }
 
@@ -82,10 +76,10 @@ export class BattlesService {
                     battles[0].host.id === userId
                         ? battles[0].host.name
                         : battles[0].guest.name,
-                total_battles: totalBattles,
-                total_wins: totalWins,
-                total_loses: totalLoses,
-                total_draws: totalDraws,
+                totalBattles: totalBattles,
+                totalWins: totalWins,
+                totalLoses: totalLoses,
+                totalDraws: totalDraws,
             };
 
             return playerPerformance;

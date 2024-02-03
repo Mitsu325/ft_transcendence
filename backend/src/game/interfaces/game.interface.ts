@@ -76,8 +76,21 @@ export interface Ball {
 export interface PerformancePlayer {
     userId: string;
     name: string;
-    total_battles: number;
-    total_wins: number;
-    total_loses: number;
-    total_draws: number;
+    totalBattles: number;
+    totalWins: number;
+    totalLoses: number;
+    totalDraws: number;
+}
+
+export interface BattleHistoric {
+    id: string;
+    status: string;
+    winnerName: string | null;
+    hostName: string;
+    hostId: string;
+    guestName: string;
+    guestId: string;
+    scoreWinner: number;
+    scoreLoser: number;
+    createdAt: Date;
 }

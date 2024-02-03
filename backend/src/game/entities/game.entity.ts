@@ -23,11 +23,11 @@ export class Battle extends BaseEntity {
     @JoinColumn({ name: 'guest_id' })
     guest: User;
 
-    @Column({ nullable: true })
-    winner_score: number;
+    @Column({ name: 'winner_score', nullable: true })
+    winnerScore: number;
 
-    @Column({ nullable: true })
-    loser_score: number;
+    @Column({ name: 'loser_score', nullable: true })
+    loserScore: number;
 
     @ManyToOne(() => User, winner => winner.id, { nullable: true })
     @JoinColumn({ name: 'winner' })
