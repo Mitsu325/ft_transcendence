@@ -12,33 +12,42 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity('battles')
 export class Battle extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, host => host.id)
     @JoinColumn({ name: 'host_id' })
-    host: string;
+    host: User;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, guest => guest.id)
     @JoinColumn({ name: 'guest_id' })
-    guest: string;
+    guest: User;
 
-    @Column({ nullable: true })
-    winner_score: number;
+    @Column({ name: 'winner_score', nullable: true })
+    winnerScore: number;
 
-    @Column({ nullable: true })
-    loser_score: number;
+    @Column({ name: 'loser_score', nullable: true })
+    loserScore: number;
 
-    @ManyToOne(() => User, { nullable: true })
+    @ManyToOne(() => User, winner => winner.id, { nullable: true })
     @JoinColumn({ name: 'winner' })
-    winner: string;
+    winner: User;
 
     @Column()
     status: string;
 
-    @CreateDateColumn({ type: 'timestamptz', default: () => 'now()' })
-    created_at: Date;
+    @CreateDateColumn({
+        name: 'created_at',
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+    })
+    createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamptz', default: () => 'now()' })
-    updated_at: Date;
+    @UpdateDateColumn({
+        name: 'updated_at',
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        onUpdate: 'CURRENT_TIMESTAMP',
+    })
+    updatedAt: Date;
 }
