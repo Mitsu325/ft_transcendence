@@ -43,11 +43,9 @@ const HistoricTable = () => {
     gameService
       .getPlayerHistoric(user?.id || '')
       .then(res => {
-        console.log(res);
         setBattlesHistoric(res);
       })
       .catch(() => {
-        console.log('Error');
         FailureNotification({
           message: 'Ops! Encontramos algumas falhas durante o processo',
           description:
@@ -94,16 +92,19 @@ const HistoricTable = () => {
             title: 'Vencedor',
             dataIndex: 'winnerName',
             key: 'winner',
+            ellipsis: true,
           },
           {
             title: 'Vencedor Score',
             dataIndex: 'scoreWinner',
             key: 'winner_score',
+            ellipsis: true,
           },
           {
             title: 'Perdedor Score',
             dataIndex: 'scoreLoser',
             key: 'loser_score',
+            ellipsis: true,
           },
           {
             title: 'Resultado',

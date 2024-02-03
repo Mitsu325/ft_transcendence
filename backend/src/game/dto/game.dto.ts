@@ -15,12 +15,12 @@ export class CreateBattleDto {
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    winner_score: number;
+    winnerScore: number;
 
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    loser_score: number;
+    loserScore: number;
 
     @IsString()
     @IsNotEmpty()
