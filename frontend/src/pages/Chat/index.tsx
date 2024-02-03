@@ -5,7 +5,7 @@ import ChatList from './ListCard/ChatList';
 import WelcomeChat from './MessageCard/WelcomeChat';
 import MessageList from './MessageCard/MessageList';
 import 'pages/Chat/style.css';
-import { socket } from 'socket';
+import { chatSocket } from 'socket';
 import Channels from 'pages/Channel/channel';
 import CreateChannel from 'components/CreateChannel';
 import Conversation from 'components/Conversation';
@@ -58,14 +58,14 @@ export default function Chat() {
     const storedMenuItem = queryParams.get('menu') || 'channel';
     setSelectedMenuItem(storedMenuItem);
     if (storedMenuItem === 'chat') {
-      socket.auth = { token: localStorage.getItem('token') };
-      socket.connect();
+      chatSocket.auth = { token: localStorage.getItem('token') };
+      chatSocket.connect();
     } else {
       setComponent('create');
     }
 
     return () => {
-      socket.disconnect();
+      chatSocket.disconnect();
     };
   }, [queryParams]);
 

@@ -1,6 +1,7 @@
 export interface Player {
   id: string;
   name: string;
+  username: string;
   avatar: string | null;
 }
 
@@ -13,6 +14,7 @@ export interface RoomGame {
   room_id: string;
   player1: Player;
   player2: Player | null;
+  guestId?: string;
 }
 
 export interface GameData {

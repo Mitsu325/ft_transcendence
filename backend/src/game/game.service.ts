@@ -5,10 +5,16 @@ import { CreateBattleDto } from './dto/game.dto';
 import { Battle } from './entities/game.entity';
 import { Server } from 'socket.io';
 
+export interface CreateRoom {
+    user: Player;
+    guestId?: string;
+}
+
 export interface Player {
     id: string;
     name: string;
-    avatar: null | string;
+    username: string;
+    avatar: string | null;
 }
 
 export interface Players {
@@ -28,6 +34,7 @@ export interface Room {
     ballService: BallMoverService;
     isRunning: boolean;
     level: number;
+    guestId?: string;
 }
 
 export interface Game {

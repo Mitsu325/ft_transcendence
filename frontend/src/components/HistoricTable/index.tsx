@@ -72,7 +72,6 @@ const HistoricTable: React.FC = () => {
         const resp = await getData(playerId, '/battles/performance_player');
         setPlayerPerformance(resp);
         setShowModal(true);
-        console.log(resp);
       } catch (error) {
         console.error('Error data:', error);
       }

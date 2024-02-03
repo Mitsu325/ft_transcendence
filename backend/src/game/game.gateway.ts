@@ -17,6 +17,7 @@ import {
     Room,
     Game,
     MatchPadle,
+    CreateRoom,
 } from './game.service';
 
 interface Padle {
@@ -83,7 +84,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('CreateRoom')
     handleCreateRoom(
-        @MessageBody() user: Player,
+        @MessageBody() { user, guestId }: CreateRoom,
         @ConnectedSocket() client: Socket,
     ) {
         if (!game.rooms[client.id]) {
@@ -92,14 +93,15 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                 room_id: client.id,
                 player1: { ...user },
                 player2: null,
-                padles: initialPadles,
+                padles: JSON.parse(JSON.stringify(initialPadles)),
                 padlesService: null,
-                scores: initialScores,
+                scores: JSON.parse(JSON.stringify(initialScores)),
                 scoresService: null,
                 ball: initialBall,
                 ballService: null,
                 isRunning: false,
                 level: 1,
+                guestId,
             };
             this.server.emit('game', game);
             this.server.emit('cleanRoom', game.rooms[client.id]);
@@ -148,6 +150,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                     return;
                 }
             }
+            client.emit('message', 'Não há salas disponíveis no momento!');
         } else {
             client.emit('message', 'Não há salas disponíveis no momento!');
         }
@@ -171,8 +174,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
                 xdirection: initD,
                 ydirection: initD,
             };
-            game.rooms[room].scores = initialScores;
-            game.rooms[room].padles = initialPadles;
+            game.rooms[room].scores = JSON.parse(JSON.stringify(initialScores));
+            game.rooms[room].padles = JSON.parse(JSON.stringify(initialPadles));
             loopGame = setInterval(async () => {
                 if (!game.rooms[room]?.isRunning) {
                     clearInterval(loopGame);
@@ -210,9 +213,11 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         if (game.rooms[padle.room] && direction === 'GO') {
-            game.rooms[padle.room].padles = await game.rooms[
-                padle.room
-            ].padlesService.movePadle(padle, initialPadles, player);
+            await game.rooms[padle.room].padlesService.movePadle(
+                padle,
+                game.rooms[padle.room].padles,
+                player,
+            );
             this.server
                 .to(padle.room)
                 .emit('movePadles', padle.room, game.rooms[padle.room].padles);
@@ -237,23 +242,35 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() client: Socket,
     ) {
         if (game.rooms[room.userRoomId]) {
-            game.rooms[room.userRoomId].isRunning = false;
-            const battle = this.gameService.getDataBattle(
-                room.userRoomId,
-                game,
-            );
-            this.gameService.saveBattle(battle);
-            try {
+            if (game.rooms[room.userRoomId].isRunning) {
+                game.rooms[room.userRoomId].isRunning = false;
+
+                const battle = this.gameService.getDataBattle(
+                    room.userRoomId,
+                    game,
+                );
+                this.gameService.saveBattle(battle);
+                try {
+                    this.server
+                        .to(room.userRoomId)
+                        .emit(
+                            'playerLeftRoom',
+                            'GameOver: Player left the room!',
+                        );
+                } catch (error) {}
+
+                this.gameService.removeRoomAndNotify(
+                    room.userRoomId,
+                    room.userPlayer.id,
+                    game,
+                    this.server,
+                );
+            } else {
+                delete game.rooms[room.userRoomId];
                 this.server
                     .to(room.userRoomId)
-                    .emit('playerLeftRoom', 'GameOver: Player left the room!');
-            } catch (error) {}
-            this.gameService.removeRoomAndNotify(
-                room.userRoomId,
-                room.userPlayer.id,
-                game,
-                this.server,
-            );
+                    .emit('leaveRoom', { leaveRoom: true });
+            }
             client.leave(room.userRoomId);
         } else {
             console.error(`Room not found for user ${room.userPlayer.id}`);
@@ -274,7 +291,8 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
         if (!existingPlayer && !playerAlreadyInGame) {
             game.players[client.id] = {
                 id: player.id,
-                name: player.username,
+                name: player.name,
+                username: player.username,
                 avatar: player.avatar,
             };
         } else {

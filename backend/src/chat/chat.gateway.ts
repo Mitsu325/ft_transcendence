@@ -43,6 +43,7 @@ type SendMessage = {
     cors: {
         origin: 'http://localhost:3000',
     },
+    namespace: 'chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(ChatGateway.name);

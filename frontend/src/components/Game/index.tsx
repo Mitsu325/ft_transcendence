@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from 'hooks/useAuth';
 import PlayerCard from 'components/PlayerCard';
 import RoomCard from 'components/RoomCard';
-import { Button, Modal } from 'antd';
+import { Button, Divider, Modal } from 'antd';
 import LeaveRoomModal from 'components/Modal/LeaveRoomModal';
 import Court from 'components/Court';
 import {
@@ -19,22 +19,25 @@ import {
   Players,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
+import { useSearchParams } from 'react-router-dom';
 
 let socket: Socket;
 
 export const Game = () => {
   const user = useAuth()?.user;
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const userPlayer = React.useMemo(() => {
+  const userPlayer = useMemo(() => {
     const newPlayer = {
       id: user?.id ?? '',
       name: user?.name ?? '',
+      username: user?.username ?? '',
       avatar: user?.avatar ?? null,
     };
     return newPlayer;
   }, [user]);
 
-  const [gameData, setGameData] = React.useState<GameData>({
+  const [gameData, setGameData] = useState<GameData>({
     players: [],
     rooms: [],
     status: '',
@@ -43,42 +46,96 @@ export const Game = () => {
     message: '',
   });
 
-  socket = React.useMemo(() => {
+  socket = useMemo(() => {
     const newSocket = io('http://localhost:3003', {
       reconnectionDelay: 10000,
     });
     return newSocket;
   }, []);
 
-  const [userRoomId, setUserRoomId] = React.useState<string>(socket.id);
-  const [roomOpen, setRoomOpen] = React.useState<string>('');
-  const [players, setPlayers] = React.useState<Players>({
+  const [userRoomId, setUserRoomId] = useState<string>(socket.id);
+  const [roomOpen, setRoomOpen] = useState<string>('');
+  const [players, setPlayers] = useState<Players>({
     player1: 'Anfitrião',
     player2: 'Convidado',
   });
-  const [balls, setBalls] = React.useState<{ [roomId: string]: Ball }>({
+  const [balls, setBalls] = useState<{ [roomId: string]: Ball }>({
     [socket.id]: initialBall,
   });
-  const [padles, setPadles] = React.useState<{ [roomId: string]: MatchPadles }>(
-    { ['0']: initialPadles },
-  );
-  const [scores, setScores] = React.useState<{ [roomId: string]: MatchScores }>(
-    { ['0']: initialScores },
-  );
-  const [level, setLevel] = React.useState<{ [roomId: string]: MatchLevel }>({
+  const [padles, setPadles] = useState<{ [roomId: string]: MatchPadles }>({
+    ['0']: initialPadles,
+  });
+  const [scores, setScores] = useState<{ [roomId: string]: MatchScores }>({
+    ['0']: initialScores,
+  });
+  const [level, setLevel] = useState<{ [roomId: string]: MatchLevel }>({
     ['0']: { level: 1 },
   });
 
-  const [newMessage, setNewMessage] = React.useState('');
-  const [visible, setVisible] = React.useState(false);
-  const [message, setMessage] = React.useState('');
-  const [messageOpen, setMessageOpen] = React.useState(visible);
+  const [newMessage, setNewMessage] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageOpen, setMessageOpen] = useState(visible);
+  const [enable, setEnable] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (enable && searchParams.has('guestId')) {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        status: 'CREATED',
+        message: 'Sala criada',
+        connected: true,
+        match: true,
+      }));
+      socket.emit('CreateRoom', {
+        user: userPlayer,
+        guestId: searchParams.get('guestId'),
+      });
+      setUserRoomId(socket.id);
+      searchParams.delete('guestId');
+      setSearchParams(searchParams);
+    }
+    if (enable && searchParams.has('hostId')) {
+      const hostId = searchParams.get('hostId');
+      const room = gameData.rooms.find(
+        item => item.player1.id === hostId && item.guestId === user?.id,
+      );
+      if (room) {
+        room.player2 = userPlayer;
+        socket.emit('GetInRoom', room);
+        setGameData(prevGameData => ({
+          ...prevGameData,
+          match: true,
+        }));
+        setUserRoomId(room.room_id);
+        searchParams.delete('hostId');
+        setSearchParams(searchParams);
+        startMatch(room.room_id);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enable, searchParams]);
+
+  useEffect(() => {
+    if (searchParams.has('cleanRoom')) {
+      leaveRoom();
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        status: 'LEAVE',
+        match: false,
+      }));
+      searchParams.delete('cleanRoom');
+      setSearchParams(searchParams);
+      setVisible(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
     setVisible(true);
   }, [newMessage]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     socket.on('connect', () => {
       socket.emit('PlayerConnected', user);
       setGameData(prevGameData => ({
@@ -100,6 +157,7 @@ export const Game = () => {
       const playersArray = Object.values(receivedGame.players);
       const roomsArray = Object.values(receivedGame.rooms);
 
+      setEnable(true);
       setGameData(prevGameData => ({
         ...prevGameData,
         players: playersArray,
@@ -125,6 +183,17 @@ export const Game = () => {
 
     socket.on('roomOpen', roomId => {
       setRoomOpen(roomId);
+    });
+
+    socket.on('leaveRoom', leaveRoom => {
+      if (leaveRoom) {
+        setGameData(prevGameData => ({
+          ...prevGameData,
+          match: false,
+          status: 'LEAVE',
+        }));
+        setVisible(false);
+      }
     });
 
     socket.on('matchStarted', (roomId, recevedBall) => {
@@ -198,22 +267,26 @@ export const Game = () => {
       message: 'Sala criada',
       match: true,
     }));
-    socket.emit('CreateRoom', userPlayer);
+    socket.emit('CreateRoom', { user: userPlayer });
     setUserRoomId(socket.id);
   };
 
   const getInRoom = (room: RoomGame) => {
-    if (userPlayer.id !== room.player1.id && room.player2 === null) {
-      room.player2 = userPlayer;
-      socket.emit('GetInRoom', room);
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        match: true,
-      }));
-    } else {
-      setNewMessage('');
-      setNewMessage('Sala ocupada');
+    if (
+      userPlayer.id === room.player1.id ||
+      room.guestId ||
+      room.player2 !== null
+    ) {
+      setMessage('Sala ocupada');
+      setMessageOpen(true);
+      return;
     }
+    room.player2 = userPlayer;
+    socket.emit('GetInRoom', room);
+    setGameData(prevGameData => ({
+      ...prevGameData,
+      match: true,
+    }));
     let room_id = socket.id;
     gameData.rooms.forEach(room => {
       if (room.player2?.id === userPlayer.id) {
@@ -228,7 +301,7 @@ export const Game = () => {
     socket.emit('requestRoomOpen', userPlayer);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (roomOpen !== '') {
       const room = gameData.rooms.find(
         room => room.room_id === roomOpen && room.player2 === null,
@@ -280,78 +353,62 @@ export const Game = () => {
   return (
     <>
       {gameData.match && gameData.connected ? (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '50vh',
-          }}
-        >
-          <h1 style={{ padding: '20px' }}>*** PONG ***</h1>
-          <h2>
-            {players.player1.toUpperCase()} X {players.player2.toUpperCase()}
+        <>
+          <h1 className="title">Pong</h1>
+          <h2 className="sub-title text-center">
+            {players.player1} X {players.player2}
           </h2>
-          <div>
-            <Court
-              roomId={userRoomId}
-              matchBall={balls[userRoomId]}
-              matchPadles={padles[userRoomId]}
-              matchScores={scores[userRoomId]}
-              matchLevel={level[userRoomId]}
-              onSendKey={sendKey}
-              onSendLevel={sendLevel}
-            />
-          </div>
-          <div style={{ padding: '20px' }}>
-            <Button onClick={leaveRoom}>Sair da sala</Button>
-          </div>
-        </div>
+          <Court
+            roomId={userRoomId}
+            matchBall={balls[userRoomId]}
+            matchPadles={padles[userRoomId]}
+            matchScores={scores[userRoomId]}
+            matchLevel={level[userRoomId]}
+            onSendKey={sendKey}
+            onSendLevel={sendLevel}
+          />
+          <Button
+            style={{ display: 'block', margin: '40px auto 0' }}
+            onClick={leaveRoom}
+          >
+            Sair da sala
+          </Button>
+        </>
       ) : (
-        <div style={{ display: 'flex', width: '100%' }}>
-          <div style={{ flex: '70%', marginRight: '30px' }}>
-            <h1 style={{ padding: '20px' }}>LOUNGE</h1>
-            <h2 style={{ padding: '10px' }}>
-              {user?.name && user.name.toUpperCase()}
-            </h2>
-            <h2 style={{ padding: '20px' }}>*** JOGADORES ***</h2>
-            <div className="players-container">
-              {gameData.players.map(player => (
-                <PlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-            <div>
-              <Button onClick={matchMakerRequest}>Encontrar Adversário</Button>
-            </div>
-            <h2 style={{ padding: '20px' }}>*** SALAS ***</h2>
-            <div>
-              <Button onClick={createRoom}>Criar sala</Button>
-            </div>
-            <div className="rooms-container">
-              {gameData.rooms.map(room => (
-                <RoomCard
-                  key={room.room_id}
-                  room={room}
-                  getInRoom={getInRoom}
-                />
-              ))}
-            </div>
+        <>
+          <h1 className="title">Lounge - {user?.name}</h1>
+          <h2 className="sub-title">Jogadores</h2>
+          <Divider />
+          <div className="players-container">
+            {gameData.players.map(player => (
+              <PlayerCard key={player.id} player={player} />
+            ))}
           </div>
-          <div>
-            <LeaveRoomModal visible={visible} message={newMessage} />
+          <Button className="mb-40" onClick={matchMakerRequest}>
+            Encontrar Adversário
+          </Button>
+
+          <h2 className="sub-title">Salas</h2>
+          <Divider />
+          <Button className="mb-20" onClick={createRoom}>
+            Criar sala
+          </Button>
+          <div className="rooms-container">
+            {gameData.rooms.map(room => (
+              <RoomCard key={room.room_id} room={room} getInRoom={getInRoom} />
+            ))}
           </div>
-          <div>
-            <Modal
-              title="Aviso!"
-              open={messageOpen}
-              onOk={() => setMessageOpen(false)}
-              onCancel={() => setMessageOpen(false)}
-            >
-              <p>{message}</p>
-            </Modal>
-          </div>
-        </div>
+
+          <LeaveRoomModal visible={visible} message={newMessage} />
+          <Modal
+            title="Aviso!"
+            open={messageOpen}
+            onOk={() => setMessageOpen(false)}
+            onCancel={() => setMessageOpen(false)}
+          >
+            <p>{message}</p>
+          </Modal>
+        </>
       )}
     </>
   );
