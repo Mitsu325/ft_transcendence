@@ -54,7 +54,7 @@ export default function AppAuthenticator() {
 
   return (
     <>
-      <h2 className="profile-sub-title">Autenticação de dois fatores</h2>
+      <h2 className="sub-title">Autenticação de dois fatores</h2>
       <Divider />
       <p className="profile-text mb-24">
         A Autenticação de Dois Fatores (2FA) adiciona uma camada extra de

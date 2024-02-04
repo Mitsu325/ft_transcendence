@@ -12,7 +12,7 @@ export default function UserProfileData({
   const { user } = useAuth();
   return (
     <>
-      <h1 className="profile-title">{userProfile?.name}</h1>
+      <h1 className="title">{userProfile?.name}</h1>
       <p className="profile-text mb-12">
         Username: {userProfile?.username || 'Não definido'}
       </p>

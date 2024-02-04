@@ -108,8 +108,8 @@ export default function BlockUsers({
 
   return (
     <>
-      <h1 className="profile-title">{userProfile?.name}</h1>
-      <h2 className="profile-sub-title">Contatos bloqueados</h2>
+      <h1 className="title">{userProfile?.name}</h1>
+      <h2 className="sub-title">Contatos bloqueados</h2>
       <Divider />
       {renderContent()}
     </>

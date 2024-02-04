@@ -24,7 +24,7 @@ export default function UserEditProfile({
 
   return (
     <>
-      <h1 className="profile-title">{userProfile?.name}</h1>
+      <h1 className="title">{userProfile?.name}</h1>
       {renderContent()}
     </>
   );

@@ -64,6 +64,7 @@ const HistoricTable = () => {
 
   return (
     <>
+      <h1 className="title">Histórico de partidas</h1>
       <Table
         columns={[
           {

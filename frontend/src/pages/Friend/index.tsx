@@ -66,7 +66,7 @@ export default function Friend({ content }: { content: string }) {
 
   return (
     <>
-      <h1 className="friend-title">Amigos</h1>
+      <h1 className="title">Amigos</h1>
       <div className="friend-content">
         <Menu
           className="friend-menu"
