@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import api from 'services/api';
-import { Table, Modal, Badge } from 'antd';
+import { Table, Modal } from 'antd';
 import { userService } from '../../services/user.api';
 
 interface DataType {
@@ -50,7 +50,6 @@ const HistoricTable: React.FC = () => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [playerPerformance, setPlayerPerformance] =
     React.useState<PerformancePlayer>(initPerformancePlayer);
-  const [playerStatus, setPlayerStatus] = React.useState('');
 
   const getData = async (userId: string, route: string) => {
     try {
@@ -98,6 +97,10 @@ const HistoricTable: React.FC = () => {
 
   React.useEffect(() => {
     setLoading(true);
+
+    userService.getUsersStatus().then(users => {
+      console.log('users status', users);
+    });
   }, []);
 
   return (

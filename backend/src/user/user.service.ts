@@ -7,6 +7,7 @@ import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { UploadFileService } from 'src/upload-file/upload-file.service';
 import { twoFactorGenerator } from 'src/utils/twoFactor.util';
+import { AuthService } from 'src/auth/auth.service';
 
 interface UserStatus {
   id: string;
@@ -23,6 +24,7 @@ export class UserService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly uploadFileService: UploadFileService,
+    private readonly authService: AuthService,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -152,7 +154,6 @@ export class UserService {
   private userStatusData: Record<string, UserStatus> = {};
   async updateStatusUser(status: UserStatus) {
     const { id, status: newStatus } = status;
-
     if (this.userStatusData[id]) {
       this.userStatusData[id].status = newStatus;
     } else {
@@ -161,14 +162,14 @@ export class UserService {
   }
 
   async updatedUsersStatus() {
-    const updatedData: UpdateStatusResponse = Object.entries(this.userStatusData).reduce(
+    const updatedData = Object.entries(this.userStatusData).reduce(
       (acc, [userId, userData]) => {
-        if (userData.status !== 'offline') {
-          acc[userId] = { status: userData.status };
-        }
+        // if (userData.status !== 'offline') {
+        acc.push({ id: userId, status: userData.status });
+        // }
         return acc;
       },
-      {} as UpdateStatusResponse,
+      [] as { id: string; status: string }[],
     );
     return updatedData;
   }

@@ -151,7 +151,7 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @Post('set/user-status')
   async updateStatus(@Body() status: UserStatus, @Request() req) {
-    const roomId = await this.playersService.findPlayerById(status.id, game);
+    const roomId = this.playersService.findPlayerById(status.id, game);
     if (roomId !== null) {
       status.status = 'playing';
     }
@@ -163,7 +163,6 @@ export class UserController {
   @Get('get/all-users-status')
   async getUsersStatus() {
     const usersStatus = await this.userService.updatedUsersStatus();
-    console.log(usersStatus);
     return usersStatus;
   }
 }

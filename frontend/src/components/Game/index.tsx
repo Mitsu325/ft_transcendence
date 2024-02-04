@@ -19,6 +19,7 @@ import {
   Players,
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
+import { userService } from '../../services/user.api';
 
 let socket: Socket;
 
@@ -73,6 +74,7 @@ export const Game = () => {
   const [visible, setVisible] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [messageOpen, setMessageOpen] = React.useState(visible);
+  const [userStatus, setUserStatus] = React.useState('');
 
   React.useEffect(() => {
     setVisible(true);
@@ -200,6 +202,7 @@ export const Game = () => {
     }));
     socket.emit('CreateRoom', userPlayer);
     setUserRoomId(socket.id);
+    setUserStatus('playing');
   };
 
   const getInRoom = (room: RoomGame) => {
@@ -222,6 +225,7 @@ export const Game = () => {
     });
     setUserRoomId(room_id);
     startMatch(room_id);
+    setUserStatus('playing');
   };
 
   const matchMakerRequest = () => {
@@ -248,6 +252,7 @@ export const Game = () => {
       gameData.rooms.splice(roomIndex, 1);
     }
     socket.emit('leaveRoom', { userPlayer, userRoomId });
+    setUserStatus('online');
   };
 
   const startMatch = (room_id: string) => {
@@ -276,6 +281,17 @@ export const Game = () => {
     };
     socket.emit('sendLevel', matchLevel);
   };
+
+  React.useEffect(() => {
+    const status_obj = {
+      id: userPlayer.id,
+      status: userStatus,
+    };
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status_obj);
+    }
+    updateUserStatus();
+  }, [userStatus]);
 
   return (
     <>

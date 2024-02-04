@@ -7,7 +7,7 @@ export interface User_Status {
   status: string;
 }
 
-export const UserStatusSocket = () => {
+export const UserStatusUpdater = () => {
   const user = useAuth()?.user;
 
   const userPlayer = React.useMemo(() => {
@@ -27,15 +27,15 @@ export const UserStatusSocket = () => {
       if (currentTime && startTime && startTime < currentTime) {
         let timeSleep = Math.floor((currentTime - startTime) / 1000);
 
-        if (timeSleep > 30 && userStatus === 'online') {
-          setUserStatus('offline');
+        if (timeSleep > 10 && userStatus === 'online') {
+          setUserStatus('inactive');
           timeSleep = 0;
-        } else if (timeSleep <= 30 && userStatus === 'offline') {
+        } else if (timeSleep <= 10 && userStatus === 'inactive') {
           setUserStatus('online');
           timeSleep = 0;
         }
       }
-    }, 40000);
+    }, 12000);
 
     return () => {
       clearInterval(intervalId);
