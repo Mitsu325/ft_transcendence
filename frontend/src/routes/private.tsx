@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from 'pages/Home/home';
 import CommonLayout from 'components/Layout';
 import Chat from 'pages/Chat';
-import { Game } from 'components/Game';
+import { Game } from 'pages/Game';
 import Register from 'pages/Register';
-import HistoricTable from 'components/HistoricTable';
+import HistoricTable from 'pages/HistoricTable';
 import Friend from 'pages/Friend';
-import Manager from 'components/Management';
+import Manager from 'pages/Management';
 
 const PrivateRoutes: React.FC = () => {
   return (

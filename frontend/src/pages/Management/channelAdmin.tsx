@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, List, Avatar, Button, Tooltip } from 'antd';
-import { userService } from '../../services/user.api';
+import { userService } from 'services/user.api';
 import { adminService } from 'services/admin.api';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
-import { channelApi } from '../../services/channel.api';
+import { channelApi } from 'services/channel.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import PasswordModal from './PasswordModal';

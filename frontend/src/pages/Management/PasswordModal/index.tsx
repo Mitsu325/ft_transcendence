@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Input } from 'antd';
-import { channelApi } from '../../../services/channel.api';
+import { channelApi } from 'services/channel.api';
 import FailureNotification from 'components/Notification/FailureNotification';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import './style.css';

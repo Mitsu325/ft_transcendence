@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 import { Layout } from 'antd';
 import ChannelAdmin from './channelAdmin';
-import { channelApi } from '../../services/channel.api';
+import { channelApi } from 'services/channel.api';
 import ChannelMessage from './channelMessage';
 import { adminService } from 'services/admin.api';
 import './style.css';
 const { Content, Sider } = Layout;
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from 'hooks/useAuth';
 
 interface ChannelProps {
   id: string;
