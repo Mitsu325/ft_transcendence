@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Battle } from './entities/game.entity';
 import { BattleHistoric, PerformancePlayer } from './interfaces/game.interface';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class BattlesService {
     constructor(
         @InjectRepository(Battle)
         private battlesRepository: Repository<Battle>,
+        private readonly userService: UserService,
     ) {}
 
     async getPlayersBattleDetails(userId: string): Promise<BattleHistoric[]> {
@@ -20,7 +22,7 @@ export class BattlesService {
             });
 
             if (!battles.length) {
-                return null;
+                return [];
             }
 
             return battles.map(battle => ({
@@ -49,7 +51,18 @@ export class BattlesService {
             });
 
             if (!battles.length) {
-                return null;
+                const user = await this.userService.findById(userId);
+                return {
+                    userId,
+                    name: user.name,
+                    totalBattles: 0,
+                    totalWins: 0,
+                    totalLoses: 0,
+                    totalDraws: 0,
+                    winPercent: 0,
+                    losePercent: 0,
+                    drawPercent: 0,
+                };
             }
 
             let totalBattles: number = 0;

@@ -118,6 +118,10 @@ const HistoricTable = () => {
         dataSource={battlesHistoric}
         loading={loading}
         rowKey={record => record.id.toString()}
+        locale={{
+          emptyText:
+            'Você ainda não tem um histórico de partidas de Pong! Que tal começar agora e mostrar suas habilidades na quadra?',
+        }}
       />
       <Modal
         title={`Performance do Jogador - ${playerPerformance?.name}`}
