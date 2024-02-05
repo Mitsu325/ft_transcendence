@@ -15,9 +15,12 @@ import {
     ApiTags,
     ApiBody,
     ApiParam,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
 
 @ApiTags('channel-admin')
 @Controller('channel-admin')
@@ -25,10 +28,12 @@ export class ChannelAdminController {
     constructor(private readonly channelAdminService: ChannelAdminService) {}
 
     @ApiOperation({ description: 'Get all channel admins' })
+    @ApiQuery({ name: 'limit', type: Number, required: false })
+    @ApiQuery({ name: 'page', type: Number, required: false })
     @ApiBearerAuth('access-token')
     @Get(':channel_id')
-    findAll(@Param() params: any) {
-        return this.channelAdminService.findAll(params.channel_id);
+    findAll(@Pagination() pagination: PaginationOptions, @Param() params: any) {
+        return this.channelAdminService.findAll(params.channel_id, pagination);
     }
 
     @ApiOperation({ description: 'Add a new Admin' })

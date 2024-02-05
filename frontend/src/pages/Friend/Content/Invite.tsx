@@ -114,6 +114,7 @@ export default function FriendInvite() {
           disabled={!enableInvite}
           loading={loading}
           onClick={sendInvite}
+          className="m-0"
         >
           Enviar pedido de amizade
         </Button>

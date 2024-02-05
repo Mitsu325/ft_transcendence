@@ -1,31 +1,20 @@
 import React, { useState, useEffect } from 'react';
-
-import { Layout } from 'antd';
-import ChannelAdmin from './channelAdmin';
-import { channelApi } from 'services/channel.api';
-import ChannelMessage from './channelMessage';
-import { adminService } from 'services/admin.api';
-import './style.css';
-const { Content, Sider } = Layout;
 import { useAuth } from 'hooks/useAuth';
-
-interface ChannelProps {
-  id: string;
-  name_channel: string;
-  type: string;
-  owner: string;
-}
-
-interface typeAdmin {
-  admin_id: string;
-}
+import FailureNotification from 'components/Notification/FailureNotification';
+import { channelApi } from 'services/channel.api';
+import { adminService } from 'services/admin.api';
+import { ChannelProps, typeAdmin } from 'interfaces/channel.interface';
+import ChannelAdmin from './channelAdmin';
+import ChannelMessage from './channelMessage';
+import './style.css';
 
 const ChannelManagement: React.FC = () => {
   const [channels, setChannels] = useState<ChannelProps[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<ChannelProps>();
-  const [hoveredChannel, setHoveredChannel] = useState<string | undefined>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [hasAdmin, setHasAdmin] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const user = useAuth()?.user;
 
@@ -35,79 +24,74 @@ const ChannelManagement: React.FC = () => {
         const channelsData = await channelApi.getChannel();
         setChannels(channelsData);
       } catch (error) {
-        console.error('Erro ao obter canais:', error);
+        FailureNotification({
+          message: 'Ops! Encontramos algumas falhas durante o processo',
+          description:
+            'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
+        });
       }
     };
     getChannels();
-  }, [channels]);
+  }, []);
 
-  const handleChannelClick = async (channel: ChannelProps) => {
-    setIsOwner(false);
-    setIsAdmin(false);
+  const handleChannelClick = async (channel: ChannelProps, index: number) => {
+    setActiveIndex(index);
     setSelectedChannel(channel);
     const userId = user?.id ?? '';
     const ownerRes = await channelApi.getOwner(channel.id);
     const adminRes = await adminService.getAdminsId(channel.id);
-    if (ownerRes.data === userId) {
-      setIsOwner(true);
-    }
+    setHasAdmin(!!adminRes);
+    setIsOwner(ownerRes.data === userId);
     const isAdminUser = adminRes.admins.some(
       (admins: typeAdmin) => admins.admin_id === userId,
     );
-    if (isAdminUser) {
-      setIsAdmin(true);
-    }
-  };
-
-  const handleChannelHover = (channel: ChannelProps) => {
-    setHoveredChannel(channel.id);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredChannel(undefined);
+    setIsAdmin(!!isAdminUser);
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={200} theme="dark">
-        <div className="sider">
-          <span className="sider-title">Canais</span>
-          <div className="line"></div>
+    <>
+      <h1 className="title">Gerenciamento</h1>
+      <div className="managemet-content">
+        <div className="side-group">
+          <h2 className="sub-title">Canais</h2>
+
+          <div className="list-channel">
+            <dl className="list-channel-group">
+              {channels.map((channel, index) => (
+                <dt
+                  tabIndex={index + 1}
+                  className={
+                    'list-channel-item' +
+                    (activeIndex === index ? ' list-channel-active' : '')
+                  }
+                  key={channel.id}
+                  onClick={() => handleChannelClick(channel, index)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter') {
+                      handleChannelClick(channel, index);
+                    }
+                  }}
+                >
+                  {channel.name_channel}
+                </dt>
+              ))}
+            </dl>
+          </div>
         </div>
-        <ul className="list">
-          {channels.map(channel => (
-            <li
-              className="items"
-              key={channel.id}
-              onClick={() => handleChannelClick(channel)}
-              onMouseEnter={() => handleChannelHover(channel)}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                backgroundColor:
-                  selectedChannel?.id === channel.id
-                    ? '#1677FE'
-                    : hoveredChannel === channel.id
-                    ? '#1677FE'
-                    : 'transparent',
-              }}
-            >
-              {channel.name_channel}
-            </li>
-          ))}
-        </ul>
-      </Sider>
-      <Layout>
-        <Content style={{ marginLeft: '15px' }}>
-          <>
-            {selectedChannel && (isAdmin || isOwner) ? (
-              <ChannelAdmin channel={selectedChannel} owner={isOwner} />
-            ) : (
-              <ChannelMessage />
-            )}
-          </>
-        </Content>
-      </Layout>
-    </Layout>
+
+        <div className="management-channel-group">
+          {selectedChannel && (isAdmin || isOwner) ? (
+            <ChannelAdmin
+              channel={selectedChannel}
+              owner={isOwner}
+              hasAdmin={hasAdmin}
+            />
+          ) : (
+            <ChannelMessage />
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

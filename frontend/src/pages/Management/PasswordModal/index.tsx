@@ -104,7 +104,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
           value={channelPassword}
           onChange={e => setChannelPassword(e.target.value)}
         />
-        <Button type="primary" onClick={handleAddPassword}>
+        <Button type="primary" className="mt-12" onClick={handleAddPassword}>
           Adicionar Senha
         </Button>
       </Modal>
@@ -131,7 +131,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
           value={newPassword}
           onChange={e => setNewPassword(e.target.value)}
         />
-        <Button type="primary" onClick={handleChangePassword}>
+        <Button type="primary" className="mt-12" onClick={handleChangePassword}>
           Mudar Senha
         </Button>
         <p className="input-text">Remover senha atual</p>
@@ -142,7 +142,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
           value={removePassword}
           onChange={e => setRemovePassword(e.target.value)}
         />
-        <Button type="primary" onClick={handleRemovePassword}>
+        <Button type="primary" className="mt-12" onClick={handleRemovePassword}>
           Remover Senha
         </Button>
       </Modal>

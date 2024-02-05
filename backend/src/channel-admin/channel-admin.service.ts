@@ -3,9 +3,11 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelAdmin } from './entities/admin.entity';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { ChannelAdminDto } from './dto/admin.dto';
 import { Equal } from 'typeorm';
 import { RemoveAdminDto } from './dto/remove-admin.dto';
+import { PaginationOptions } from 'src/common/interfaces/pagination.interface';
+import { AdminRes } from './interfaces/channel-admin.interface';
+import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 
 @Injectable()
 export class ChannelAdminService {
@@ -58,21 +60,43 @@ export class ChannelAdminService {
         }
     }
 
-    async findAll(channel_id: string): Promise<ChannelAdminDto[]> {
+    async findAll(
+        channel_id: string,
+        pagination: PaginationOptions,
+    ): Promise<AdminRes> {
         try {
-            const admins = await this.ChannelAdminRepository.find({
+            const { page, limit } = pagination;
+            const skip = (page - 1) * limit;
+
+            const total = await this.ChannelAdminRepository.count({
                 where: {
                     channel: Equal(channel_id),
                     active: true,
                 },
             });
-            return admins.map(admin => ({
+
+            const admins = await this.ChannelAdminRepository.find({
+                where: {
+                    channel: Equal(channel_id),
+                    active: true,
+                },
+                order: { createdAt: 'DESC' },
+                skip,
+                take: limit,
+            });
+
+            if (!admins.length) {
+                return { data: [], pagination: { total: 0, page, limit } };
+            }
+
+            const data = admins.map(admin => ({
                 id: admin.id,
                 channel_id: admin.channel.name_channel,
-                admin_id: admin.admin.name,
                 active: admin.active,
-                avatar: admin.admin.avatar,
+                admin: getNonSensitiveUserInfo(admin.admin),
             }));
+
+            return { data, pagination: { total, page, limit } };
         } catch (error) {
             console.error('Error to find channel administrators:', error);
             throw error;
