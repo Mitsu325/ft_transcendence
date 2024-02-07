@@ -22,7 +22,7 @@ export default function AdminList({ channelId }: { channelId: string }) {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const limit = 1;
+  const limit = 10;
   const [users, setUsers] = useState<SelectProps['options']>([]);
   const [searchValue, setSearchValue] = useState<string>();
   const [enableAction, setEnableAction] = useState<boolean>(false);

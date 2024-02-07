@@ -1,8 +1,11 @@
+/* eslint-disable no-useless-catch */
 import api from 'services/api';
 import adminInterface from 'interfaces/admin.interface';
 import removeAdmInterface from 'interfaces/removeAdm.interface';
 import { Pagination } from 'interfaces/reqBody/pagination.interface';
 import { buildPaginationUrl } from 'utils/build-pagination-url';
+import { UpdateAdminAction } from 'interfaces/reqBody/admin-action.interface';
+import { ActionType } from 'interfaces/channel.interface';
 
 async function getAdmins(channel_id: string, pagination?: Pagination) {
   const url = buildPaginationUrl(`channel-admin/${channel_id}`, pagination);
@@ -25,9 +28,51 @@ async function getAdminsId(channel_id: string) {
   return result?.data;
 }
 
+async function getAdminActions(
+  channel_id: string,
+  action: ActionType,
+  pagination?: Pagination,
+) {
+  let url = `channel-admin/action/${channel_id}`;
+
+  if (pagination) {
+    const params = new URLSearchParams({
+      page: pagination.page.toString(),
+      action,
+      limit: pagination.limit.toString(),
+    });
+
+    url += `?${params.toString()}`;
+  } else {
+    const params = new URLSearchParams({
+      action,
+    });
+
+    url += `?${params.toString()}`;
+  }
+
+  try {
+    const result = await api.get(url);
+    return result?.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function updateAdminActions(params: UpdateAdminAction) {
+  try {
+    const result = await api.post('channel-admin/action', params);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const adminService = {
   getAdmins,
   addAdmin,
   removeAdmin,
   getAdminsId,
+  getAdminActions,
+  updateAdminActions,
 };

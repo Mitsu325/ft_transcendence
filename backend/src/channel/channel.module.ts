@@ -10,5 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     imports: [TypeOrmModule.forFeature([Channel, Messages])],
     providers: [ChannelService, ChannelGateway],
     controllers: [ChannelController],
+    exports: [ChannelService],
 })
 export class ChannelModule {}

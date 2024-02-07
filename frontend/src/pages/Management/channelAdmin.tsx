@@ -8,7 +8,7 @@ import SuccessNotification from 'components/Notification/SuccessNotification';
 import AdminList from './Content/AdminList';
 import PasswordModal from './PasswordModal';
 import './style.css';
-import AdminAction from './Content/AdminAction';
+import AdminActionList from './Content/AdminActionList';
 
 const menuItems: MenuProps['items'] = [
   {
@@ -16,8 +16,16 @@ const menuItems: MenuProps['items'] = [
     key: 'admin',
   },
   {
-    label: 'Ações',
-    key: 'actions',
+    label: 'Silenciados',
+    key: 'mute',
+  },
+  {
+    label: 'Expulsos',
+    key: 'kick',
+  },
+  {
+    label: 'Banidos',
+    key: 'ban',
   },
 ];
 
@@ -60,8 +68,10 @@ const ChannelAdmin: React.FC<Channel> = ({ channel, owner, hasAdmin }) => {
     switch (content) {
       case 'admin':
         return <AdminList channelId={channel.id} />;
-      case 'actions':
-        return <AdminAction channelId={channel.id} />;
+      case 'mute':
+      case 'kick':
+      case 'ban':
+        return <AdminActionList channelId={channel.id} action={content} />;
       default:
         break;
     }

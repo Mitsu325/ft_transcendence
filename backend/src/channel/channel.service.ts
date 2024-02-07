@@ -35,6 +35,12 @@ export class ChannelService {
         return channelDtos;
     }
 
+    async findById(channelId: string) {
+        return await this.channelsRepository.findOne({
+            where: { id: channelId },
+        });
+    }
+
     async create(createChannelDto: CreateChannelDto) {
         try {
             const savedChannel =

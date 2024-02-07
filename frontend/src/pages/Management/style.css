@@ -87,6 +87,11 @@
   margin-bottom: 20px;
 }
 
+.date-input {
+  margin-right: 32px;
+  margin-bottom: 20px;
+}
+
 
 @media screen and (max-width: 1200px) {
   .side-group {
