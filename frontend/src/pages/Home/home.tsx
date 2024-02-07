@@ -2,14 +2,8 @@ import * as React from 'react';
 import { Divider } from 'antd';
 import avatar from 'assets/avatar.png';
 import 'pages/Home/style.css';
-import { userService } from '../../services/user.api';
 
 export default function Home() {
-  React.useEffect(() => {
-    userService.getUsersStatus().then(response => {
-      console.log(response);
-    });
-  }, []);
   return (
     <>
       <h1 className="text">JMP Pong!</h1>

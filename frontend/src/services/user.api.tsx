@@ -45,6 +45,11 @@ async function getUsersStatus() {
   return result.data || null;
 }
 
+async function getUserStatusById(id: string) {
+  const result = await api.get(`/user/get/users-status-by-id/${id}`);
+  return result.data || null;
+}
+
 export const userService = {
   getUser,
   searchUserByName,
@@ -54,4 +59,5 @@ export const userService = {
   update2fa,
   updateUserStatus,
   getUsersStatus,
+  getUserStatusById,
 };

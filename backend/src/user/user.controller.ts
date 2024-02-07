@@ -151,10 +151,6 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @Post('set/user-status')
   async updateStatus(@Body() status: UserStatus, @Request() req) {
-    const roomId = this.playersService.findPlayerById(status.id, game);
-    if (roomId !== null) {
-      status.status = 'playing';
-    }
     await this.userService.updateStatusUser(status);
   }
 
@@ -164,5 +160,19 @@ export class UserController {
   async getUsersStatus() {
     const usersStatus = await this.userService.updatedUsersStatus();
     return usersStatus;
+  }
+
+  @ApiOperation({ description: 'Get users status by id' })
+  @ApiBearerAuth('access-token')
+  @Get('get/users-status-by-id/:id')
+  async getUsersStatusById(@Param() params: any) {
+    const usersStatus = await this.userService.updatedUsersStatus();
+    const statusFounded = usersStatus.find(el => el.id === params.id);
+
+    if (statusFounded) {
+      return statusFounded.status;
+    } else {
+      return "offline";
+    }
   }
 }

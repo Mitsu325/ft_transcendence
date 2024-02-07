@@ -50,6 +50,7 @@ const HistoricTable: React.FC = () => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [playerPerformance, setPlayerPerformance] =
     React.useState<PerformancePlayer>(initPerformancePlayer);
+  const [userStatus, setUserStatus] = React.useState('online');
 
   const getData = async (userId: string, route: string) => {
     try {
@@ -97,11 +98,26 @@ const HistoricTable: React.FC = () => {
 
   React.useEffect(() => {
     setLoading(true);
-
-    userService.getUsersStatus().then(users => {
-      console.log('users status', users);
-    });
   }, []);
+
+  React.useEffect(() => {
+    const status_obj = {
+      id: userPlayer.id,
+      status: userStatus,
+    };
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status_obj);
+    }
+    updateUserStatus();
+  }, [userStatus]);
+
+  const getStatus = (id: string) => {
+    let status = '';
+    userService.getUserStatusById(id).then(usersSt => {
+      status = usersSt;
+      console.log(id, status);
+    });
+  };
 
   return (
     <>
@@ -121,9 +137,12 @@ const HistoricTable: React.FC = () => {
             dataIndex: 'battle_host',
             key: 'host',
             render: (text, record) => (
-              <a onClick={() => getPerformancePlayer(record.battle_host_id)}>
-                {text}
-              </a>
+              getStatus(record.battle_host_id),
+              (
+                <a onClick={() => getPerformancePlayer(record.battle_host_id)}>
+                  {text}
+                </a>
+              )
             ),
           },
           {

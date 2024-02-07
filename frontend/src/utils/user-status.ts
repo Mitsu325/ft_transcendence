@@ -28,9 +28,9 @@ export const UserStatusUpdater = () => {
         let timeSleep = Math.floor((currentTime - startTime) / 1000);
 
         if (timeSleep > 10 && userStatus === 'online') {
-          setUserStatus('inactive');
+          setUserStatus('offline');
           timeSleep = 0;
-        } else if (timeSleep <= 10 && userStatus === 'inactive') {
+        } else if (timeSleep <= 10 && userStatus === 'offline') {
           setUserStatus('online');
           timeSleep = 0;
         }
@@ -70,12 +70,24 @@ export const UserStatusUpdater = () => {
       setStartTime(Date.now());
     };
 
+    const detectedUnload = () => {
+      setUserStatus('');
+      setUserStatus('offline');
+      setStartTime(Date.now());
+    };
+
     window.addEventListener('mouseout', handleMouseOut);
     window.addEventListener('keydown', sendKeyEvent);
+    window.addEventListener('beforeunload', event => {
+      detectedUnload();
+    });
 
     return () => {
       window.addEventListener('mouseout', handleMouseOut);
       window.addEventListener('keydown', sendKeyEvent);
+      window.addEventListener('beforeunload', event => {
+        detectedUnload();
+      });
     };
   }, []);
 };

@@ -74,7 +74,7 @@ export const Game = () => {
   const [visible, setVisible] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [messageOpen, setMessageOpen] = React.useState(visible);
-  const [userStatus, setUserStatus] = React.useState('');
+  const [userStatus, setUserStatus] = React.useState('online');
 
   React.useEffect(() => {
     setVisible(true);
@@ -117,6 +117,7 @@ export const Game = () => {
         message: data.message,
         match: false,
       }));
+      setUserStatus('online');
     });
 
     socket.on('cleanRoom', receivedRoom => {
@@ -184,6 +185,7 @@ export const Game = () => {
 
     return () => {
       socket.disconnect();
+      setUserStatus('online');
       setNewMessage('Seu adversário se desconectou');
       setGameData(prevGameData => ({
         ...prevGameData,
@@ -252,6 +254,7 @@ export const Game = () => {
       gameData.rooms.splice(roomIndex, 1);
     }
     socket.emit('leaveRoom', { userPlayer, userRoomId });
+    gameData.match = false;
     setUserStatus('online');
   };
 
