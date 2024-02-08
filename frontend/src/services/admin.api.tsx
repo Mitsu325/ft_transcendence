@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-catch */
 import api from 'services/api';
 import adminInterface from 'interfaces/admin.interface';
 import removeAdmInterface from 'interfaces/removeAdm.interface';
@@ -51,21 +50,13 @@ async function getAdminActions(
     url += `?${params.toString()}`;
   }
 
-  try {
-    const result = await api.get(url);
-    return result?.data;
-  } catch (error) {
-    throw error;
-  }
+  const result = await api.get(url);
+  return result?.data;
 }
 
 async function updateAdminActions(params: UpdateAdminAction) {
-  try {
-    const result = await api.post('channel-admin/action', params);
-    return result?.data || null;
-  } catch (error) {
-    throw error;
-  }
+  const result = await api.post('channel-admin/action', params);
+  return result?.data || null;
 }
 
 async function getMemberAction(channelId: string, memberId: string) {
