@@ -1,5 +1,5 @@
 .container {
-  width: 250px;
+  width: 260px;
   height: max-content;
   margin: auto;
   background-color: #ebebeb;
@@ -10,6 +10,7 @@
 }
 
 .form-field {
+  width: 100%;
   display: inline-block;
   padding: 5px;
   margin-top: 20px;
@@ -19,4 +20,15 @@
   display: block;
   color: rgb(237, 67, 55);
   font-size: 0.9em;
+}
+
+.password-field-group {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.btn-eye {
+  margin-top: 20px;
+  margin-left: 8px;
 }

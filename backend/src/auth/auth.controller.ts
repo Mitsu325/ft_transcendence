@@ -19,7 +19,6 @@ import {
 import { ParamExistValidationPipe } from 'src/common/code-validation.pipe';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { EmailExistsValidationPipe } from 'src/user/pipes/verifyEmail.validation.pipe';
 import { UserService } from 'src/user/user.service';
 import { Public } from 'src/common/constants';
 
@@ -58,9 +57,6 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @Post('sign-up')
     async signUp(@Body() createUserDto: CreateUserDto) {
-        await new EmailExistsValidationPipe(this.userService).transform(
-            createUserDto,
-        );
         return await this.authService.signUp(
             createUserDto.name,
             createUserDto.email,

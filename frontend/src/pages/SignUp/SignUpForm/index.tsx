@@ -11,6 +11,7 @@ import SuccessNotification from 'components/Notification/SuccessNotification';
 import FailureNotification from 'components/Notification/FailureNotification';
 import 'pages/SignUp/SignUpForm/style.css';
 import { useNavigate } from 'react-router-dom';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const validationSignup = yup.object().shape({
   name: yup.string().required('Campo obrigatório'),
@@ -32,13 +33,26 @@ const validationSignup = yup.object().shape({
 export default function SignUpForm() {
   const context = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (values: SignUpBody) => {
     try {
       setLoading(true);
       const res = await authService.signUp(values);
-      setAuthorizationHeader(res.access_token);
+      if (!res.success) {
+        FailureNotification({
+          message: 'Não foi possível criar a conta',
+          description: `O ${
+            res.reason === 'email_exists' ? 'e-mail' : 'username'
+          } fornecido já está em uso. Por favor, tente com outro ${
+            res.reason === 'email_exists' ? 'e-mail' : 'username'
+          } ou faça login na sua conta existente.`,
+        });
+        setLoading(false);
+        return;
+      }
+      setAuthorizationHeader(res?.access_token);
       const user = await userService.getUser();
       navigate('/');
       context.Login(res.access_token, user);
@@ -48,12 +62,17 @@ export default function SignUpForm() {
       });
       setLoading(false);
     } catch (error) {
+      console.log(error);
       FailureNotification({
-        message: 'Não foi possível logar',
-        description: 'Por favor, verifique suas credenciais e tente novamente.',
+        message: 'Não foi possível criar a conta',
+        description: 'Por favor, tente novamente.',
       });
       setLoading(false);
     }
+  };
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -76,7 +95,11 @@ export default function SignUpForm() {
             <ErrorMessage component="span" name="name" className="form-error" />
           </div>
           <div>
-            <Field name="username" className="form-field" placeholder="Login" />
+            <Field
+              name="username"
+              className="form-field"
+              placeholder="Username"
+            />
             <ErrorMessage
               component="span"
               name="username"
@@ -97,12 +120,20 @@ export default function SignUpForm() {
             />
           </div>
           <div>
-            <Field
-              name="password"
-              className="form-field"
-              type="password"
-              placeholder="Senha"
-            />
+            <div className="password-field-group">
+              <Field
+                name="password"
+                className="form-field"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Senha"
+              />
+              <Button
+                className="btn-eye"
+                shape="circle"
+                icon={showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                onClick={togglePassword}
+              />
+            </div>
             <ErrorMessage
               component="span"
               name="password"
@@ -110,12 +141,20 @@ export default function SignUpForm() {
             />
           </div>
           <div>
-            <Field
-              name="confirmPassword"
-              className="form-field"
-              type="password"
-              placeholder="Confirme a Senha"
-            />
+            <div className="password-field-group">
+              <Field
+                name="confirmPassword"
+                className="form-field"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Confirme a Senha"
+              />
+              <Button
+                className="btn-eye"
+                shape="circle"
+                icon={showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                onClick={togglePassword}
+              />
+            </div>
             <ErrorMessage
               component="span"
               name="confirmPassword"

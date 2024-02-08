@@ -51,6 +51,14 @@ export class AuthService {
     }
 
     async signUp(name, email, username, password) {
+        const emailExists = await this.userService.findEmail(email);
+        if (emailExists) {
+            return { success: false, reason: 'email_exists' };
+        }
+        const usernameExists = await this.userService.findByUsername(username);
+        if (usernameExists) {
+            return { success: false, reason: 'username_exists' };
+        }
         const hashPass = await hashPassword(password);
         password = hashPass;
         username = username.replace(/\s/g, '');
@@ -70,6 +78,7 @@ export class AuthService {
         });
         const payload = { sub: user.id, username: user.username };
         return {
+            success: true,
             access_token: await this.jwtService.signAsync(payload),
         };
     }

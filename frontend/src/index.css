@@ -20,9 +20,9 @@ body {
 
 .primary-button {
   min-width: 200px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 20px auto;
   padding: 5px 10px;
+  display: block;
 }
 
 .w-60 {
