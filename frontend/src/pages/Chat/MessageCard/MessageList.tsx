@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Divider, List, Popconfirm } from 'antd';
+import { Button, Divider, List, Popconfirm, Tooltip } from 'antd';
 import AvatarCustom from 'components/Avatar';
 import MessageBox from 'components/Message/MessageBox';
 import MessageInput from 'components/Message/MessageInput';
 import { chatService } from 'services/chat.api';
 import FailureNotification from 'components/Notification/FailureNotification';
-import { chatSocket } from 'socket';
+import { chatSocket, friendSocket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
 import InfiniteScroll from 'components/InfiniteScroll';
 import { ChattingUser, Message } from 'interfaces/chat.interface';
-import { StopOutlined } from '@ant-design/icons';
+import { StopOutlined, TrophyOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 
 interface MessageListProps {
   selectedUser: ChattingUser;
@@ -32,6 +33,7 @@ export default function MessageList({
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const limit = 20;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setInitialLoadComplete(false);
@@ -171,6 +173,24 @@ export default function MessageList({
       });
   };
 
+  const inviteToPlay = () => {
+    friendSocket.emit('invite-play', {
+      sender: {
+        id: user?.id,
+        name: user?.name,
+        username: user?.username,
+        avatar: user?.avatar,
+      },
+      recipient: selectedUser,
+    });
+
+    const path = {
+      pathname: '/game-options',
+      search: createSearchParams({ guestId: selectedUser.id }).toString(),
+    };
+    navigate(path);
+  };
+
   return (
     <>
       <div className="message-header">
@@ -178,22 +198,33 @@ export default function MessageList({
           <AvatarCustom src={selectedUser.avatar} size={48} />
           <h1 className="message-header-title ml-12">{selectedUser.name}</h1>
         </div>
-        {selectedUser.id !== user?.id && (
-          <Popconfirm
-            title={'Bloquear ' + selectedUser.name}
-            description="Você tem certeza que deseja continuar?"
-            onConfirm={() => confirm(selectedUser.id)}
-            okText="Sim"
-            cancelText="Não"
-          >
+        <div>
+          <Tooltip title="Convidar para jogar">
             <Button
               shape="circle"
-              icon={<StopOutlined />}
-              aria-label="Bloquear"
-              style={{ color: '#cf1322' }}
+              icon={<TrophyOutlined />}
+              aria-label="Convidar para jogar"
+              style={{ marginRight: '8px' }}
+              onClick={inviteToPlay}
             />
-          </Popconfirm>
-        )}
+          </Tooltip>
+          {selectedUser.id !== user?.id && (
+            <Popconfirm
+              title={'Bloquear ' + selectedUser.name}
+              description="Você tem certeza que deseja continuar?"
+              onConfirm={() => confirm(selectedUser.id)}
+              okText="Sim"
+              cancelText="Não"
+            >
+              <Button
+                shape="circle"
+                icon={<StopOutlined />}
+                aria-label="Bloquear"
+                style={{ color: '#cf1322' }}
+              />
+            </Popconfirm>
+          )}
+        </div>
       </div>
       <Divider className="border-dark m-0" />
       <InfiniteScroll
