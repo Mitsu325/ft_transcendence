@@ -14,6 +14,7 @@ import {
   HomeOutlined,
   LogoutOutlined,
   MessageOutlined,
+  PoweroffOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -162,6 +163,19 @@ const CommonLayout = () => {
     setSelectedMenuKey([key]);
   };
 
+  const confirmLogout = () => {
+    modal.confirm({
+      title: 'Confirmar saída da conta',
+      icon: <PoweroffOutlined />,
+      content:
+        'Tem certeza de que deseja sair da sua conta? Ao sair, você será desconectado e precisará fazer login novamente para acessar sua conta.',
+      okText: 'Confirmar',
+      cancelText: 'Cancelar',
+      onOk: () => onLogout(),
+      onCancel: () => Modal.destroyAll(),
+    });
+  };
+
   const onLogout = () => {
     setLoading(true);
     SuccessNotification({
@@ -199,7 +213,7 @@ const CommonLayout = () => {
               className="logout-btn"
               icon={<LogoutOutlined />}
               loading={loading}
-              onClick={() => onLogout()}
+              onClick={() => confirmLogout()}
             />
           </Tooltip>
         </Sider>
