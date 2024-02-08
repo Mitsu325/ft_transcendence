@@ -15,6 +15,7 @@ export const joinRoom = (roomId: string | null, userName: string) => {
 export const sendMessage = (
   roomId: string | null,
   newMessage: string,
+  userId: string,
   userName: string,
   createdAt: string,
 ) => {
@@ -22,6 +23,7 @@ export const sendMessage = (
     socket.emit('sendMessage', {
       roomId: roomId,
       message: newMessage,
+      userId: userId,
       userName: userName,
       createdAt: createdAt,
     });

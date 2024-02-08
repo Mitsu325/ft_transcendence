@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { IsNull, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelAdmin } from './entities/admin.entity';
@@ -19,9 +19,13 @@ export class ChannelAdminService {
     constructor(
         @InjectRepository(ChannelAdmin)
         private ChannelAdminRepository: Repository<ChannelAdmin>,
+
         @InjectRepository(AdminAction)
         private AdminActionRepository: Repository<AdminAction>,
+
+        @Inject(forwardRef(() => ChannelService))
         private readonly channelService: ChannelService,
+
         private readonly userService: UserService,
     ) {}
 
@@ -163,13 +167,13 @@ export class ChannelAdminService {
 
             const query = [
                 {
-                    channel: Equal(channelId),
+                    channel: { id: channelId },
                     action,
                     active: true,
                     expirationDate: IsNull(),
                 },
                 {
-                    channel: Equal(channelId),
+                    channel: { id: channelId },
                     action,
                     active: true,
                     expirationDate: MoreThan(currentDate),
@@ -205,6 +209,63 @@ export class ChannelAdminService {
             return { data, pagination: { total, page, limit } };
         } catch (error) {
             console.error('Error to find channel administrators:', error);
+            throw error;
+        }
+    }
+
+    async findMemberAction(channelId: string, memberId: string) {
+        const currentDate = new Date();
+
+        const query = [
+            {
+                channel: { id: channelId },
+                member: { id: memberId },
+                active: true,
+                expirationDate: IsNull(),
+            },
+            {
+                channel: { id: channelId },
+                member: { id: memberId },
+                active: true,
+                expirationDate: MoreThan(currentDate),
+            },
+        ];
+
+        try {
+            const memberAction = await this.AdminActionRepository.findOne({
+                where: query,
+            });
+
+            return {
+                action: memberAction?.action || '',
+                expirationDate: memberAction?.expirationDate || null,
+            };
+        } catch (error) {
+            console.error('Error to find member action:', error);
+            throw error;
+        }
+    }
+
+    async findChannelsWithoutAccess(memberId: string) {
+        try {
+            const memberActions = await this.AdminActionRepository.find({
+                where: [
+                    {
+                        member: { id: memberId },
+                        active: true,
+                        action: 'ban',
+                    },
+                    {
+                        member: { id: memberId },
+                        active: true,
+                        action: 'kick',
+                    },
+                ],
+            });
+
+            return memberActions.map(action => action.channel.id);
+        } catch (error) {
+            console.error('Error to find member action:', error);
             throw error;
         }
     }

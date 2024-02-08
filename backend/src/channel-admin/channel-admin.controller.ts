@@ -81,6 +81,11 @@ export class ChannelAdminController {
     }
 
     @ApiOperation({ description: 'Get all channel admin actions' })
+    @ApiParam({
+        name: 'channelId',
+        type: 'string',
+        description: 'Channel ID',
+    })
     @ApiQuery({
         name: 'action',
         type: String,
@@ -100,6 +105,26 @@ export class ChannelAdminController {
             params.channelId,
             pagination,
             action,
+        );
+    }
+
+    @ApiOperation({ description: 'Get all blocked users' })
+    @ApiParam({
+        name: 'channelId',
+        type: 'string',
+        description: 'Channel ID',
+    })
+    @ApiParam({
+        name: 'memberId',
+        type: 'string',
+        description: 'Member ID',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('member-action/:channelId/:memberId')
+    async findAllBlockedUsers(@Param() params: any) {
+        return await this.channelAdminService.findMemberAction(
+            params.channelId,
+            params.memberId,
         );
     }
 

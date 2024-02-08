@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ChannelAdminController } from './channel-admin.controller';
 import { ChannelAdminService } from './channel-admin.service';
 import { ChannelAdmin } from './entities/admin.entity';
@@ -9,11 +9,12 @@ import { ChannelModule } from 'src/channel/channel.module';
 
 @Module({
     imports: [
+        forwardRef(() => ChannelModule),
         UserModule,
-        ChannelModule,
         TypeOrmModule.forFeature([ChannelAdmin, AdminAction]),
     ],
     controllers: [ChannelAdminController],
     providers: [ChannelAdminService],
+    exports: [ChannelAdminService],
 })
 export class ChannelAdminModule {}

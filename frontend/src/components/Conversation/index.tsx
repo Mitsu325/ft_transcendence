@@ -6,12 +6,20 @@ import { socket } from '../../Socket/Socket';
 import { sendMessage, connect, disconnect } from '../../Socket/utilsSocket';
 import { channelApi } from '../../services/channel.api';
 import './style.css';
+import { adminService } from 'services/admin.api';
+import { ActionType } from 'interfaces/channel.interface';
+import FailureNotification from 'components/Notification/FailureNotification';
 
 const { TextArea } = Input;
 interface Message {
   userName: string;
   message: string;
   createdAt: string;
+}
+
+interface memberAction {
+  action: ActionType | '';
+  expirationDate: Date | null;
 }
 
 const Conversation: React.FC<{
@@ -24,6 +32,10 @@ const Conversation: React.FC<{
   const [groupedMessages, setGroupedMessages] = useState<{
     [date: string]: Message[];
   }>({});
+  const [memberAction, setMemberAction] = useState<memberAction>({
+    action: '',
+    expirationDate: null,
+  });
 
   const user = useAuth()?.user;
 
@@ -74,8 +86,17 @@ const Conversation: React.FC<{
       setMessages(msgData);
     };
 
+    const getMemberAction = async () => {
+      const memberAction = await adminService.getMemberAction(
+        roomId,
+        userPlayer.id,
+      );
+      setMemberAction(memberAction);
+    };
+
     getMessages();
-  }, [roomId, userPlayer.name]);
+    getMemberAction();
+  }, [roomId, userPlayer]);
 
   useEffect(() => {
     const grouped: { [date: string]: Message[] } = {};
@@ -102,12 +123,31 @@ const Conversation: React.FC<{
   };
 
   const handleSendMessage = async () => {
-    const msg = await channelApi.createMessage({
+    if (memberAction.action) return;
+
+    const res = await channelApi.createMessage({
       channel_id: String(roomId),
       sender_id: userPlayer.id,
       message: newMessage,
     });
-    sendMessage(roomId, newMessage, userPlayer.name, msg.createdAt);
+    if (!res.success) {
+      FailureNotification({
+        message: 'Erro ao enviar mensagem',
+        description: res.message,
+      });
+      if (res.data) {
+        setMemberAction(res.data);
+      }
+      setNewMessage('');
+      return;
+    }
+    sendMessage(
+      roomId,
+      newMessage,
+      userPlayer.id,
+      userPlayer.name,
+      res.message.createdAt,
+    );
     setNewMessage('');
   };
 
@@ -127,10 +167,6 @@ const Conversation: React.FC<{
               <p className="date">{formattedDate}</p>
               {groupedMessages[formattedDate].map((data, index) => {
                 const messageDate = new Date(data.createdAt);
-                messageDate.setMinutes(
-                  messageDate.getMinutes() - messageDate.getTimezoneOffset(),
-                );
-
                 const formattedHour = messageDate.toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -162,6 +198,7 @@ const Conversation: React.FC<{
           placeholder="Escreva uma mensagem"
           value={newMessage}
           onChange={handleInputChange}
+          disabled={memberAction.action === 'mute'}
         />
         <Button
           className="send-button"

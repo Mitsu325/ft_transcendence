@@ -68,6 +68,13 @@ async function updateAdminActions(params: UpdateAdminAction) {
   }
 }
 
+async function getMemberAction(channelId: string, memberId: string) {
+  const result = await api.get(
+    `channel-admin/member-action/${channelId}/${memberId}`,
+  );
+  return result?.data;
+}
+
 export const adminService = {
   getAdmins,
   addAdmin,
@@ -75,4 +82,5 @@ export const adminService = {
   getAdminsId,
   getAdminActions,
   updateAdminActions,
+  getMemberAction,
 };
