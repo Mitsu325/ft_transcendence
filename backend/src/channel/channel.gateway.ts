@@ -1,3 +1,4 @@
+import { Inject, forwardRef } from '@nestjs/common';
 import {
     SubscribeMessage,
     WebSocketGateway,
@@ -8,6 +9,7 @@ import {
     MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { ChannelAdminService } from 'src/channel-admin/channel-admin.service';
 
 const usersInRooms = {};
 @WebSocketGateway({
@@ -20,6 +22,11 @@ export class ChannelGateway
 {
     @WebSocketServer()
     server: Server;
+
+    constructor(
+        @Inject(forwardRef(() => ChannelAdminService))
+        private readonly channelAdminService: ChannelAdminService,
+    ) {}
 
     private rooms: Map<string, Set<string>> = new Map();
 
@@ -54,15 +61,23 @@ export class ChannelGateway
     }
 
     @SubscribeMessage('sendMessage')
-    handleMessage(
+    async handleMessage(
         @MessageBody()
         data: {
             roomId: string;
             message: string;
+            userId: string;
             userName: string;
             createdAt: string;
         },
     ) {
+        const memberAction = await this.channelAdminService.findMemberAction(
+            data.roomId,
+            data.userId,
+        );
+
+        if (memberAction.action) return;
+
         this.sendMessageToRoom(
             data.roomId,
             data.message,

@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as crypto from 'crypto';
+import * as jwt from 'jsonwebtoken';
 import { Channel } from './entities/channel.entity';
 import { Messages } from './entities/message.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { comparePass } from 'src/utils/hash.util';
-import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
+import { ChannelAdminService } from 'src/channel-admin/channel-admin.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChannelService {
@@ -18,21 +20,37 @@ export class ChannelService {
 
         @InjectRepository(Messages)
         private readonly MessageRepository: Repository<Messages>,
+
+        @Inject(forwardRef(() => ChannelAdminService))
+        private readonly channelAdminService: ChannelAdminService,
+
+        private readonly userService: UserService,
     ) {}
 
-    async findAll(): Promise<ChannelDto[]> {
+    async findAll(userId: string): Promise<ChannelDto[]> {
+        const channelsWithoutAccess =
+            await this.channelAdminService.findChannelsWithoutAccess(userId);
+
         const channels = await this.channelsRepository.find();
 
-        const channelDtos = await Promise.all(
-            channels.map(async channel => ({
-                id: channel.id,
-                name_channel: channel.name_channel,
-                type: channel.type,
-                owner: channel.owner ? channel.owner.name : null,
-            })),
+        const filterChannels: ChannelDto[] = await Promise.all(
+            channels
+                .filter(channel => !channelsWithoutAccess.includes(channel.id))
+                .map(async channel => ({
+                    id: channel.id,
+                    name_channel: channel.name_channel,
+                    type: channel.type,
+                    owner: channel.owner ? channel.owner.name : null,
+                })),
         );
 
-        return channelDtos;
+        return filterChannels;
+    }
+
+    async findById(channelId: string) {
+        return await this.channelsRepository.findOne({
+            where: { id: channelId },
+        });
     }
 
     async create(createChannelDto: CreateChannelDto) {
@@ -47,8 +65,49 @@ export class ChannelService {
     }
 
     async addMessage(messageDto: CreateMessageDto) {
-        const message = await this.MessageRepository.save(messageDto);
-        return message;
+        try {
+            const memberAction =
+                await this.channelAdminService.findMemberAction(
+                    messageDto.channel_id,
+                    messageDto.sender_id,
+                );
+
+            if (memberAction.action) {
+                return {
+                    success: false,
+                    message: 'Não foi possível enviar mensagem',
+                    data: memberAction,
+                };
+            }
+
+            const channel = await this.findById(messageDto.channel_id);
+
+            const sender = await this.userService.findById(
+                messageDto.sender_id,
+            );
+
+            if (!channel || !sender) {
+                return {
+                    success: false,
+                    message: 'Não foi possível enviar mensagem',
+                    data: { action: '', expirationDate: null },
+                };
+            }
+
+            const message = await this.MessageRepository.save({
+                channel_id: channel,
+                sender_id: sender,
+                message: messageDto.message,
+            });
+
+            return { success: true, message };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Não foi possível enviar mensagem',
+                data: { action: '', expirationDate: null },
+            };
+        }
     }
 
     async getMessages(channel_id) {

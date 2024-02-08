@@ -27,7 +27,7 @@ export class Messages {
 
     @CreateDateColumn({
         name: 'created_at',
-        type: 'timestamp',
+        type: 'timestamptz',
         default: () => 'CURRENT_TIMESTAMP',
     })
     createdAt: Date;

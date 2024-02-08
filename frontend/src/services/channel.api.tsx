@@ -1,5 +1,5 @@
 import api from 'services/api';
-import ChannelInterface from '../interfaces/channel.interface';
+import { ChannelInterface } from '../interfaces/channel.interface';
 import messageInterface from 'interfaces/message.interface';
 
 async function createChannel(params: ChannelInterface) {

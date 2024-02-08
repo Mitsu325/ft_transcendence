@@ -72,8 +72,7 @@ export default function FriendList() {
         setLoading(false);
         FailureNotification({
           message: 'Ops! Encontramos algumas falhas durante o processo',
-          description:
-            'Não foi possível carregar as informações. Verifique sua conexão e tente novamente',
+          description: 'Verifique sua conexão e tente novamente',
         });
       });
   };

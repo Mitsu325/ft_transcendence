@@ -8,6 +8,7 @@
   align-items: center;
   color: #001529;
   border-bottom: 1px solid #001529;
+  cursor: pointer;
 }
 
 .channel-item:hover {
@@ -21,7 +22,6 @@
 .chat-icon {
   font-size: 40px;
   color: #001529;
-  cursor: pointer;
 }
 
 .channel-name {

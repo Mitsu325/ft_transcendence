@@ -28,8 +28,8 @@ export class ChannelController {
     @ApiOperation({ description: 'Get all channels' })
     @ApiBearerAuth('access-token')
     @Get()
-    findAll(): Promise<ChannelDto[]> {
-        return this.channelService.findAll();
+    findAll(@Request() req): Promise<ChannelDto[]> {
+        return this.channelService.findAll(req.user.sub);
     }
 
     @ApiOperation({ description: 'Create a new channel' })

@@ -136,11 +136,9 @@ export default function Channels({
               borderLeft:
                 activeChannel === item.id ? '5px solid #1677FF' : 'none',
             }}
+            onClick={() => handleChatClick(item.id, item.name_channel)}
           >
-            <div
-              className="icon-channel"
-              onClick={() => handleChatClick(item.id, item.name_channel)}
-            >
+            <div className="icon-channel">
               <WechatOutlined className="chat-icon" />
             </div>
             <div className="channel-name">
