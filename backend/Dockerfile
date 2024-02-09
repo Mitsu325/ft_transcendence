@@ -1,6 +1,6 @@
-FROM node:latest AS build
+FROM node:latest
 
-WORKDIR /app
+WORKDIR /src
 
 COPY package*.json ./
 
@@ -10,14 +10,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
-
-FROM node:lts
-
 ENV NODE_ENV=production
 
-WORKDIR /app
-
-RUN chown -R node:node /app
+RUN chown -R node:node /src
 
 CMD ["npm", "run", "start:prod"]

@@ -1,4 +1,4 @@
-FROM node:latest AS build
+FROM node:latest
 
 WORKDIR /app
 
@@ -8,16 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
-
-FROM node:latest
-
 ENV NODE_ENV=production
 
-WORKDIR /app
-
-COPY --from=build /app/build /app
-
-RUN chown -R node:node /app
+# RUN chown -R node:node /app
 
 CMD ["npm","start"]
