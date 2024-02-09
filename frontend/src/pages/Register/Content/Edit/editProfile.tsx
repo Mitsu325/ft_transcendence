@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import UploadAvatar from './uploadAvatar';
 import UserModel from 'interfaces/userModel';
+import UserEditProfileData from './editProfileData';
 
 export default function UserEditProfile({
   userProfile,
@@ -12,7 +13,12 @@ export default function UserEditProfile({
 
   const renderContent = () => {
     if (user?.username === userProfile?.username) {
-      return <UploadAvatar />;
+      return (
+        <>
+          <UploadAvatar />
+          <UserEditProfileData />
+        </>
+      );
     }
     return (
       <p>

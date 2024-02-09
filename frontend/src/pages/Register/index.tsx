@@ -88,8 +88,7 @@ export default function Register({ content }: { content: string }) {
           });
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usernameParam, user?.username]);
+  }, [usernameParam, user]);
 
   const listItems = menuItems.map((item, index) => {
     return (

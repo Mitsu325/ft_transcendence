@@ -70,7 +70,12 @@ export default function UploadAvatar() {
       showUploadList={false}
     >
       <Tooltip title="Atualize seu avatar carregando uma nova imagem">
-        <Button icon={<CloudUploadOutlined />} size="large" loading={loading}>
+        <Button
+          icon={<CloudUploadOutlined />}
+          size="large"
+          loading={loading}
+          className="mb-20"
+        >
           Atualizar avatar
         </Button>
       </Tooltip>

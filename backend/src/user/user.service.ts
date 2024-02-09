@@ -7,6 +7,7 @@ import { CreateFromOAuthDto } from './dto/create-from-oauth.dto';
 import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { UploadFileService } from 'src/upload-file/upload-file.service';
 import { twoFactorGenerator } from 'src/utils/twoFactor.util';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -138,5 +139,14 @@ export class UserService {
             )}?secret=${twoFactorSecret}&issuer=pong`;
         }
         return res;
+    }
+
+    async updateUser(userId: string, updateUserDto: UpdateUserDto) {
+        const { name, username, email } = updateUserDto;
+        await this.usersRepository.update(
+            { id: userId },
+            { name, username, email },
+        );
+        return await this.getNoSecrets(userId);
     }
 }

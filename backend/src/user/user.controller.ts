@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     ParseFilePipeBuilder,
+    Patch,
     Post,
     Query,
     Request,
@@ -29,6 +30,7 @@ import {
     VALID_IMAGE_MIME_TYPES,
 } from 'src/common/constants';
 import { Update2faDto } from './dto/update-2fa.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -130,5 +132,13 @@ export class UserController {
             req.user.sub,
             update2faDto.twoFactorAuth,
         );
+    }
+
+    @ApiOperation({ description: 'Update user' })
+    @ApiBody({ type: UpdateUserDto, description: 'Request body.' })
+    @ApiBearerAuth('access-token')
+    @Patch()
+    updateUser(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+        return this.userService.updateUser(req.user.sub, updateUserDto);
     }
 }

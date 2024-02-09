@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-catch */
+import { userData } from 'pages/Register/Content/Edit/editProfileData';
 import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
 
@@ -66,6 +67,15 @@ async function update2fa(twoFactorAuth: boolean) {
   }
 }
 
+async function updateUser(userData: userData) {
+  try {
+    const result = await api.patch('/user', userData);
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const userService = {
   getUser,
   getAllUsers,
@@ -74,4 +84,5 @@ export const userService = {
   getUserByUsername,
   uploadAvatar,
   update2fa,
+  updateUser,
 };
