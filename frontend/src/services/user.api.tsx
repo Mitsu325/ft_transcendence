@@ -76,6 +76,15 @@ async function updateUser(userData: userData) {
   }
 }
 
+async function updatePassword(password: string, newPassword: string) {
+  try {
+    const result = await api.patch('/user/password', { password, newPassword });
+    return result?.data || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const userService = {
   getUser,
   getAllUsers,
@@ -85,4 +94,5 @@ export const userService = {
   uploadAvatar,
   update2fa,
   updateUser,
+  updatePassword,
 };

@@ -8,6 +8,8 @@ import { getNonSensitiveUserInfo } from 'src/utils/formatNonSensitive.util';
 import { UploadFileService } from 'src/upload-file/upload-file.service';
 import { twoFactorGenerator } from 'src/utils/twoFactor.util';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { comparePass, hashPassword } from 'src/utils/hash.util';
 
 @Injectable()
 export class UserService {
@@ -143,10 +145,29 @@ export class UserService {
 
     async updateUser(userId: string, updateUserDto: UpdateUserDto) {
         const { name, username, email } = updateUserDto;
+        const formatUsername = username.replace(/\s/g, '');
         await this.usersRepository.update(
             { id: userId },
-            { name, username, email },
+            { name, username: formatUsername, email },
         );
         return await this.getNoSecrets(userId);
+    }
+
+    async updatePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+        const { password, newPassword } = changePasswordDto;
+
+        const user = await this.findById(userId);
+        const matchPass = await comparePass(password, user.password);
+        if (!matchPass) {
+            return { success: false };
+        }
+
+        const hashPass = await hashPassword(newPassword);
+
+        await this.usersRepository.update(
+            { id: userId },
+            { password: hashPass },
+        );
+        return { success: true };
     }
 }

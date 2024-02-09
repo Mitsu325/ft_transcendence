@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from 'hooks/useAuth';
 import UserModel from 'interfaces/userModel';
 import AppAuthenticator from './appAuthenticator';
+import Password from './password';
 
 export default function UserSecurity({
   userProfile,
@@ -12,7 +13,12 @@ export default function UserSecurity({
 
   const renderContent = () => {
     if (user?.username === userProfile?.username) {
-      return <AppAuthenticator />;
+      return (
+        <>
+          <Password />
+          <AppAuthenticator />
+        </>
+      );
     }
     return (
       <p>

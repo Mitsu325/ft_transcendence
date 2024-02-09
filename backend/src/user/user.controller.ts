@@ -31,6 +31,7 @@ import {
 } from 'src/common/constants';
 import { Update2faDto } from './dto/update-2fa.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -140,5 +141,16 @@ export class UserController {
     @Patch()
     updateUser(@Body() updateUserDto: UpdateUserDto, @Request() req) {
         return this.userService.updateUser(req.user.sub, updateUserDto);
+    }
+
+    @ApiOperation({ description: 'Update password' })
+    @ApiBody({ type: ChangePasswordDto, description: 'Request body.' })
+    @ApiBearerAuth('access-token')
+    @Patch('password')
+    updatePassword(
+        @Body() changePasswordDto: ChangePasswordDto,
+        @Request() req,
+    ) {
+        return this.userService.updatePassword(req.user.sub, changePasswordDto);
     }
 }

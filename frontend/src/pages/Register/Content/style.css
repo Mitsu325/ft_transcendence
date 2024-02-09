@@ -32,6 +32,10 @@
   margin: 0 auto;
 }
 
+.profile-form-input {
+  max-width: 480px;
+}
+
 .mt-20 {
   margin-top: 20px;
 }
