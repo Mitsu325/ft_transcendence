@@ -1,17 +1,33 @@
-FROM node:latest
+FROM node:20-alpine as dev
+RUN apk --update add postgresql-client
 
-WORKDIR /src
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-
-RUN npm install -g npm@latest
 
 RUN npm install
 
 COPY . .
 
-ENV NODE_ENV=production
+RUN npm run build
 
-RUN chown -R node:node /src
+# ---
 
-CMD ["npm", "run", "start:prod"]
+FROM node:20-alpine as production
+RUN apk --update add postgresql-client
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install --production
+
+COPY . .
+
+COPY --from=dev /usr/src/app/dist ./dist
+
+CMD ["node", "dist/main"]

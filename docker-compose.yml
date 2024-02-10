@@ -1,27 +1,32 @@
 version: '3'
 
 services:
-  backend:
+  api:
+    container_name: 'pong-api-${NODE_ENV}'
+    image: 'pong-api-${NODE_ENV}'
     build:
       context: ./backend
+      target: '${NODE_ENV}'
       dockerfile: Dockerfile
+    command: ['./wait-for-postgres.sh', './docker-entrypoint.sh']
     env_file:
       - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
     ports:
       - 3003:3003
-    # environment:
-    #   - NODE_ENV=production
-    #   - POSTGRES_PORT=${POSTGRES_PORT}
-    #   - POSTGRES_USER=${POSTGRES_USER}
-    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    #   - POSTGRES_DB=${POSTGRES_DB}
-    depends_on:
-      - pgsql
     networks:
       - ft_transcendence
-    restart: always
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+    restart: unless-stopped
 
   frontend:
+    container_name: 'pong-web-${NODE_ENV}'
+    image: 'pong-web-${NODE_ENV}'
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -30,38 +35,40 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - backend
+      - api
     networks:
       - ft_transcendence
-    restart: always
+    restart: unless-stopped
 
-  pgsql:
-    # build:
-    #   context: ./db
-    #   dockerfile: Dockerfile
+  postgres:
+    container_name: postgres
     image: postgres:alpine
-    container_name: 'pgsql'
+    networks:
+      - ft_transcendence
     env_file:
       - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PG_DATA=/var/lib/postgresql/data
     ports:
       - 5432:5432
     volumes:
       - pg-data:/var/lib/postgresql/data
-    networks:
-      - ft_transcendence
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   adminer:
+    container_name: pgadmin
     image: adminer
+    networks:
+      - ft_transcendence
     restart: always
     ports:
       - 8080:8080
 
 networks:
   ft_transcendence:
+    name: ft_transcendence
     driver: bridge
 
 volumes:
