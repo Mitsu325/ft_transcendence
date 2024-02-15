@@ -122,3 +122,20 @@ export class GameService {
         }
     }
 }
+
+@Injectable()
+export class PlayersService {
+  findPlayerById(playerId: string, game: Game): string | null {
+    for (const roomId in game.rooms) {
+      const room = game.rooms[roomId];
+
+      if (
+        room.player1.id === playerId ||
+        (room.player2 && room.player2.id === playerId)
+      ) {
+        return roomId;
+      }
+    }
+    return null;
+  }
+}

@@ -2,6 +2,8 @@
 import { userData } from 'pages/Register/Content/Edit/editProfileData';
 import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
+import { User_Status } from '../interfaces/userStatus';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 async function getUser() {
   try {
@@ -85,6 +87,20 @@ async function updatePassword(password: string, newPassword: string) {
   }
 }
 
+async function updateUserStatus(userStatus: User_Status) {
+  await api.post('user/set/user-status', userStatus);
+}
+
+async function getUsersStatus() {
+  const result = await api.get('/user/get/all-users-status');
+  return result.data || null;
+}
+
+async function getUserStatusById(id: string) {
+  const result = await api.get(`/user/get/users-status-by-id/${id}`);
+  return result.data || null;
+}
+
 export const userService = {
   getUser,
   getAllUsers,
@@ -95,4 +111,7 @@ export const userService = {
   update2fa,
   updateUser,
   updatePassword,
+  updateUserStatus,
+  getUsersStatus,
+  getUserStatusById,
 };

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GamePong } from './game.gateway';
-import { GameService } from './game.service';
+import { GameService, PlayersService } from './game.service';
 import { GameController } from './game.controller';
 import { Battle } from './entities/game.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,6 +20,7 @@ import { ScoresService } from './scores.service';
         BallMoverService,
         PaddlesMoverService,
         ScoresService,
+        PlayersService,
     ],
 })
 export class GameModule {}

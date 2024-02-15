@@ -21,7 +21,7 @@ import { BallMoverService } from './ball-mover.service';
 import { ScoresService } from './scores.service';
 import { PaddlesMoverService } from './paddles-mover.service';
 
-const game: Game = {
+export const game: Game = {
     players: {},
     rooms: {},
 };

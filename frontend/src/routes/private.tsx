@@ -8,8 +8,10 @@ import Register from 'pages/Register';
 import HistoricTable from 'pages/HistoricTable';
 import Friend from 'pages/Friend';
 import Manager from 'pages/Management';
+import { UserStatusUpdater } from '../utils/user-status';
 
 const PrivateRoutes: React.FC = () => {
+  UserStatusUpdater();
   return (
     <BrowserRouter>
       <Routes>

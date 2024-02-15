@@ -6,17 +6,24 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadFileModule } from 'src/upload-file/upload-file.module';
+import { GameModule } from 'src/game/game.module';
+import { PlayersService } from 'src/game/game.service';
 
 @Module({
-    imports: [UploadFileModule, TypeOrmModule.forFeature([User])],
-    controllers: [UserController],
-    providers: [
-        UserService,
-        {
-            provide: APP_GUARD,
-            useClass: AuthGuard,
-        },
-    ],
-    exports: [UserService],
+  imports: [
+    UploadFileModule,
+    TypeOrmModule.forFeature([User]),
+    GameModule,
+  ],
+  controllers: [UserController],
+  providers: [
+    UserService,
+    PlayersService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
+  exports: [UserService],
 })
-export class UserModule {}
+export class UserModule { }

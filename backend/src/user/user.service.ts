@@ -11,6 +11,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { comparePass, hashPassword } from 'src/utils/hash.util';
 
+interface UserStatus {
+    id: string;
+    status: string;
+}
+
+export interface UpdateStatusResponse {
+    [userId: string]: { status: string };
+}
+
 @Injectable()
 export class UserService {
     constructor(
@@ -169,5 +178,36 @@ export class UserService {
             { password: hashPass },
         );
         return { success: true };
+    }
+
+    private userStatusData: Record<string, UserStatus> = {};
+    async updateStatusUser(status: UserStatus) {
+        const { id, status: newStatus } = status;
+
+        if (newStatus === 'offline') {
+            if (this.userStatusData[id]) {
+                delete this.userStatusData[id];
+            }
+        } else {
+            if (this.userStatusData[id]) {
+                this.userStatusData[id].status = newStatus;
+            } else {
+                this.userStatusData[id] = { id, status: newStatus };
+            }
+        }
+    }
+
+    async updatedUsersStatus() {
+        const updatedData = Object.entries(this.userStatusData).reduce(
+            (acc, [userId, userData]) => {
+                if (userData.status !== 'offline') {
+                    acc.push({ id: userId, status: userData.status });
+                }
+                return acc;
+            },
+            [] as { id: string; status: string }[],
+        );
+        console.log('updatedData: ', updatedData);
+        return updatedData;
     }
 }
