@@ -78,14 +78,14 @@ export const UserStatusUpdater = () => {
 
     window.addEventListener('mouseout', handleMouseOut);
     window.addEventListener('keydown', sendKeyEvent);
-    window.addEventListener('beforeunload', event => {
+    window.addEventListener('beforeunload', () => {
       detectedUnload();
     });
 
     return () => {
       window.addEventListener('mouseout', handleMouseOut);
       window.addEventListener('keydown', sendKeyEvent);
-      window.addEventListener('beforeunload', event => {
+      window.addEventListener('beforeunload', () => {
         detectedUnload();
       });
     };

@@ -22,6 +22,8 @@ export interface UpdateStatusResponse {
 
 @Injectable()
 export class UserService {
+    private userStatusData: Record<string, UserStatus> = {};
+
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
@@ -180,7 +182,6 @@ export class UserService {
         return { success: true };
     }
 
-    private userStatusData: Record<string, UserStatus> = {};
     async updateStatusUser(status: UserStatus) {
         const { id, status: newStatus } = status;
 
@@ -207,7 +208,6 @@ export class UserService {
             },
             [] as { id: string; status: string }[],
         );
-        console.log('updatedData: ', updatedData);
         return updatedData;
     }
 }

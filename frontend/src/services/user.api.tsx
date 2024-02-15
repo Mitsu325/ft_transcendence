@@ -3,7 +3,6 @@ import { userData } from 'pages/Register/Content/Edit/editProfileData';
 import { createSearchParams } from 'react-router-dom';
 import api from 'services/api';
 import { User_Status } from '../interfaces/userStatus';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 async function getUser() {
   try {

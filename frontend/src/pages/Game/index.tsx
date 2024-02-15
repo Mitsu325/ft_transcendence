@@ -20,6 +20,7 @@ import {
 } from 'interfaces/gameInterfaces/interfaces';
 import './style.css';
 import { useSearchParams } from 'react-router-dom';
+import { userService } from '../../services/user.api';
 
 let socket: Socket;
 
@@ -77,6 +78,7 @@ export const Game = () => {
   const [message, setMessage] = useState('');
   const [messageOpen, setMessageOpen] = useState(visible);
   const [enable, setEnable] = useState(false);
+  const [userStatus, setUserStatus] = React.useState('online');
 
   useEffect(() => {
     if (enable && searchParams.has('guestId')) {
@@ -174,6 +176,7 @@ export const Game = () => {
         match: false,
       }));
       setRoomOpen('');
+      setUserStatus('online');
     });
 
     socket.on('cleanRoom', receivedRoom => {
@@ -252,6 +255,7 @@ export const Game = () => {
 
     return () => {
       socket.disconnect();
+      setUserStatus('online');
       setNewMessage('Seu adversário se desconectou');
       setGameData(prevGameData => ({
         ...prevGameData,
@@ -270,6 +274,7 @@ export const Game = () => {
     }));
     socket.emit('CreateRoom', { user: userPlayer });
     setUserRoomId(socket.id);
+    setUserStatus('playing');
   };
 
   const getInRoom = (room: RoomGame) => {
@@ -296,6 +301,7 @@ export const Game = () => {
     });
     setUserRoomId(room_id);
     startMatch(room_id);
+    setUserStatus('playing');
   };
 
   const matchMakerRequest = () => {
@@ -322,6 +328,8 @@ export const Game = () => {
       gameData.rooms.splice(roomIndex, 1);
     }
     socket.emit('leaveRoom', { userPlayer, userRoomId });
+    gameData.match = false;
+    setUserStatus('online');
   };
 
   const startMatch = (room_id: string) => {
@@ -350,6 +358,18 @@ export const Game = () => {
     };
     socket.emit('sendLevel', matchLevel);
   };
+
+  React.useEffect(() => {
+    const status_obj = {
+      id: userPlayer.id,
+      status: userStatus,
+    };
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status_obj);
+    }
+    updateUserStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userStatus]);
 
   return (
     <>
