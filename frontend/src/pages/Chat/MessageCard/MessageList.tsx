@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Divider, List, Popconfirm, Tooltip } from 'antd';
+import { Button, Divider, List, Modal, Popconfirm, Tooltip } from 'antd';
 import AvatarCustom from 'components/Avatar';
 import MessageBox from 'components/Message/MessageBox';
 import MessageInput from 'components/Message/MessageInput';
@@ -9,11 +9,13 @@ import { chatSocket, friendSocket } from 'socket';
 import { useAuth } from 'hooks/useAuth';
 import InfiniteScroll from 'components/InfiniteScroll';
 import { ChattingUser, Message } from 'interfaces/chat.interface';
-import { StopOutlined, TrophyOutlined } from '@ant-design/icons';
+import { AlertOutlined, StopOutlined, TrophyOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import { createSearchParams, useNavigate } from 'react-router-dom';
+import { userService } from 'services/user.api';
 
 interface MessageListProps {
+  userStatus: 'online' | 'playing' | 'offline';
   selectedUser: ChattingUser;
   setSelectedUser: React.Dispatch<
     React.SetStateAction<ChattingUser | undefined>
@@ -21,7 +23,10 @@ interface MessageListProps {
   onReloadUsers: () => void;
 }
 
+type UserStatusClass = 'status-online' | 'status-playing' | 'status-offline';
+
 export default function MessageList({
+  userStatus,
   selectedUser,
   setSelectedUser,
   onReloadUsers,
@@ -34,6 +39,25 @@ export default function MessageList({
   const limit = 20;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [status, setStatus] = useState<UserStatusClass>('status-offline');
+  const [modal, contextHolder] = Modal.useModal();
+
+  useEffect(() => {
+    switch (userStatus) {
+      case 'online':
+        setStatus('status-online');
+        break;
+      case 'playing':
+        setStatus('status-playing');
+        break;
+      case 'offline':
+        setStatus('status-offline');
+        break;
+      default:
+        setStatus('status-offline');
+        break;
+    }
+  }, [userStatus]);
 
   useEffect(() => {
     setInitialLoadComplete(false);
@@ -173,7 +197,24 @@ export default function MessageList({
       });
   };
 
-  const inviteToPlay = () => {
+  const inviteToPlay = async () => {
+    try {
+      const status = await userService.getUserStatusById(selectedUser.id);
+
+      if (status !== 'online') {
+        modal.warning({
+          title: 'Não é possível convidar para jogar',
+          icon: <AlertOutlined />,
+          content: `Infelizmente, ${selectedUser.name} não está disponível para jogar`,
+          okText: 'Fechar',
+          onOk: () => Modal.destroyAll(),
+        });
+        return;
+      }
+    } catch (error) {
+      return;
+    }
+
     friendSocket.emit('invite-play', {
       sender: {
         id: user?.id,
@@ -195,34 +236,39 @@ export default function MessageList({
     <>
       <div className="message-header">
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AvatarCustom src={selectedUser.avatar} size={48} />
+          <div className="avatar-badge">
+            <AvatarCustom src={selectedUser.avatar} size={48} />
+            <div className={'badge ' + status}></div>
+          </div>
           <h1 className="message-header-title ml-12">{selectedUser.name}</h1>
         </div>
         <div>
-          <Tooltip title="Convidar para jogar">
-            <Button
-              shape="circle"
-              icon={<TrophyOutlined />}
-              aria-label="Convidar para jogar"
-              style={{ marginRight: '8px' }}
-              onClick={inviteToPlay}
-            />
-          </Tooltip>
           {selectedUser.id !== user?.id && (
-            <Popconfirm
-              title={'Bloquear ' + selectedUser.name}
-              description="Você tem certeza que deseja continuar?"
-              onConfirm={() => confirm(selectedUser.id)}
-              okText="Sim"
-              cancelText="Não"
-            >
-              <Button
-                shape="circle"
-                icon={<StopOutlined />}
-                aria-label="Bloquear"
-                style={{ color: '#cf1322' }}
-              />
-            </Popconfirm>
+            <>
+              <Tooltip title="Convidar para jogar">
+                <Button
+                  shape="circle"
+                  icon={<TrophyOutlined />}
+                  aria-label="Convidar para jogar"
+                  style={{ marginRight: '8px' }}
+                  onClick={inviteToPlay}
+                />
+              </Tooltip>
+              <Popconfirm
+                title={'Bloquear ' + selectedUser.name}
+                description="Você tem certeza que deseja continuar?"
+                onConfirm={() => confirm(selectedUser.id)}
+                okText="Sim"
+                cancelText="Não"
+              >
+                <Button
+                  shape="circle"
+                  icon={<StopOutlined />}
+                  aria-label="Bloquear"
+                  style={{ color: '#cf1322' }}
+                />
+              </Popconfirm>
+            </>
           )}
         </div>
       </div>
@@ -241,6 +287,7 @@ export default function MessageList({
       </InfiniteScroll>
       <Divider className="border-dark m-0" />
       <MessageInput handleClick={sendMessage} />
+      {contextHolder}
     </>
   );
 }

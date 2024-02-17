@@ -1,6 +1,7 @@
 import {
   Button,
   List,
+  Modal,
   Pagination,
   PaginationProps,
   Popconfirm,
@@ -12,18 +13,26 @@ import { Invite, InviteRes } from 'interfaces/friend.interface';
 import React, { useEffect, useState } from 'react';
 import { friendService } from 'services/friend.api';
 import 'pages/Friend/Content/style.css';
-import { LineOutlined, TrophyOutlined } from '@ant-design/icons';
+import { AlertOutlined, LineOutlined, TrophyOutlined } from '@ant-design/icons';
 import SuccessNotification from 'components/Notification/SuccessNotification';
 import { friendSocket } from 'socket';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { userNonSensitiveInfo } from 'interfaces/userModel';
 import { useAuth } from 'hooks/useAuth';
+import { userService } from 'services/user.api';
+
+interface UserStatus {
+  id: string;
+  status: 'online' | 'playing' | 'offline';
+}
 
 export default function FriendList() {
   const { user } = useAuth();
   const [friend, setFriend] = useState<Invite[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [status, setStatus] = useState<UserStatus[]>([]);
+  const [modal, contextHolder] = Modal.useModal();
   const limit = 10;
   const navigate = useNavigate();
 
@@ -51,6 +60,21 @@ export default function FriendList() {
     loadFriends(1);
   }, []);
 
+  useEffect(() => {
+    getStatus();
+    const intervalId = setInterval(() => {
+      getStatus();
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const getStatus = () => {
+    userService.getUsersStatus().then(usersStatus => {
+      setStatus(usersStatus);
+    });
+  };
+
   const onChange: PaginationProps['onChange'] = (page: number) => {
     loadFriends(page);
   };
@@ -77,7 +101,24 @@ export default function FriendList() {
       });
   };
 
-  const inviteToPlay = (friend: userNonSensitiveInfo) => {
+  const inviteToPlay = async (friend: userNonSensitiveInfo) => {
+    try {
+      const status = await userService.getUserStatusById(friend.id);
+
+      if (status !== 'online') {
+        modal.warning({
+          title: 'Não é possível convidar para jogar',
+          icon: <AlertOutlined />,
+          content: `Infelizmente, ${friend.name} não está disponível para jogar`,
+          okText: 'Fechar',
+          onOk: () => Modal.destroyAll(),
+        });
+        return;
+      }
+    } catch (error) {
+      return;
+    }
+
     friendSocket.emit('invite-play', {
       sender: {
         id: user?.id,
@@ -105,6 +146,10 @@ export default function FriendList() {
         }}
         renderItem={item => (
           <UserListItem
+            userStatus={
+              status.find(statusData => statusData.id === item.friend.id)
+                ?.status || 'offline'
+            }
             active={false}
             avatar={item.friend.avatar}
             title={item.friend.name}
@@ -147,6 +192,7 @@ export default function FriendList() {
         disabled={loading}
         hideOnSinglePage
       />
+      {contextHolder}
     </>
   );
 }

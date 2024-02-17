@@ -7,13 +7,20 @@ import { chatSocket } from 'socket';
 import { userService } from 'services/user.api';
 import { Chat, ChattingUser } from 'interfaces/chat.interface';
 
+interface UserStatus {
+  id: string;
+  status: 'online' | 'playing' | 'offline';
+}
+
 interface ChatListProps {
+  userStatus: UserStatus[];
   reloadUsers: boolean;
   selectedUser: ChattingUser | undefined;
   handleUserClick: (chattingUser?: ChattingUser) => void;
 }
 
 export default function ChatList({
+  userStatus,
   selectedUser,
   handleUserClick,
   reloadUsers,
@@ -134,6 +141,10 @@ export default function ChatList({
         dataSource={chats}
         renderItem={item => (
           <UserListItem
+            userStatus={
+              userStatus.find(statusData => statusData.id === item.chatUser.id)
+                ?.status || 'offline'
+            }
             itemClassName="user-item"
             active={selectedUser?.id === item.chatUser.id}
             avatar={item.chatUser.avatar}

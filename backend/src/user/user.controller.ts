@@ -32,10 +32,8 @@ import {
 import { Update2faDto } from './dto/update-2fa.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdateStatusResponse } from './user.service';
 import { PlayersService } from 'src/game/game.service';
-import { game } from 'src/game/game.gateway';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 class UserStatus {
     id: string;
@@ -171,7 +169,7 @@ export class UserController {
     @ApiBody({ type: UserStatus, description: 'Request body.' })
     @ApiBearerAuth('access-token')
     @Post('set/user-status')
-    async updateStatus(@Body() status: UserStatus, @Request() req) {
+    async updateStatus(@Body() status: UserStatus) {
         await this.userService.updateStatusUser(status);
     }
 
@@ -188,7 +186,9 @@ export class UserController {
     @Get('get/users-status-by-id/:id')
     async getUsersStatusById(@Param() params: any) {
         const usersStatus = await this.userService.updatedUsersStatus();
-        const statusFounded = usersStatus.find(el => el.id === params.id);
+        const statusFounded = usersStatus.find(
+            el => String(el.id) === String(params.id),
+        );
 
         if (statusFounded) {
             return statusFounded.status;

@@ -36,3 +36,30 @@
   font-size: 0.85rem;
   margin-right: 4px;
 }
+
+.avatar-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.status-online {
+  background-color: #389e0d;
+}
+
+.status-playing {
+  background-color: #cf1322;
+}
+
+.status-offline {
+  background-color: #8c8c8c;
+}

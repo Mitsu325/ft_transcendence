@@ -10,6 +10,12 @@ import Channels from 'pages/Channel/channel';
 import CreateChannel from 'components/CreateChannel';
 import Conversation from 'components/Conversation';
 import { ChattingUser } from 'interfaces/chat.interface';
+import { userService } from 'services/user.api';
+
+interface UserStatus {
+  id: string;
+  status: 'online' | 'playing' | 'offline';
+}
 
 const menuItems = [
   {
@@ -29,6 +35,7 @@ export default function Chat() {
   const [nameChannel, setNameChannel] = useState('');
   const [currentRoom, setCurrentRoom] = useState<string>('');
   const [updateChannels, setUpdateChannels] = useState(false);
+  const [status, setStatus] = useState<UserStatus[]>([]);
   const queryParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search],
@@ -52,6 +59,21 @@ export default function Chat() {
 
   const handleReloadUsers = () => {
     setReloadUsers((prev: boolean) => !prev);
+  };
+
+  useEffect(() => {
+    getStatus();
+    const intervalId = setInterval(() => {
+      getStatus();
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const getStatus = () => {
+    userService.getUsersStatus().then(usersStatus => {
+      setStatus(usersStatus);
+    });
   };
 
   useEffect(() => {
@@ -87,6 +109,7 @@ export default function Chat() {
       case 'chat':
         return (
           <ChatList
+            userStatus={status}
             reloadUsers={reloadUsers}
             handleUserClick={handleUserClick}
             selectedUser={selectedUser}
@@ -109,6 +132,10 @@ export default function Chat() {
       }
       return (
         <MessageList
+          userStatus={
+            status.find(statusData => statusData.id === selectedUser.id)
+              ?.status || 'offline'
+          }
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           onReloadUsers={handleReloadUsers}
