@@ -6,7 +6,7 @@ services:
     image: 'pong-api-${NODE_ENV}'
     build:
       context: ./backend
-      # target: '${NODE_ENV}'
+      target: '${NODE_ENV}'
       dockerfile: Dockerfile
     command: ['./wait-for-postgres.sh', './docker-entrypoint.sh']
     env_file:
@@ -18,7 +18,7 @@ services:
     networks:
       - ft_transcendence
     volumes:
-      - ./backend:/usr/src/app
+      - /usr/src/app
       - /usr/src/app/node_modules
     depends_on:
       - postgres
@@ -48,6 +48,7 @@ services:
     env_file:
       - .env
     environment:
+      - TYPEORM_CONFIG=/app/src/configs/typeorm.config.ts
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -68,7 +69,7 @@ services:
 
 networks:
   ft_transcendence:
-    # name: ft_transcendence
+    name: ft_transcendence
     driver: bridge
 
 volumes:

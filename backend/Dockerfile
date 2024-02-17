@@ -2,6 +2,8 @@ FROM node:20-alpine as dev
 RUN apk --update add postgresql-client
 
 RUN mkdir -p /usr/src/app
+
+RUN chmod 777 /usr/src/app
 WORKDIR /usr/src/app
 
 COPY package*.json ./
@@ -24,7 +26,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --production
+RUN npm install --omit=dev
 
 COPY . .
 

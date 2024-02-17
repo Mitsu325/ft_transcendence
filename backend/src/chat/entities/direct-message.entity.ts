@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 
-@Entity()
+@Entity({ name: 'direct_messages' })
 export class DirectMessage extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;

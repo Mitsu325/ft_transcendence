@@ -8,7 +8,7 @@ import { ChannelDto } from './dto/channel.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { comparePass } from 'src/utils/hash.util';
 import { PrivateChannelUsers } from './entities/privateChannel.entity';
-import * as crypto from 'crypto';
+const crypto = require('crypto');
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
