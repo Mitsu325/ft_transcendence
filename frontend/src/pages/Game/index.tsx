@@ -176,7 +176,7 @@ export const Game = () => {
         match: false,
       }));
       setRoomOpen('');
-      setUserStatus('online');
+      setUserStatus('endgame');
     });
 
     socket.on('cleanRoom', receivedRoom => {
@@ -255,7 +255,7 @@ export const Game = () => {
 
     return () => {
       socket.disconnect();
-      setUserStatus('online');
+      setUserStatus('endgame');
       setNewMessage('Seu adversário se desconectou');
       setGameData(prevGameData => ({
         ...prevGameData,
@@ -329,7 +329,7 @@ export const Game = () => {
     }
     socket.emit('leaveRoom', { userPlayer, userRoomId });
     gameData.match = false;
-    setUserStatus('online');
+    setUserStatus('endgame');
   };
 
   const startMatch = (room_id: string) => {

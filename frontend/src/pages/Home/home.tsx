@@ -2,8 +2,24 @@ import * as React from 'react';
 import { Divider } from 'antd';
 import avatar from 'assets/avatar.png';
 import 'pages/Home/style.css';
+import { useAuth } from 'hooks/useAuth';
+import { userService } from '../../services/user.api';
 
 export default function Home() {
+  const { user } = useAuth();
+
+  React.useEffect(() => {
+    const status_obj = {
+      id: user?.id ?? '',
+      status: 'online',
+    };
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status_obj);
+    }
+    updateUserStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   return (
     <>
       <h1 className="text">JMP Pong!</h1>
