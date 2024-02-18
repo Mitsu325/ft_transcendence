@@ -251,6 +251,7 @@ export class GamePong implements OnGatewayConnection, OnGatewayDisconnect {
           room.userRoomId,
           game,
         );
+
         this.gameService.saveBattle(battle);
         try {
           this.server
