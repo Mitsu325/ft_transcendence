@@ -96,6 +96,7 @@ export const Game = () => {
       setUserRoomId(socket.id);
       searchParams.delete('guestId');
       setSearchParams(searchParams);
+      setUserStatus('playing');
     }
     if (enable && searchParams.has('hostId')) {
       const hostId = searchParams.get('hostId');

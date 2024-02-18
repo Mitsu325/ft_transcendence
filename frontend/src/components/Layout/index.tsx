@@ -27,6 +27,7 @@ import { isTokenExpired } from 'utils/jwt-decode';
 import 'components/Layout/style.css';
 import { friendSocket } from 'socket';
 import { userNonSensitiveInfo } from 'interfaces/userModel';
+import { userService } from 'services/user.api';
 
 const { Header, Content, Sider } = Layout;
 
@@ -36,6 +37,7 @@ const CommonLayout = () => {
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuKey, setSelectedMenuKey] = useState(['']);
+  const [userStatus, setUserStatus] = React.useState('online');
   const [modal, contextHolder] = Modal.useModal();
   const navigate = useNavigate();
 
@@ -92,6 +94,7 @@ const CommonLayout = () => {
         avatar: user?.avatar,
       },
     });
+    setUserStatus('endgame');
   };
 
   const closeWarningModal = () => {
@@ -101,6 +104,7 @@ const CommonLayout = () => {
     };
     navigate(path);
     Modal.destroyAll();
+    setUserStatus('endgame');
   };
 
   useEffect(() => {
@@ -108,6 +112,7 @@ const CommonLayout = () => {
     friendSocket.connect();
 
     friendSocket.on('invite-play', ({ sender }) => {
+      setUserStatus('playing');
       modal.confirm({
         title: 'Você recebeu um convite para jogar Pong!',
         icon: <FlagOutlined />,
@@ -158,6 +163,18 @@ const CommonLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
+
+  React.useEffect(() => {
+    const status_obj = {
+      id: user?.id || '',
+      status: userStatus,
+    };
+    async function updateUserStatus() {
+      await userService.updateUserStatus(status_obj);
+    }
+    updateUserStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userStatus]);
 
   const handleMenuClick = ({ key }: { key: string }) => {
     setSelectedMenuKey([key]);

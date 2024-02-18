@@ -163,6 +163,8 @@ export class FriendService {
                     },
                 );
                 invite.status = 'pending';
+                invite.sender = senderUser;
+                invite.recipient = recipientUser;
                 friend = invite;
             } else {
                 return {
