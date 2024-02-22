@@ -28,11 +28,3 @@ stop:
 list:
 	@echo "$(GREEN)** List containers **$(RESET)"
 	@docker-compose -f $(COMPOSE) ps
-
-front:
-	@echo "$(GREEN)** Start frontend ** $(RESET)"
-	@cd frontend && npm start
-
-back:
-	@echo "$(GREEN)** Start backend **$(RESET)"
-	@cd backend && npm run start:dev
