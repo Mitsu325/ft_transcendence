@@ -12,7 +12,7 @@ import {
 
 export type FriendStatusType = 'active' | 'pending' | 'rejected' | 'unfriended';
 
-@Entity()
+@Entity({ name: 'friend' })
 export class Friend extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;

@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  api:
+    container_name: 'pong-api-${NODE_ENV}'
+    image: 'pong-api-${NODE_ENV}'
+    build:
+      context: ./backend
+      target: '${NODE_ENV}'
+      dockerfile: Dockerfile
+    command: ['./wait-for-postgres.sh', './docker-entrypoint.sh']
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - 3003:3003
+    networks:
+      - ft_transcendence
+    volumes:
+      - /usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  frontend:
+    container_name: 'pong-web-${NODE_ENV}'
+    image: 'pong-web-${NODE_ENV}'
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    networks:
+      - ft_transcendence
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres
+    image: postgres:alpine
+    networks:
+      - ft_transcendence
+    env_file:
+      - .env
+    environment:
+      - TYPEORM_CONFIG=/app/src/configs/typeorm.config.ts
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PG_DATA=/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  adminer:
+    container_name: pgadmin
+    image: adminer
+    networks:
+      - ft_transcendence
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  ft_transcendence:
+    name: ft_transcendence;
+    driver: bridge
+
+volumes:
+  pg-data:

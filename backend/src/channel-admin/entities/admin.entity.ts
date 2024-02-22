@@ -10,7 +10,7 @@ import {
 import { User } from '../../user/entities/user.entity';
 import { Channel } from '../../channel/entities/channel.entity';
 
-@Entity()
+@Entity({ name: 'channel_admin' })
 export class ChannelAdmin {
     @PrimaryGeneratedColumn('uuid')
     id: string;

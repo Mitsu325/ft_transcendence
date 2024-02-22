@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 
-@Entity()
+@Entity({ name: 'blocked' })
 export class Blocked extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;

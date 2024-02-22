@@ -5,6 +5,7 @@ export interface ChannelInterface {
   type: string;
   password?: string;
   owner: string;
+  users?: string[];
 }
 
 export interface ChannelProps {

@@ -1,14 +1,15 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
 import { Channel } from './entities/channel.entity';
 import { Messages } from './entities/message.entity';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { comparePass } from 'src/utils/hash.util';
+import { PrivateChannelUsers } from './entities/privateChannel.entity';
+const crypto = require('crypto');
+import * as jwt from 'jsonwebtoken';
 import { ChannelAdminService } from 'src/channel-admin/channel-admin.service';
 import { UserService } from 'src/user/user.service';
 
@@ -20,6 +21,8 @@ export class ChannelService {
 
         @InjectRepository(Messages)
         private readonly MessageRepository: Repository<Messages>,
+        @InjectRepository(PrivateChannelUsers)
+        private readonly privateChannelUsersRepository: Repository<PrivateChannelUsers>,
 
         @Inject(forwardRef(() => ChannelAdminService))
         private readonly channelAdminService: ChannelAdminService,
@@ -57,6 +60,18 @@ export class ChannelService {
         try {
             const savedChannel =
                 await this.channelsRepository.save(createChannelDto);
+            if (createChannelDto.users && createChannelDto.users.length > 0) {
+                await Promise.all(
+                    createChannelDto.users.map(async userId => {
+                        const privateChannelUser = new PrivateChannelUsers();
+                        privateChannelUser.userId = userId;
+                        privateChannelUser.channelId = savedChannel.id;
+                        await this.privateChannelUsersRepository.save(
+                            privateChannelUser,
+                        );
+                    }),
+                );
+            }
             return savedChannel;
         } catch (error) {
             console.error(error);
@@ -235,5 +250,17 @@ export class ChannelService {
             console.error('Error remove channel password:', error);
             return false;
         }
+    }
+
+    async isUserInChannel(userId: string, channelId: string): Promise<boolean> {
+        const result = await this.privateChannelUsersRepository.findOne({
+            where: {
+                userId: Equal(userId),
+                channelId: Equal(channelId),
+            },
+        });
+        if (result) {
+            return true;
+        } else return false;
     }
 }
