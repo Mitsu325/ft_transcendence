@@ -24,15 +24,6 @@ const HistoricTable = () => {
     },
   );
 
-  // ! exemplo de como consultar status de user, remover depois
-  // const getStatus = (id: string) => {
-  //   let status = '';
-  //   userService.getUserStatusById(id).then(usersSt => {
-  //     status = usersSt;
-  //     console.log(id, status);
-  //   });
-  // };
-
   const getPerformancePlayer = (playerId: string) => {
     gameService
       .getPerformancePlayers(playerId || '')
