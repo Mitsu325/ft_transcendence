@@ -12,7 +12,7 @@ import { AuthGuard } from './auth.guard';
         JwtModule.register({
             global: true,
             secret: jwtConstants.secret,
-            signOptions: { expiresIn: '100d' }, // TODO: alterar a data de expiração do login
+            signOptions: { expiresIn: '1d' },
         }),
     ],
     controllers: [AuthController],

@@ -6,7 +6,6 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadFileModule } from 'src/upload-file/upload-file.module';
-// import { GameModule } from 'src/game/game.module';
 import { PlayersService } from 'src/game/game.service';
 
 @Module({
