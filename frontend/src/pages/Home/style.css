@@ -3,11 +3,6 @@
   margin-bottom: 60px;
 }
 
-.divider {
-  border-color: #001529;
-  margin-bottom: 60px;
-}
-
 .pong-container {
   display: flex;
   flex-direction: column;
@@ -72,31 +67,4 @@
 .paddle-right {
   right: 0;
   animation-name: moveUp;
-}
-
-.games-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 50px;
-  gap: 9px;
-}
-
-.game-card {
-  display: flex;
-  margin-bottom: 10px;
-  border: 2px solid #001529;
-  border-radius: 5px;
-  background-color: #d3d3d3;
-}
-
-.game-card img {
-  width: 100px;
-  height: 100px;
-  display: block;
-}
-
-.player-info p {
-  margin-top: 5px;
-  text-align: center;
 }

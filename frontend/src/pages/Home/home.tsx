@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Divider } from 'antd';
-import avatar from 'assets/avatar.png';
 import 'pages/Home/style.css';
 import { useAuth } from 'hooks/useAuth';
 import { userService } from '../../services/user.api';
@@ -17,7 +16,6 @@ export default function Home() {
       await userService.updateUserStatus(status_obj);
     }
     updateUserStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
@@ -30,38 +28,6 @@ export default function Home() {
         <div className="paddle paddle-left"></div>
         <div className="paddle paddle-right"></div>
       </div>
-
-      <p className="text">Jogos </p>
-      <Divider className="divider" />
-
-      <div className="games-grid">
-        <div className="game-card">
-          <div className="player-info">
-            <img src={avatar} alt="Avatar player 1" />
-            <p>Username</p>
-          </div>
-
-          <div className="player-info">
-            <img src={avatar} alt="Avatar player 2" />
-            <p>Username </p>
-          </div>
-        </div>
-
-        <div className="game-card">
-          <div className="player-info">
-            <img src={avatar} alt="Avatar Jogador 1" />
-            <p>Username</p>
-          </div>
-
-          <div className="player-info">
-            <img src={avatar} alt="Avatar Jogador 2" />
-            <p>Username </p>
-          </div>
-        </div>
-      </div>
-
-      <p className="text">Chats</p>
-      <Divider className="divider" />
     </>
   );
 }
