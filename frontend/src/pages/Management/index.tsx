@@ -51,46 +51,50 @@ const ChannelManagement: React.FC = () => {
   return (
     <>
       <h1 className="title">Gerenciamento</h1>
-      <div className="managemet-content">
-        <div className="side-group">
-          <h2 className="sub-title">Canais</h2>
+      {!channels.length ? (
+        <p>Não há canais para exibir neste momento.</p>
+      ) : (
+        <div className="managemet-content">
+          <div className="side-group">
+            <h2 className="sub-title">Canais</h2>
 
-          <div className="list-channel">
-            <dl className="list-channel-group">
-              {channels.map((channel, index) => (
-                <dt
-                  tabIndex={index + 1}
-                  className={
-                    'list-channel-item' +
-                    (activeIndex === index ? ' list-channel-active' : '')
-                  }
-                  key={channel.id}
-                  onClick={() => handleChannelClick(channel, index)}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter') {
-                      handleChannelClick(channel, index);
+            <div className="list-channel">
+              <dl className="list-channel-group">
+                {channels.map((channel, index) => (
+                  <dt
+                    tabIndex={index + 1}
+                    className={
+                      'list-channel-item' +
+                      (activeIndex === index ? ' list-channel-active' : '')
                     }
-                  }}
-                >
-                  {channel.name_channel}
-                </dt>
-              ))}
-            </dl>
+                    key={channel.id}
+                    onClick={() => handleChannelClick(channel, index)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleChannelClick(channel, index);
+                      }
+                    }}
+                  >
+                    {channel.name_channel}
+                  </dt>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          <div className="management-channel-group">
+            {selectedChannel && (isAdmin || isOwner) ? (
+              <ChannelAdmin
+                channel={selectedChannel}
+                owner={isOwner}
+                hasAdmin={hasAdmin}
+              />
+            ) : (
+              <ChannelMessage />
+            )}
           </div>
         </div>
-
-        <div className="management-channel-group">
-          {selectedChannel && (isAdmin || isOwner) ? (
-            <ChannelAdmin
-              channel={selectedChannel}
-              owner={isOwner}
-              hasAdmin={hasAdmin}
-            />
-          ) : (
-            <ChannelMessage />
-          )}
-        </div>
-      </div>
+      )}
     </>
   );
 };
