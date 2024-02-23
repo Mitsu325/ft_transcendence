@@ -22,7 +22,6 @@ export interface typeAdmin {
 export interface Channel {
   channel: ChannelProps;
   owner: boolean;
-  hasAdmin: boolean;
 }
 
 export interface Admin {

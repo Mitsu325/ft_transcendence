@@ -29,20 +29,18 @@ const menuItems: MenuProps['items'] = [
   },
 ];
 
-const ChannelAdmin: React.FC<Channel> = ({ channel, owner, hasAdmin }) => {
+const ChannelAdmin: React.FC<Channel> = ({ channel, owner }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [content, setContent] = useState('admin');
 
   const handleLeave = async () => {
-    if (hasAdmin) {
-      const res = await channelApi.updateOwner(channel.id);
-      if (res.data.message == 'Success') {
-        SuccessNotification({
-          message: 'Saiu do canal',
-          description: 'Você não é mais dono deste canal.',
-        });
-      }
+    const res = await channelApi.updateOwner(channel.id);
+    if (res.data.success) {
+      SuccessNotification({
+        message: 'Saiu do canal',
+        description: 'Você não é mais dono deste canal.',
+      });
     } else {
       FailureNotification({
         message: 'Não é possível sair do canal.',

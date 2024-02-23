@@ -29,12 +29,34 @@ export class ChannelAdminService {
         private readonly userService: UserService,
     ) {}
 
-    async create(createAdminDto: CreateAdminDto) {
+    private async adminActive(channelId: string, adminId: string) {
+        const channelOwner = await this.channelService.findOwner(channelId);
+        const adminIsActive = await this.ChannelAdminRepository.find({
+            where: {
+                channel: { id: channelId },
+                admin: { id: adminId },
+                active: true,
+            },
+        });
+        if ((!channelOwner || channelOwner.id === adminId) && !adminIsActive) {
+            return false;
+        }
+        return true;
+    }
+
+    async create(createAdminDto: CreateAdminDto, userId: string) {
         try {
+            const { channel_id, admin_id, active } = createAdminDto;
+
+            const adminActive = await this.adminActive(channel_id.id, userId);
+            if (!adminActive) {
+                return { success: false, error: 'without-permission' };
+            }
+
             const activeAdmin = await this.ChannelAdminRepository.findOne({
                 where: {
-                    channel: Equal(createAdminDto.channel_id),
-                    admin: Equal(createAdminDto.admin_id),
+                    channel: Equal(channel_id),
+                    admin: Equal(admin_id),
                     active: true,
                 },
             });
@@ -45,8 +67,8 @@ export class ChannelAdminService {
 
             const existingAdmin = await this.ChannelAdminRepository.findOne({
                 where: {
-                    channel: Equal(createAdminDto.channel_id),
-                    admin: Equal(createAdminDto.admin_id),
+                    channel: Equal(channel_id),
+                    admin: Equal(admin_id),
                     active: false,
                 },
             });
@@ -57,9 +79,9 @@ export class ChannelAdminService {
                 return { success: true };
             } else {
                 const newAdmin = this.ChannelAdminRepository.create({
-                    channel: createAdminDto.channel_id,
-                    admin: createAdminDto.admin_id,
-                    active: createAdminDto.active,
+                    channel: channel_id,
+                    admin: admin_id,
+                    active: active,
                 });
                 await this.ChannelAdminRepository.save(newAdmin);
                 return { success: true };
@@ -118,12 +140,35 @@ export class ChannelAdminService {
 
     async removeAdmin(
         removeAdminDto: RemoveAdminDto,
-    ): Promise<{ success: boolean; message?: string }> {
+        userId: string,
+    ): Promise<{ success: boolean; error?: string }> {
         try {
+            const { admin_id, channel_id } = removeAdminDto;
+
+            const adminActive = await this.adminActive(channel_id, userId);
+            if (!adminActive) {
+                return { success: false, error: 'without-permission' };
+            }
+
+            const channel = await this.channelService.findById(channel_id);
+            const channelAdmins = await this.ChannelAdminRepository.find({
+                where: {
+                    channel: { id: channel_id },
+                    active: true,
+                },
+            });
+
+            if (
+                (!channel.owner || !channel.owner.id) &&
+                channelAdmins.length === 1
+            ) {
+                return { success: false };
+            }
+
             const channelAdmin = await this.ChannelAdminRepository.findOne({
                 where: {
-                    channel: { id: removeAdminDto.channel_id },
-                    admin: { id: removeAdminDto.admin_id },
+                    channel: { id: channel_id },
+                    admin: { id: admin_id },
                     active: true,
                 },
             });
@@ -131,8 +176,8 @@ export class ChannelAdminService {
             if (channelAdmin) {
                 channelAdmin.active = false;
                 await this.ChannelAdminRepository.save(channelAdmin);
-                return { success: true };
             }
+            return { success: true };
         } catch (error) {
             console.error('Error in removing channel administrator:', error);
             return { success: false };
@@ -294,7 +339,7 @@ export class ChannelAdminService {
             },
         });
 
-        if (channel.owner.id !== userId && !channelAdmin) {
+        if ((!channel.owner || channel.owner.id !== userId) && !channelAdmin) {
             return {
                 status: 'no-permission',
                 message: 'Sem permissão para efetuar a ação',
@@ -309,7 +354,7 @@ export class ChannelAdminService {
             },
         });
 
-        if (channel.owner.id === memberId || memberIsAdmin) {
+        if ((channel.owner && channel.owner.id === memberId) || memberIsAdmin) {
             return {
                 status: 'member-is-admin',
                 message: 'O usuário é um admin',

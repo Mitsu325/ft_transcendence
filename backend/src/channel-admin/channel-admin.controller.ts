@@ -46,16 +46,19 @@ export class ChannelAdminController {
     @ApiBody({ type: CreateAdminDto, description: 'Request body.' })
     @HttpCode(HttpStatus.CREATED)
     @Post('add')
-    create(@Body() createAdminDto: CreateAdminDto) {
-        return this.channelAdminService.create(createAdminDto);
+    create(@Body() createAdminDto: CreateAdminDto, @Request() req) {
+        return this.channelAdminService.create(createAdminDto, req.user.sub);
     }
 
     @ApiOperation({ description: 'Remove an Admin' })
     @ApiBearerAuth('access-token')
     @ApiBody({ type: RemoveAdminDto, description: 'Request body.' })
     @Patch('removeAdmin')
-    async removeAdmin(@Body() removeAdminDto: RemoveAdminDto) {
-        return this.channelAdminService.removeAdmin(removeAdminDto);
+    async removeAdmin(@Body() removeAdminDto: RemoveAdminDto, @Request() req) {
+        return this.channelAdminService.removeAdmin(
+            removeAdminDto,
+            req.user.sub,
+        );
     }
 
     @ApiOperation({ description: 'Get admins of channelId' })

@@ -160,11 +160,7 @@ export class ChannelController {
     @Patch('update-owner/:id')
     async updateOwner(@Param('id') id: string): Promise<any> {
         try {
-            const updateOwner = await this.channelService.updateOwner(id);
-            return {
-                message: 'Success.',
-                owner: updateOwner.owner,
-            };
+            return await this.channelService.updateOwner(id);
         } catch (error) {
             return { error: 'Error update owner.' };
         }

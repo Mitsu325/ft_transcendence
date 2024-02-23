@@ -13,7 +13,6 @@ const ChannelManagement: React.FC = () => {
   const [selectedChannel, setSelectedChannel] = useState<ChannelProps>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [hasAdmin, setHasAdmin] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const user = useAuth()?.user;
@@ -40,7 +39,6 @@ const ChannelManagement: React.FC = () => {
     const userId = user?.id ?? '';
     const ownerRes = await channelApi.getOwner(channel.id);
     const adminRes = await adminService.getAdminsId(channel.id);
-    setHasAdmin(adminRes.admins && adminRes.admins.length > 0);
     setIsOwner(ownerRes.data === userId);
     const isAdminUser = adminRes.admins.some(
       (admins: typeAdmin) => admins.admin_id === userId,
@@ -84,11 +82,7 @@ const ChannelManagement: React.FC = () => {
 
           <div className="management-channel-group">
             {selectedChannel && (isAdmin || isOwner) ? (
-              <ChannelAdmin
-                channel={selectedChannel}
-                owner={isOwner}
-                hasAdmin={hasAdmin}
-              />
+              <ChannelAdmin channel={selectedChannel} owner={isOwner} />
             ) : (
               <ChannelMessage />
             )}

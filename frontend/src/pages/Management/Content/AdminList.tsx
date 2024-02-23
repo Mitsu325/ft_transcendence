@@ -77,11 +77,19 @@ export default function AdminList({ channelId }: { channelId: string }) {
             message: 'Ok',
             description: 'Adminstrador adicionado com sucesso',
           });
+          loadAdmins(1);
         } else {
-          WarningNotification({
-            message: 'Ops, algo deu errado',
-            description: 'Parece que a pessoa já é admin e está ativo.',
-          });
+          if (ret.error === 'without-permission') {
+            WarningNotification({
+              message: 'Você não possui permissão',
+              description: 'Não é possível adicionar admin.',
+            });
+          } else {
+            WarningNotification({
+              message: 'Ops, algo deu errado',
+              description: 'Parece que a pessoa já é admin e está ativo.',
+            });
+          }
         }
         setLoading(false);
         setSearchValue('');
@@ -136,10 +144,17 @@ export default function AdminList({ channelId }: { channelId: string }) {
         });
         loadAdmins(1);
       } else {
-        FailureNotification({
-          message: 'Ops! Encontramos algumas falhas durante o processo',
-          description: 'Administrador já removido ou inativo',
-        });
+        if (ret.error === 'without-permission') {
+          WarningNotification({
+            message: 'Você não possui permissão',
+            description: 'Não é possível remover admin.',
+          });
+        } else {
+          FailureNotification({
+            message: 'Ops! Encontramos algumas falhas durante o processo',
+            description: 'Administrador já removido ou inativo',
+          });
+        }
       }
       setLoading(false);
     } catch (error) {

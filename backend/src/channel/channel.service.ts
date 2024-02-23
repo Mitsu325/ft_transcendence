@@ -184,13 +184,21 @@ export class ChannelService {
         }
     }
 
-    async updateOwner(channelId: string): Promise<Channel> {
+    async updateOwner(channelId: string) {
         try {
+            const admins = await this.channelAdminService.findAll(channelId, {
+                limit: 10,
+                page: 1,
+            });
+            if (!admins.pagination.total) {
+                return { success: false, error: 'not-admin' };
+            }
             const channel = await this.channelsRepository.findOne({
                 where: { id: channelId },
             });
             channel.owner = null;
-            return this.channelsRepository.save(channel);
+            await this.channelsRepository.save(channel);
+            return { success: true, owner: channel.owner };
         } catch (error) {
             throw error;
         }
