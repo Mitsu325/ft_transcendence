@@ -40,7 +40,7 @@ const ChannelManagement: React.FC = () => {
     const userId = user?.id ?? '';
     const ownerRes = await channelApi.getOwner(channel.id);
     const adminRes = await adminService.getAdminsId(channel.id);
-    setHasAdmin(!!adminRes);
+    setHasAdmin(adminRes.admins && adminRes.admins.length > 0);
     setIsOwner(ownerRes.data === userId);
     const isAdminUser = adminRes.admins.some(
       (admins: typeAdmin) => admins.admin_id === userId,
