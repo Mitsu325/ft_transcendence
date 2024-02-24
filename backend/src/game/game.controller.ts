@@ -14,14 +14,16 @@ export class GameController {
 
     @ApiOperation({ description: 'Historic Battles' })
     @ApiParam({
-        name: 'userId',
+        name: 'username',
         type: 'string',
         description: 'ID whose history I want to see',
     })
     @ApiBearerAuth('access-token')
-    @Get('historic_battles/:userId')
+    @Get('historic_battles/:username')
     async playerHistoric(@Param() params: any) {
-        return await this.battlesService.getPlayersBattleDetails(params.userId);
+        return await this.battlesService.getPlayersBattleDetails(
+            params.username,
+        );
     }
 
     @ApiOperation({ description: 'Performance Player' })

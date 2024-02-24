@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  ClockCircleOutlined,
   EditOutlined,
   KeyOutlined,
   TeamOutlined,
@@ -51,6 +52,12 @@ export default function Register({ content }: { content: string }) {
       path: `/profile/${user?.username}/blocked-users`,
       icon: <TeamOutlined />,
       label: 'Bloqueados',
+    },
+    {
+      key: 'game-historic',
+      path: `/historic/${user?.username}`,
+      icon: <ClockCircleOutlined />,
+      label: 'Histórico de partidas',
     },
   ];
 
@@ -130,7 +137,18 @@ export default function Register({ content }: { content: string }) {
           size={mdScreenBreakpoint ? 240 : 120}
           className="avatar-pos gray-border"
         />
-        {showList && <dl className="profile-menu-list">{listItems}</dl>}
+        {showList ? (
+          <dl className="profile-menu-list">{listItems}</dl>
+        ) : (
+          <dl className="profile-menu-list">
+            <dt key="game-historic" className="profile-menu-list-item">
+              <Link to={`/historic/${usernameParam}`}>
+                <ClockCircleOutlined />
+                <span className="ml-8">Histórico de partidas</span>
+              </Link>
+            </dt>
+          </dl>
+        )}
       </div>
       <div className="profile-content">{renderContent()}</div>
     </div>

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from 'hooks/useAuth';
 import { Table, Modal } from 'antd';
 import { BattleHistoric, PerformancePlayer } from 'interfaces/battle.interface';
 import { gameService } from 'services/game.api';
 import FailureNotification from 'components/Notification/FailureNotification';
+import { useParams } from 'react-router';
 
 const HistoricTable = () => {
-  const { user } = useAuth();
+  const { username: usernameParam } = useParams();
   const [battlesHistoric, setBattlesHistoric] = useState<BattleHistoric[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -41,10 +41,12 @@ const HistoricTable = () => {
   };
 
   useEffect(() => {
+    if (!usernameParam) return;
+
     setLoading(true);
 
     gameService
-      .getPlayerHistoric(user?.id || '')
+      .getPlayerHistoric(usernameParam)
       .then(res => {
         setBattlesHistoric(res);
       })
@@ -60,7 +62,7 @@ const HistoricTable = () => {
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [usernameParam]);
 
   return (
     <>

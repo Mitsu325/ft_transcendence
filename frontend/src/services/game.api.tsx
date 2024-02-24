@@ -1,9 +1,9 @@
 /* eslint-disable no-useless-catch */
 import api from 'services/api';
 
-async function getPlayerHistoric(userId: string) {
+async function getPlayerHistoric(username: string) {
   try {
-    const result = await api.get(`/battles/historic_battles/${userId}`);
+    const result = await api.get(`/battles/historic_battles/${username}`);
     return result?.data || null;
   } catch (error) {
     throw error;
