@@ -23,6 +23,10 @@ const validationSignup = yup.object().shape({
   password: yup
     .string()
     .min(8, 'min 8 caracteres')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+      'Um caracter especial, uma letra maiúscula',
+    )
     .required('Campo obrigatório'),
   confirmPassword: yup
     .string()
