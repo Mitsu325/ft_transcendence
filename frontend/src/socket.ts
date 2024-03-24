@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = process.env.VERCEL_URL || '';
+const URL = `https://${process.env.VERCEL_URL || ''}`;
 
 export const chatSocket = io(`${URL}/chat`, {
   autoConnect: false,
