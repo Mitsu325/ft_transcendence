@@ -10,9 +10,6 @@ import { useAuth } from 'hooks/useAuth';
 import TwoFactorModal from 'components/Modal/TwoFactModal';
 import UserModel from 'interfaces/userModel';
 
-const CLIENT_ID =
-  'u-s4t2ud-69c6515e1aadb326fe9b48fc0b673b271390fbb38afb06138005fbf548933f38';
-
 export default function OAuth42() {
   const context = useAuth();
   const [loading, setLoading] = useState(false);
@@ -85,8 +82,8 @@ export default function OAuth42() {
 
   function loginWith42() {
     const params = {
-      client_id: CLIENT_ID,
-      redirect_uri: 'http://localhost:3000',
+      client_id: process.env.AUTH_CLIENT_ID || '',
+      redirect_uri: process.env.REDIRECT_URI || '',
       scope: 'public',
       response_type: 'code',
     };
