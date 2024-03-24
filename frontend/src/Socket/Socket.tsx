@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = `https://${process.env.VERCEL_URL || ''}`;
+const URL = process.env.API_URL || '';
 
 export const socket = io(URL, {
   autoConnect: false,
