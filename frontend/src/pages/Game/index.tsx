@@ -48,7 +48,7 @@ export const Game = () => {
   });
 
   socket = useMemo(() => {
-    const newSocket = io(process.env.API_URL || '', {
+    const newSocket = io(process.env.VERCEL_URL || '', {
       reconnectionDelay: 10000,
     });
     return newSocket;

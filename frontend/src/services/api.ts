@@ -3,7 +3,7 @@ import FailureNotification from 'components/Notification/FailureNotification';
 import { useAuth } from 'hooks/useAuth';
 
 const api = axios.create({
-  baseURL: process.env.API_URL || '',
+  baseURL: process.env.VERCEL_URL || '',
 });
 
 api.interceptors.response.use(

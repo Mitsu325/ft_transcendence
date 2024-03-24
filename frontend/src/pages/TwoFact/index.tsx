@@ -12,7 +12,7 @@ export default function TwoFactorAuthPage() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        `${process.env.API_URL || ''}/two-factor-auth/verifyOTP`,
+        `${process.env.VERCEL_URL || ''}/two-factor-auth/verifyOTP`,
         { userId, otp },
       );
 
