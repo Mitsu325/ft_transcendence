@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = 'http://localhost:3003';
+const URL = 'process.env.API_URL';
 
 export const chatSocket = io(`${URL}/chat`, {
   autoConnect: false,

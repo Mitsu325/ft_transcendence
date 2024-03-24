@@ -59,7 +59,7 @@ export default function UploadAvatar() {
   return (
     <Upload
       name="file"
-      action="http://localhost:3003/user/upload-avatar"
+      action="process.env.API_URL/user/upload-avatar"
       headers={{
         authorization: `Bearer ${authToken}` || '',
         contentType: 'multipart/form-data',

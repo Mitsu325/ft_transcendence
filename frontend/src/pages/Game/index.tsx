@@ -48,7 +48,7 @@ export const Game = () => {
   });
 
   socket = useMemo(() => {
-    const newSocket = io('http://localhost:3003', {
+    const newSocket = io('process.env.API_URL', {
       reconnectionDelay: 10000,
     });
     return newSocket;
